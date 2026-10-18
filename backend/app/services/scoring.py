@@ -30,9 +30,7 @@ class ScoringService:
         self.artifacts = artifact_service
 
     def score_sandbox_transaction(self, request: SandboxScoreRequest) -> SandboxScoreResponse:
-        t0 = time.perf_counter()
-
-        # 1. Load model pipeline and frozen policy
+        # 1. Load model pipeline and frozen policy (cached in memory)
         calibrator, ensemble, residualizer, feature_names = self.artifacts.get_model_pipeline()
         frozen_policy = self.artifacts.get_frozen_policy()
         if frozen_policy is None:
@@ -41,6 +39,9 @@ class ScoringService:
         cfg = frozen_policy["thresholds"]
         cfg_hash = "8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240"
         split_hash = "07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd"
+
+        # Start high-resolution timer measuring live transaction inference and routing
+        t0 = time.perf_counter()
 
         # 2. Build feature vector in exact frozen order, filling missing numeric fields with np.nan
         row_dict: Dict[str, Any] = {}
@@ -142,6 +143,8 @@ class ScoringService:
             latency_ms=dt_ms,
             provenance={
                 "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+                "source_mode": "SYNTHETIC_SMOKE_ONLY",
+                "real_data_benchmark_status": "DEFERRED",
                 "evidence_type": "sandbox_live_evaluation",
                 "model_backend": "scikit-learn HistGradientBoosting + Sigmoid Calibration",
             },

@@ -266,3 +266,68 @@ export class ApiClientError extends Error {
     this.details = errorDetail.details;
   }
 }
+
+export interface ModeDetail {
+  mode: string;
+  available: boolean;
+  status: string;
+  active: boolean;
+  description: string;
+  missing_prerequisites: string[];
+  diagnostics: Record<string, unknown>;
+}
+
+export interface ModesOverviewResponse {
+  active_mode: string;
+  supported_modes: ModeDetail[];
+  notice: string;
+}
+
+export interface ModeSelectResponse {
+  active_mode: string;
+  message: string;
+  status: string;
+  diagnostics: Record<string, unknown>;
+}
+
+export interface DriftReportResponse {
+  status: string;
+  scenario_id: string;
+  features_monitored: number;
+  overall_drift_detected: boolean;
+  significant_shift_features: string[];
+  moderate_shift_features: string[];
+  mean_psi: number;
+  max_psi: number;
+  feature_drift_reports: Array<{
+    feature: string;
+    psi: number | null;
+    drift_category: string;
+    ks_statistic: number | null;
+    ks_pvalue: number | null;
+    ref_missing_rate: number;
+    act_missing_rate: number;
+    missing_rate_delta: number;
+  }>;
+  real_data_benchmark_status: string;
+  notice: string;
+}
+
+export interface ReplayProposalRecord {
+  proposal_id: string;
+  base_cfg_hash: string;
+  target_cfg_hash: string;
+  status: 'REJECTED' | 'AWAITING_HUMAN_APPROVAL' | 'APPROVED_ACTIVE';
+  schema_valid: boolean;
+  hash_matched: boolean;
+  keys_valid: boolean;
+  validation_passed: boolean;
+  workload_constraint_passed: boolean;
+  baseline_metrics: Record<string, unknown>;
+  proposed_metrics: Record<string, unknown>;
+  rejection_reasons: string[];
+  approved_by: string | null;
+  approval_timestamp: string | null;
+  created_at: string;
+  record_hash: string;
+}

@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
+import { evaluateLatencySla } from '../../lib/latency';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
@@ -188,6 +189,7 @@ export const SandboxPage: React.FC = () => {
   const signals = scoringResult?.signals;
   const decision = scoringResult?.decision;
   const latency = scoringResult?.latency_ms;
+  const slaResult = evaluateLatencySla(latency);
   const action = decision?.action;
   const reasonCode = decision?.reason_code;
 
@@ -812,7 +814,7 @@ export const SandboxPage: React.FC = () => {
                               marginTop: '2px',
                             }}
                           >
-                            HGB + Sigmoid Platt evaluation
+                            Model + routing evaluation (live measurement)
                           </div>
                         </div>
                       </div>
@@ -821,7 +823,9 @@ export const SandboxPage: React.FC = () => {
                         <div
                           style={{
                             fontFamily: 'var(--font-mono)',
-                            color: 'var(--accent-primary-bright)',
+                            color: slaResult.isExceeded
+                              ? 'var(--color-fraud-alert)'
+                              : 'var(--accent-primary-bright)',
                             fontWeight: 800,
                             fontSize: '22px',
                             lineHeight: 1.1,
@@ -835,15 +839,29 @@ export const SandboxPage: React.FC = () => {
                             fontSize: '11px',
                             fontFamily: 'var(--font-mono)',
                             fontWeight: 700,
-                            color: 'var(--color-routine-bright)',
-                            background: 'var(--color-routine-tint)',
-                            border: '1px solid var(--color-routine-dim)',
+                            color: slaResult.isPass
+                              ? 'var(--color-routine-bright)'
+                              : slaResult.isExceeded
+                              ? 'var(--color-fraud-alert)'
+                              : 'var(--text-tertiary)',
+                            background: slaResult.isPass
+                              ? 'var(--color-routine-tint)'
+                              : slaResult.isExceeded
+                              ? 'var(--color-fraud-alert-tint, rgba(239, 68, 68, 0.15))'
+                              : 'var(--bg-surface-subdued)',
+                            border: `1px solid ${
+                              slaResult.isPass
+                                ? 'var(--color-routine-dim)'
+                                : slaResult.isExceeded
+                                ? 'rgba(239, 68, 68, 0.35)'
+                                : 'var(--border-subtle)'
+                            }`,
                             padding: '2px 8px',
                             borderRadius: 'var(--radius-xs)',
                             marginTop: '4px',
                           }}
                         >
-                          PASS &bull; &lt;25ms SLA
+                          {slaResult.badgeText}
                         </span>
                       </div>
                     </div>

@@ -4,9 +4,13 @@ import {
   AuditListResponse,
   CaseDetailResponse,
   CasesResponse,
+  DriftReportResponse,
   HealthResponse,
+  ModesOverviewResponse,
+  ModeSelectResponse,
   OverviewResponse,
   PolicyCompareResponse,
+  ReplayProposalRecord,
   ReplayRowsResponse,
   ResultsResponse,
   SandboxScoreResponse,
@@ -122,4 +126,24 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ features }),
     }),
+  getModes: () => request<ModesOverviewResponse>('/api/modes'),
+  selectMode: (mode: string) =>
+    request<ModeSelectResponse>('/api/modes/select', {
+      method: 'POST',
+      body: JSON.stringify({ mode }),
+    }),
+  getDrift: (scenario?: string) =>
+    request<DriftReportResponse>(`/api/governance/drift${scenario ? `?scenario=${encodeURIComponent(scenario)}` : ''}`),
+  getProposals: () => request<ReplayProposalRecord[]>('/api/governance/proposals'),
+  validateProposal: (proposal: { proposal_id: string; base_cfg_hash: string; changes: Record<string, unknown>; rationale: string }) =>
+    request<ReplayProposalRecord>('/api/governance/proposals/validate', {
+      method: 'POST',
+      body: JSON.stringify(proposal),
+    }),
+  approveProposal: (proposalId: string, approver: string) =>
+    request<ReplayProposalRecord>('/api/governance/proposals/approve', {
+      method: 'POST',
+      body: JSON.stringify({ proposal_id: proposalId, approver }),
+    }),
+  verifyAuditChain: () => request<{ verified: boolean; chain_length: number; genesis_hash: string; head_hash: string; tamper_detected: boolean; details: string }>('/api/governance/audit-chain/verify'),
 };

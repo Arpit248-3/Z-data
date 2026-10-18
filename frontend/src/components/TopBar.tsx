@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, ShieldAlert } from 'lucide-react';
 import { ApiStatusIndicator } from './ApiStatusIndicator';
+import { ModeSwitcher } from './ModeSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { useApiStatus } from '../lib/api/hooks';
 
@@ -73,15 +74,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobile }) => {
         </NavLink>
 
         <div className="header-divider" aria-hidden="true" />
-
-        <div
-          className="badge badge-synthetic topbar-badge"
-          title="Development Environment Evidence Mode: SYNTHETIC_SMOKE_ONLY"
-        >
-          <span className="badge-dot" />
-          <span className="badge-text-full">SYNTHETIC_SMOKE_ONLY</span>
-          <span className="badge-text-short">SYNTHETIC</span>
-        </div>
+        <ModeSwitcher />
       </div>
 
       {/* Center: Primary Horizontal Navigation with Scroller */}

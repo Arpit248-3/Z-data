@@ -1,0 +1,59 @@
+{
+  "architecture_version": "ieee_cis_v1",
+  "execution_mode": "RESOURCE_CONSTRAINED_LOCAL_DEV",
+  "benchmark_comparable": false,
+  "training_timestamp": "2026-10-18T12:16:57.872741+00:00",
+  "total_samples": 25000,
+  "row_counts": {
+    "train": 15000,
+    "calibration": 2500,
+    "validation": 2500,
+    "test": 5000
+  },
+  "dt_intervals": {
+    "train": [
+      86400,
+      417692
+    ],
+    "calibration": [
+      417694,
+      480690
+    ],
+    "validation": [
+      480691,
+      517208
+    ],
+    "test": [
+      517221,
+      653745
+    ]
+  },
+  "prevalence": {
+    "train": 0.0272,
+    "calibration": 0.0284,
+    "validation": 0.0332,
+    "test": 0.0294
+  },
+  "split_hashes": {
+    "train": "425a3052f8c31908cd6bbc1bb1d4d19b49ac4008ff6042375b591a0e2623bc62",
+    "calibration": "cd8f1b88ade78c879b5251d663f8fcd4b9345da7d6e935a4039c7ea19d17b30c",
+    "validation": "266528066cde0fc6c76e814a3b6fbc92e5353235db44882eb469924928451a09",
+    "test": "55ca6aca874720a861bf7ebee69b61b57dc892cc0569a82f40cc32689a810c1b"
+  },
+  "feature_count": 391,
+  "validation_ece": 0.008768283705008522,
+  "calibration_metrics": {
+    "validation_ece": 0.008768283705008522,
+    "test_ece": 0.007260004493738909,
+    "test_roc_auc": 0.8603444674799654,
+    "test_pr_auc": 0.3671655860801211,
+    "test_b2_roc_auc": 0.8637444262683438
+  },
+  "component_checksums": {
+    "feature_pipeline.joblib": "7b4b515d68ff72e7bcc544ca0384a45f0ceed2b06c34fd957b969f565b3f2732",
+    "baseline_b2.joblib": "81c8b5dde626dcfd3a8523009013e4deab255825ec286e6e46206ea3891634cc",
+    "ensemble.joblib": "ec8ba27ec249b70bb11e2478d85fee6dd970bc048e8a764e95d6b2908a6b71fd",
+    "calibrator.joblib": "70a5ebc2130b55bc280b8ccfb94b40580cd3c13fdad131f2bf50866d93df4103"
+  },
+  "limitations": "Trained strictly on a 25,000-row chronological subsample to respect the host memory gate (7.75 GB RAM total, 2.34 GB available). Estimators used local development resource caps (max_iter=30, ExtraTrees max_depth=12 with 30 trees, n_jobs=1). These artifacts allow full downstream code integration and test verification, but DO NOT reproduce the canonical full-data benchmark in results/results.json."
+}
