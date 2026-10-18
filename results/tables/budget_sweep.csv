@@ -1,0 +1,5 @@
+budget_multiple,target_budget,capacity,b2_recall,signalgate_recall,delta_recall_vs_b2_pp,signalgate_touched_rate,signalgate_precision,admitted_alerts,admitted_reviews,deferred_count
+1.0x,0.0435,87,0.045045,0.063063,1.8018,0.0435,0.08046,11,76,959
+1.5x,0.06525,130,0.09009,0.09009,-0.0,0.065,0.076923,11,119,974
+2.0x,0.087,174,0.108108,0.108108,-0.0,0.087,0.068966,11,163,964
+3.0x,0.1305,261,0.135135,0.153153,1.8018,0.1305,0.065134,11,250,939

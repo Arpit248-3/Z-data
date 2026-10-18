@@ -1,0 +1,72 @@
+================================================================================
+SIGNALGATE ENVIRONMENT AUDIT & PHASE 1 PREFLIGHT REPORT
+================================================================================
+Timestamp: 2026-10-17T04:11:05Z
+Status: SYNTHETIC_SMOKE_ONLY
+
+1. SYSTEM & PLATFORM
+  Operating System      : Windows 11 (10.0.26200)
+  Architecture          : AMD64
+  Processor             : Intel64 Family 6 Model 140 Stepping 1, GenuineIntel
+  Logical CPU Cores     : 4
+  Total RAM (GB)        : 8.0
+  Python Version        : 3.13.7
+  Python Executable     : C:\Users\arpit\AppData\Local\Programs\Python\Python313\python.exe
+  Project Root          : C:\Users\arpit\Desktop\project
+  Git Root              : C:/Users/arpit/Desktop/project
+  Git Scope Contained   : True
+  LinuxONE Community VM : NOT_AVAILABLE (x86_64 local dev)
+
+2. INSTALLED DEPENDENCY MATRIX
+  - pandas        : version=2.3.3        status=OK              required=True
+  - numpy         : version=2.2.6        status=OK              required=True
+  - scipy         : version=1.17.1       status=OK              required=True
+  - sklearn       : version=1.8.0        status=OK              required=True
+  - joblib        : version=1.5.3        status=OK              required=True
+  - yaml          : version=6.0.3        status=OK              required=True
+  - pytest        : version=9.1.1        status=OK              required=True
+  - fastapi       : version=0.115.6      status=OK              required=True
+  - pydantic      : version=2.13.4       status=OK              required=True
+  - uvicorn       : version=0.32.1       status=OK              required=True
+  - shap          : version=0.52.0       status=OK              required=False
+  - snapml        : version=null         status=OPTIONAL_NOT_INSTALLED required=False
+  - node          : version=v20.20.0     status=OK              required=True
+  - npm           : version=10.8.2       status=OK              required=True
+
+3. DATASET AND FIXTURE STATUS
+  Dataset Type          : SYNTHETIC_SMOKE_FIXTURE
+  Status Tag            : SYNTHETIC_SMOKE_ONLY
+  Path                  : C:\Users\arpit\Desktop\project\data\synthetic_smoke_fixture.csv
+  SHA-256 Checksum      : da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de
+  Row Count             : 10000
+  Column Count          : 84
+  Fraud Count           : 476
+  Fraud Prevalence      : 0.0476
+  Schema Validated      : True
+  Reproducibility Check : True
+  Benchmark Claims OK   : False
+  Blocker Notice        : Actual IEEE-CIS dataset is not present in workspace or local storage. All pipeline development and smoke fits operate strictly under SYNTHETIC_SMOKE_ONLY status.
+
+4. SMOKE FIT & CALIBRATION RESULTS (SYNTHETIC EVIDENCE ONLY)
+  Evidence Classification : SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY
+  Model Tested            : HistGradientBoostingClassifier
+  Train Rows / Test Rows  : 6000 / 4000
+  Feature Count Evaluated : 81
+  Forbidden Leakage Check : PASSED (Excluded: TransactionID, TransactionDT, isFraud, true_label, split, partition)
+  Smoke Fit Latency (ms)  : 2914.85
+  Raw Test Brier Score    : 0.052222
+  Raw Test ROC-AUC        : 0.544818
+  Calibration API Status  : VERIFIED_SUPPORTED
+  Calibration Path        : sklearn.frozen.FrozenEstimator + CalibratedClassifierCV(method='sigmoid')
+  Calibrated Brier Score  : 0.050795
+  SHAP Probe Status       : VERIFIED_COMPATIBLE
+  SHAP Latency (10 rows)  : 49.18 ms
+
+5. MISSING-ARTIFACT READINESS MATRIX
+  - Real IEEE-CIS Dataset  : null [STATUS: PENDING_USER_SUPPLY]
+  - Trained Policy Router  : null [STATUS: PHASE_4_SCHEDULED]
+  - Results JSON Artifact  : null [STATUS: PHASE_5_SCHEDULED]
+  - FastAPI Endpoints      : null [STATUS: PHASE_6_SCHEDULED]
+  - React Frontend         : null [STATUS: PHASE_7_SCHEDULED]
+  - IBM Snap ML Engine     : null [STATUS: NOT_APPLICABLE_ON_X86]
+================================================================================

@@ -1,0 +1,142 @@
+{
+  "status": "RAW_DATA_VERIFIED_VALIDATION_PASSED",
+  "architecture_version": "ieee_cis_v1",
+  "target_directory": "C:\\Users\\arpit\\Desktop\\project\\data\\raw",
+  "files_present": {
+    "train_transaction.csv": {
+      "size_bytes": 683351067,
+      "sha256": "3a5c83ab6b3cc13dcabe5ffa9f522307fd5f7f7b6e6f6a60c32284ca6283d642",
+      "matches_reference": true
+    },
+    "train_identity.csv": {
+      "size_bytes": 26529680,
+      "sha256": "b63c725d8377be90a995268d97f347c17d456b95db45807adcf9f59cd603c37c",
+      "matches_reference": true
+    },
+    "test_transaction.csv": {
+      "size_bytes": 613194934,
+      "sha256": "2a8e51f1d335a86025d2b7f45beb9b78d0ab1edd726ef531d8b71a8a0065c011",
+      "matches_reference": true
+    },
+    "test_identity.csv": {
+      "size_bytes": 25797161,
+      "sha256": "3e5978cb13ca5e72f52babc4349ae0125e14b87ca8bfabe952ab67bb4ff1e10b",
+      "matches_reference": true
+    },
+    "sample_submission.csv": {
+      "size_bytes": 6080314,
+      "sha256": "50d7e0d6fcfc6e498efc297001f252101512ccdcb34aefbde6db98f8242a3626",
+      "matches_reference": true
+    }
+  },
+  "missing_files": [],
+  "ready_for_ingestion": true,
+  "training_unblocked": true,
+  "notes": "All raw IEEE-CIS CSV files are verified. 391-feature schema matches reference specification 100%. All 4 chronological split hashes match the reference pre-evaluation freeze record 100%. Target isFraud is strictly quarantined. Memory footprint is verified safe for 8 GB RAM host.",
+  "feature_schema_validation": {
+    "train_transaction_total_columns": 394,
+    "train_identity_total_columns": 41,
+    "raw_feature_count": 391,
+    "manifest_expected_count": 391,
+    "schema_match": true,
+    "categorical_columns_count": 14,
+    "numerical_columns_count": 377,
+    "missing_features": [],
+    "unexpected_features": [],
+    "quarantined_columns_detected_in_features": []
+  },
+  "train_transaction_validation": {
+    "rows": 590540,
+    "columns": 394,
+    "transaction_id_unique": true,
+    "transaction_id_range": [
+      2987000,
+      3577539
+    ],
+    "transaction_dt_min": 86400,
+    "transaction_dt_max": 15811131,
+    "transaction_dt_span_days": 181.99920138888888,
+    "transaction_dt_is_monotonic": true,
+    "isFraud_counts": {
+      "0": 569877,
+      "1": 20663
+    },
+    "isFraud_prevalence": 0.03499000914417313
+  },
+  "join_validation": {
+    "train_identity_rows": 144233,
+    "train_identity_columns": 41,
+    "train_identity_id_unique": true,
+    "transactions_with_identity": 144233,
+    "identity_coverage_pct": 0.2442391709283029,
+    "left_join_preserves_cardinality": true,
+    "expected_left_join_rows": 590540
+  },
+  "chronological_split_validation": {
+    "split_ratios": "60% Train, 10% Calibration, 10% Validation, 20% Test",
+    "total_rows": 590540,
+    "partitions": {
+      "train": {
+        "row_count": 354324,
+        "fraud_count": 11988,
+        "prevalence": 0.03383344057980831,
+        "dt_range": [
+          86400,
+          8745772
+        ],
+        "split_hash": "ee8c38fd7e8b2af1b93a7824fd80f59c7811e5ce2ac1651500d51bf6e2e1f53a",
+        "expected_reference_hash": "ee8c38fd7e8b2af1b93a7824fd80f59c7811e5ce2ac1651500d51bf6e2e1f53a",
+        "hash_matches_reference": true
+      },
+      "calibration": {
+        "row_count": 59054,
+        "fraud_count": 2550,
+        "prevalence": 0.04318081755681241,
+        "dt_range": [
+          8745798,
+          10437996
+        ],
+        "split_hash": "a1880e4f36558c33d77d0a1a2cf6b1dfe607a4983909364afff71ca84401e7bb",
+        "expected_reference_hash": "a1880e4f36558c33d77d0a1a2cf6b1dfe607a4983909364afff71ca84401e7bb",
+        "hash_matches_reference": true
+      },
+      "validation": {
+        "row_count": 59054,
+        "fraud_count": 2061,
+        "prevalence": 0.034900260778270735,
+        "dt_range": [
+          10438003,
+          12192842
+        ],
+        "split_hash": "f824d80aea2e20f72e4ed8f06e6d119c7572caf50cf304dfb4224e8d990e7170",
+        "expected_reference_hash": "f824d80aea2e20f72e4ed8f06e6d119c7572caf50cf304dfb4224e8d990e7170",
+        "hash_matches_reference": true
+      },
+      "test": {
+        "row_count": 118108,
+        "fraud_count": 4064,
+        "prevalence": 0.034409184813899145,
+        "dt_range": [
+          12192900,
+          15811131
+        ],
+        "split_hash": "88d73a15fc60f9badfedc4909ede017de45a99f6c58798d54ab9c1dff90690f1",
+        "expected_reference_hash": "88d73a15fc60f9badfedc4909ede017de45a99f6c58798d54ab9c1dff90690f1",
+        "hash_matches_reference": true
+      }
+    },
+    "split_hashes_all_match_reference": true,
+    "temporal_monotonicity_verified": true
+  },
+  "memory_governance": {
+    "host_ram_gb": 8.0,
+    "recommended_dtype": "float32",
+    "train_matrix_memory_mb": 528.49,
+    "calibration_matrix_memory_mb": 88.08,
+    "validation_matrix_memory_mb": 88.08,
+    "test_matrix_memory_mb": 176.16,
+    "estimated_single_model_peak_mb": 1721.23,
+    "estimated_ensemble_peak_mb": 2649.72,
+    "memory_safety_assessment": "SAFE: Peak ensemble training memory is estimated at ~2.7 GB, leaving >5.0 GB available on the 8 GB host. Garbage collection (gc.collect()) must be called between era member training."
+  }
+}

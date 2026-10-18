@@ -1,0 +1,51 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+!logs/test_looks.log
+
+# Environments & Credentials
+.env
+.env.*
+.venv/
+env/
+venv/
+ENV/
+kaggle.json
+*.pem
+*.key
+
+# Node / Frontend Build Outputs
+node_modules/
+frontend/node_modules/
+dist/
+dist-ssr/
+frontend/dist/
+*.local
+
+# Data Exclusions (Raw IEEE-CIS Competition Dataset & Archives)
+data/raw/
+data/interim/
+data/processed/
+*.zip
+
+# Third-Party Reference Archive (Clean-room integration lives in integrations/ibm_architecture/)
+reference/
+
+# Blender Autosave Backups
+*.blend1
+
+# IDE & OS Caches
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

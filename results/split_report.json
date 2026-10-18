@@ -1,0 +1,66 @@
+{
+  "status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+  "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+  "split_hash": "07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd",
+  "total_rows": 10000,
+  "time_column": "TransactionDT",
+  "id_column": "TransactionID",
+  "split_policy": {
+    "proportions": {
+      "train": 0.6,
+      "calib": 0.1,
+      "val": 0.1,
+      "test": 0.2
+    },
+    "tie_policy": "Primary ordering is chronological (time_col ascending). In case of identical timestamps, deterministic tie-breaking is enforced by secondary sorting on id_col ascending (or original stable row index). Partition cut-points are calculated by exact row fractions (60/10/10/20). Every row is deterministically allocated to exactly one partition with zero overlap."
+  },
+  "partitions": {
+    "train": {
+      "rows": 6000,
+      "pct_of_total": 60.0,
+      "fraud_count": 261,
+      "fraud_prevalence": 0.0435,
+      "time_range": {
+        "min": 86415,
+        "max": 268037,
+        "span_seconds": 181622
+      }
+    },
+    "calib": {
+      "rows": 1000,
+      "pct_of_total": 10.0,
+      "fraud_count": 56,
+      "fraud_prevalence": 0.056,
+      "time_range": {
+        "min": 268069,
+        "max": 297992,
+        "span_seconds": 29923
+      }
+    },
+    "val": {
+      "rows": 1000,
+      "pct_of_total": 10.0,
+      "fraud_count": 48,
+      "fraud_prevalence": 0.048,
+      "time_range": {
+        "min": 297994,
+        "max": 326441,
+        "span_seconds": 28447
+      }
+    },
+    "test": {
+      "rows": 2000,
+      "pct_of_total": 20.0,
+      "fraud_count": 111,
+      "fraud_prevalence": 0.0555,
+      "time_range": {
+        "min": 326480,
+        "max": 384646,
+        "span_seconds": 58166
+      }
+    }
+  },
+  "notice": "SYNTHETIC_SMOKE_ONLY: Partition metrics reflect synthetic fixture development data. Never cite these numbers as real benchmark performance."
+}

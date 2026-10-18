@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Courier+Prime:wght@400;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-surface":"#dee3ea","tertiary-container":"#cdbdff","on-secondary-fixed":"#121d26","surface-bright":"#353a3f","on-primary-container":"#005d55","tertiary-fixed":"#e7deff","surface-container-highest":"#30353b","background":"#0f1419","tertiary-fixed-dim":"#cdbdff","surface-tint":"#69d9cb","surface-variant":"#30353b","surface-dim":"#0f1419","secondary-fixed":"#d8e4f2","surface-container-lowest":"#0a0f14","primary":"#86f5e7","surface-container-high":"#252a30","surface":"#0f1419","on-primary-fixed-variant":"#005049","on-tertiary-container":"#584595","on-surface-variant":"#bcc9c6","surface-container-low":"#171c21","on-tertiary-fixed":"#1f025c","error-container":"#93000a","secondary-fixed-dim":"#bcc8d5","primary-fixed-dim":"#69d9cb","inverse-on-surface":"#2c3137","outline":"#869391","surface-container":"#1b2025","on-primary-fixed":"#00201d","on-tertiary-fixed-variant":"#4c3989","primary-fixed":"#86f5e8","on-secondary":"#27323c","on-error":"#690005","error":"#ffb4ab","secondary":"#bcc8d5","inverse-primary":"#006a62","on-secondary-container":"#aebac7","primary-container":"#68d8cb","on-secondary-fixed-variant":"#3d4853","on-background":"#dee3ea","on-tertiary":"#352071","on-primary":"#003732","on-error-container":"#ffdad6","inverse-surface":"#dee3ea","outline-variant":"#3d4947","tertiary":"#e7ddff","secondary-container":"#3f4a55"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"space-md":"0.75rem","space-lg":"1rem","margin-desktop":"1.5rem","space-xs":"0.25rem","space-sm":"0.5rem","margin":"1rem","space-xl":"1.5rem","gutter-desktop":"1rem","gutter":"0.75rem"},"fontFamily":{"label-sm":["IBM Plex Sans"],"label-md":["IBM Plex Sans"],"headline-lg":["IBM Plex Sans"],"code-lg":["Courier Prime"],"code-md":["Courier Prime"],"body-md":["IBM Plex Sans"],"body-sm":["IBM Plex Sans"],"display":["IBM Plex Sans"],"code-sm":["Courier Prime"],"body-lg":["IBM Plex Sans"],"headline-md":["IBM Plex Sans"],"headline-sm":["IBM Plex Sans"]},"fontSize":{"label-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.06em","fontWeight":"600"}],"label-md":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.04em","fontWeight":"600"}],"headline-lg":["1.25rem",{"lineHeight":"1.75rem","letterSpacing":"-0.01em","fontWeight":"600"}],"code-lg":["0.875rem",{"lineHeight":"1.25rem","fontWeight":"500"}],"code-md":["0.8125rem",{"lineHeight":"1.125rem","fontWeight":"400"}],"body-md":["0.875rem",{"lineHeight":"1.25rem","fontWeight":"400"}],"body-sm":["0.8125rem",{"lineHeight":"1.125rem","fontWeight":"400"}],"display":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.02em","fontWeight":"700"}],"code-sm":["0.6875rem",{"lineHeight":"0.875rem","letterSpacing":"0.03em","fontWeight":"500"}],"body-lg":["0.9375rem",{"lineHeight":"1.375rem","fontWeight":"400"}],"headline-md":["1.125rem",{"lineHeight":"1.5rem","fontWeight":"600"}],"headline-sm":["1rem",{"lineHeight":"1.375rem","fontWeight":"600"}]}}}};</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 z-50 h-16 bg-surface-container-low px-margin-desktop flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-md"><img alt="SignalGate Architecture Node" class="w-8 h-8 rounded object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U7ERP6k_QebKmNaSHgbSoQCIsZfGYFl5NuW8t3S0aVZ6RvTqU7JoDiOPuwI5KIdXV05__cfEy76fJja_MrWZBJWCc-Y7Md3fAZQ2nv6_3LvnJRSjKEGCbFZY2I_KAB-g6FKlhnxDfKy9hZvT-CcpzPk8G4ksn9QzTIlBWr07BE0b99ag3lJs8abfE9olf7Dfs91ECJA1eSe_8nvYOhyKbX2-Bnu5EHpBQ2P9xZaKKkLt0hTVDikWil_r0"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-wider uppercase text-primary font-bold leading-none">SIGNALGATE</span><span class="font-code-sm text-code-sm tracking-widest text-on-surface-variant leading-tight mt-0.5">SHIFT-AWARE FRAUD TRIAGE</span></div></div><div class="h-6 w-px bg-surface-container-highest"></div><div class="flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-high rounded border border-primary/40" title="Non-production offline evaluation mode"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span><span class="font-code-sm text-code-sm tracking-wider font-bold text-primary">EVIDENCE: SYNTHETIC_SMOKE_ONLY</span></div></div><nav class="flex items-center gap-space-xs h-full" data-active-classes="bg-surface-container-high text-primary font-bold border-b-2 border-primary"><a aria-current="page" class="px-space-md h-full flex items-center uppercase tracking-wider transition-all bg-surface-container-high text-primary font-bold border-b-2 border-primary" data-path="overview" href="#">Overview</a><a class="px-space-md h-full flex items-center font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="shift-storm-replay" href="#">Shift Storm Replay</a><a class="px-space-md h-full flex items-center font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="case-explorer" href="#">Case Explorer</a><a class="px-space-md h-full flex items-center font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="policy-comparison" href="#">Policy Comparison</a></nav><div class="flex items-center gap-space-md"><div class="hidden xl:flex flex-col items-end"><span class="font-code-sm text-code-sm text-secondary font-semibold">SHIFT-04: PEAK ASIA-PACIFIC</span><span class="font-code-sm text-code-sm text-primary">CAPACITY 84% ACTIVE</span></div><div class="h-6 w-px bg-surface-container-highest hidden xl:block"></div><div class="hidden lg:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container rounded"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span><span class="font-code-sm text-code-sm text-on-surface-variant uppercase">GATEWAY v2.4-STABLE</span></div><button class="h-8 px-space-sm bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors rounded flex items-center gap-1 font-label-sm text-label-sm" title="Quick Action Audit Log" type="button"><span class="material-symbols-outlined text-sm">receipt_long</span><span>AUDIT</span></button><div class="flex items-center gap-space-sm pl-space-xs"><div class="text-right hidden sm:block"><div class="font-label-md text-label-md text-on-surface leading-none">M. Vance</div><div class="font-code-sm text-code-sm text-on-surface-variant leading-tight">[Lead Risk Analyst]</div></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U7ERP6k_QebKmNaSHgbSoQCIsZfGYFl5NuW8t3S0aVZ6RvTqU7JoDiOPuwI5KIdXV05__cfEy76fJja_MrWZBJWCc-Y7Md3fAZQ2nv6_3LvnJRSjKEGCbFZY2I_KAB-g6FKlhnxDfKy9hZvT-CcpzPk8G4ksn9QzTIlBWr07BE0b99ag3lJs8abfE9olf7Dfs91ECJA1eSe_8nvYOhyKbX2-Bnu5EHpBQ2P9xZaKKkLt0hTVDikWil_r0"/></div></div></header><aside class="fixed left-0 top-16 bottom-7 w-64 bg-surface-container-low z-40 flex flex-col justify-between py-space-md shadow-[1px_0_8px_rgba(0,0,0,0.3)]"><div class="flex flex-col gap-space-md"><div class="px-space-md flex flex-col gap-space-xs"><span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Operational Context</span><div class="p-space-sm bg-surface-container rounded flex flex-col gap-1"><div class="flex justify-between items-center"><span class="font-code-sm text-code-sm text-on-surface-variant">TRIAGE QUEUE</span><span class="font-code-sm text-code-sm text-primary font-bold">142 PENDING</span></div><div class="flex justify-between items-center"><span class="font-code-sm text-code-sm text-on-surface-variant">ANOMALY RATE</span><span class="font-code-sm text-code-sm text-error">+14.8%</span></div></div></div><div class="px-space-md"><span class="font-label-sm text-label-sm uppercase tracking-widest text-outline mb-space-xs block">Investigation Rails</span><nav class="flex flex-col gap-1" data-active-classes="bg-surface-container-high text-primary font-bold"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-2 rounded transition-colors bg-surface-container-high text-primary font-bold" data-path="overview" href="#"><span class="material-symbols-outlined text-base">grid_view</span><span>Control Stage</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="case-explorer" href="#"><span class="material-symbols-outlined text-base">manage_search</span><span>Telemetry Inspector</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="shift-storm-replay" href="#"><span class="material-symbols-outlined text-base">history_toggle_off</span><span>Simulation Engine</span></a><a class="flex items-center gap-space-sm px-space-sm py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="policy-comparison" href="#"><span class="material-symbols-outlined text-base">balance</span><span>Threshold Matrix</span></a></nav></div></div><div class="px-space-md"><div class="p-space-sm bg-surface-container-lowest rounded flex flex-col gap-1.5"><div class="flex items-center gap-1.5 text-primary"><span class="material-symbols-outlined text-sm">security</span><span class="font-code-sm text-code-sm font-bold uppercase">Air-Gapped Sandbox</span></div><p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Synthetic telemetry stream active. Mutating events restricted from external execution.</p></div></div></aside><div class="pl-64 flex-1 flex flex-col"><main class="w-full pt-16 pb-8 bg-surface-container-lowest flex-1"><div class="flex flex-col w-full">
+<!-- TOP CONTEXTUAL TICKER & ENVIRONMENT BANNER -->
+<div class="px-margin-desktop pt-space-md pb-space-xs flex flex-col gap-space-xs">
+<!-- Audit Provenance Warning Banner -->
+<div class="bg-surface-container-low px-space-md py-space-xs rounded flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-xs shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-primary text-base select-none">terminal</span>
+<div class="flex items-center gap-space-xs flex-wrap min-w-0">
+<span class="font-code-sm text-code-sm font-bold text-primary tracking-widest uppercase">ENVIRONMENT: SYNTHETIC_SMOKE_ONLY</span>
+<span class="font-code-sm text-code-sm text-outline select-none">//</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Offline evaluation protocol active. Zero production payment networks or live cardholder records connected.</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm self-end sm:self-center shrink-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant">SEED: <span class="text-on-surface font-semibold">0x9F4A_B89</span></span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container font-code-sm text-code-sm text-primary uppercase">DETERMINISTIC</span>
+</div>
+</div>
+<!-- Title and Core Framing -->
+<div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-sm pt-space-xs pb-space-xs">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-primary uppercase tracking-widest font-semibold">[ROOM-04: LATAM-APAC GATE]</span>
+<span class="font-code-sm text-code-sm text-outline select-none">•</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">UTC 14:02:18</span>
+</div>
+<h1 class="font-display text-display text-on-surface tracking-tight mt-0.5">Operational Overview &amp; Decision Telemetry</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-4xl">
+          Real-time decision routing posture under constrained human review capacity. Dynamic triage dampeners divert epistemic model disagreement away from saturated analyst queues into deferred drift isolation stages.
+        </p>
+</div>
+<div class="flex items-center gap-space-xs shrink-0 self-start lg:self-end">
+<div class="px-space-sm py-1.5 bg-surface-container rounded flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-code-sm text-code-sm text-on-surface font-bold">TOPOLOGY LOCK: ACTIVE</span>
+</div>
+<button class="h-8 px-space-md bg-primary-container text-on-primary font-label-md text-label-md uppercase tracking-wider rounded font-bold hover:bg-primary transition-colors flex items-center gap-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-sm">tune</span>
+<span>CALIBRATE GATES</span>
+</button>
+</div>
+</div>
+</div>
+<!-- COMPACT KPI TELEMETRY BAND -->
+<div class="px-margin-desktop py-space-sm">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-desktop">
+<!-- Metric 1 -->
+<div class="bg-surface-container p-space-md rounded flex flex-col justify-between shadow-sm relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">INCOMING CASERATE</span>
+<span class="material-symbols-outlined text-primary text-base">compress</span>
+</div>
+<div class="mt-space-sm mb-space-xs flex items-baseline justify-between">
+<span class="font-code-lg text-code-lg text-on-surface font-bold text-xl sm:text-2xl tracking-tight">14,820 <span class="text-sm font-normal text-on-surface-variant">/ hr</span></span>
+<span class="font-code-sm text-code-sm text-primary font-bold flex items-center">+4.8% ↑</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-primary h-full" style="width: 68%;"></div>
+</div>
+<div class="mt-space-xs flex justify-between font-code-sm text-code-sm text-on-surface-variant">
+<span>Baseline Normal: 14,140</span>
+<span>Peak: 16.2k</span>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="bg-surface-container p-space-md rounded flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">ANALYST QUEUE CAPACITY</span>
+<span class="material-symbols-outlined text-error text-base">warning</span>
+</div>
+<div class="mt-space-sm mb-space-xs flex items-baseline justify-between">
+<span class="font-code-lg text-code-lg text-on-surface font-bold text-xl sm:text-2xl tracking-tight">180 <span class="text-sm font-normal text-on-surface-variant">cases/hr</span></span>
+<span class="font-code-sm text-code-sm text-error font-bold flex items-center">94.2% [SATURATED]</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-error h-full" style="width: 94.2%;"></div>
+</div>
+<div class="mt-space-xs flex justify-between font-code-sm text-code-sm text-on-surface-variant">
+<span>170 Active Shifts Assigned</span>
+<span>Headroom: 10/hr</span>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="bg-surface-container p-space-md rounded flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">DEFERRAL RATIO (HELD)</span>
+<span class="material-symbols-outlined text-tertiary text-base">hourglass_top</span>
+</div>
+<div class="mt-space-sm mb-space-xs flex items-baseline justify-between">
+<span class="font-code-lg text-code-lg text-on-surface font-bold text-xl sm:text-2xl tracking-tight">12.4%</span>
+<span class="font-code-sm text-code-sm text-tertiary font-bold flex items-center">1,840 Cases</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-tertiary-container h-full" style="width: 32%;"></div>
+</div>
+<div class="mt-space-xs flex justify-between font-code-sm text-code-sm text-on-surface-variant">
+<span>Model Disagreement &gt; 0.42</span>
+<span>Dampener Buffer Safe</span>
+</div>
+</div>
+<!-- Metric 4 -->
+<div class="bg-surface-container p-space-md rounded flex flex-col justify-between shadow-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">PRECISION @ RECALL 90%</span>
+<span class="material-symbols-outlined text-primary text-base">verified</span>
+</div>
+<div class="mt-space-sm mb-space-xs flex items-baseline justify-between">
+<span class="font-code-lg text-code-lg text-on-surface font-bold text-xl sm:text-2xl tracking-tight">98.14%</span>
+<span class="font-code-sm text-code-sm text-primary font-bold flex items-center">±0.04% SEED</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-primary-container h-full" style="width: 98.1%;"></div>
+</div>
+<div class="mt-space-xs flex justify-between font-code-sm text-code-sm text-on-surface-variant">
+<span>Target Spec: &gt;97.50%</span>
+<span>Offline Synthetic Batch</span>
+</div>
+</div>
+</div>
+</div>
+<!-- PRIMARY ANALYTICAL VISUAL: THE SIGNAL CORE ROUTING TOPOLOGY -->
+<div class="px-margin-desktop py-space-sm">
+<div class="bg-surface-container rounded p-space-md shadow-sm flex flex-col gap-space-sm">
+<!-- Panel Header Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-xs gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="p-1.5 bg-surface-container-high rounded text-primary">
+<span class="material-symbols-outlined text-base">hub</span>
+</span>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-headline-sm text-on-surface">Signal Core Routing Topology</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 bg-surface-container-high text-primary rounded font-bold">ACTIVE PIPELINE</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Dynamic pipeline partitioning across Model Agreement vs. Analyst Bandwidth bounds</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-1.5 font-code-sm text-code-sm text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span>INGESTION STABLE</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">|</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">WINDOW: <span class="text-on-surface">60m SLIDING</span></span>
+</div>
+</div>
+<!-- Topological Canvas Container -->
+<div class="w-full bg-surface-container-lowest rounded p-space-md overflow-x-auto relative">
+<div class="min-w-[860px] flex flex-col gap-space-md">
+<!-- Diagram Architecture: Flow Grid -->
+<div class="grid grid-cols-12 gap-space-md items-stretch relative">
+<!-- STAGE 1: INGESTION (Cols 1-3) -->
+<div class="col-span-3 flex flex-col justify-between bg-surface-container-low p-space-sm rounded shadow-sm">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-code-sm text-code-sm text-outline uppercase font-semibold">STAGE 01 // RAW INGESTION</span>
+<span class="font-code-sm text-code-sm text-primary">100.0%</span>
+</div>
+<div class="my-space-md flex flex-col gap-space-xs">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">14,820</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">events/hr</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">
+                  Inbound synthetic stream with zero-trust payload validation. Multi-tenant edge parsing.
+                </div>
+<div class="mt-space-xs p-space-xs bg-surface-container rounded font-code-sm text-code-sm text-on-surface-variant flex flex-col gap-1">
+<div class="flex justify-between"><span>BATCH_ID</span><span class="text-on-surface font-semibold">#SYN-8921</span></div>
+<div class="flex justify-between"><span>MEDIAN_RPS</span><span class="text-primary font-semibold">4,116</span></div>
+<div class="flex justify-between"><span>PAYLOAD_FAIL</span><span class="text-on-surface-variant">0.00%</span></div>
+</div>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm text-outline pt-space-xs">
+<span>INSPECTION: OK</span>
+<span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- STAGE 2: DECOMPOSITION & DISAGREEMENT (Cols 4-7) -->
+<div class="col-span-4 flex flex-col justify-between bg-surface-container-low p-space-sm rounded shadow-sm relative">
+<div class="flex items-center justify-between pb-space-xs">
+<span class="font-code-sm text-code-sm text-outline uppercase font-semibold">STAGE 02 // DUAL-MODEL DECOMPOSITION</span>
+<span class="font-code-sm text-code-sm text-primary">EVALUATING</span>
+</div>
+<!-- Decomposition Flow Sub-cards -->
+<div class="my-space-xs flex flex-col gap-space-xs">
+<!-- Dual model comparison card -->
+<div class="bg-surface-container p-space-xs rounded flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-xs">
+<span class="font-code-sm text-code-sm text-on-surface-variant">MODEL_A: Gradient Forest v4</span>
+<span class="font-code-sm text-code-sm text-primary font-bold">AUC 0.988</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-primary h-full" style="width: 82%;"></div>
+</div>
+<div class="flex justify-between items-center text-xs mt-1">
+<span class="font-code-sm text-code-sm text-on-surface-variant">MODEL_B: Transformer Seq 1.2</span>
+<span class="font-code-sm text-code-sm text-secondary font-bold">AUC 0.991</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-secondary h-full" style="width: 89%;"></div>
+</div>
+</div>
+<!-- Disagreement metric breakdown -->
+<div class="bg-surface-container-high p-space-xs rounded flex items-center justify-between">
+<div>
+<div class="font-label-sm text-label-sm text-outline uppercase">EPISTEMIC DISAGREEMENT</div>
+<div class="font-code-md text-code-md text-on-surface font-bold">ΔSpread: 0.384 <span class="font-normal text-on-surface-variant text-xs">(Median)</span></div>
+</div>
+<div class="text-right">
+<div class="font-code-sm text-code-sm text-tertiary font-bold">12.4% &gt; THRESHOLD</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">Threshold τ = 0.42</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between font-code-sm text-code-sm text-outline pt-space-xs">
+<span>GATE DISPATCHER</span>
+<span class="material-symbols-outlined text-sm text-primary">alt_route</span>
+</div>
+</div>
+<!-- STAGE 3: CAPACITY-AWARE GATE ROUTER & 4 DESTINATIONS (Cols 8-12) -->
+<div class="col-span-5 flex flex-col gap-space-xs">
+<!-- DESTINATION A: FRAUD ALERT (Direct Automated Freeze) -->
+<div class="bg-surface-container-low p-space-xs rounded flex items-center justify-between hover:bg-surface-container transition-colors shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-8 bg-[#F27870] rounded-sm shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm font-bold text-[#F27870]">FRAUD_ALERT</span>
+<span class="font-code-sm text-code-sm px-1 py-0.2 bg-[#F27870]/10 text-[#F27870] rounded">AUTO_FREEZE</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Consensus High Risk • Direct Automated Escalation</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-code-md text-code-md font-bold text-[#F27870]">342 <span class="text-xs text-on-surface-variant font-normal">cases</span></div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">2.3% of traffic</div>
+</div>
+</div>
+<!-- DESTINATION B: MANUAL REVIEW (Analyst Queue) -->
+<div class="bg-surface-container-low p-space-xs rounded flex items-center justify-between hover:bg-surface-container transition-colors shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-8 bg-[#E8B35E] rounded-sm shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm font-bold text-[#E8B35E]">MANUAL_REVIEW</span>
+<span class="font-code-sm text-code-sm px-1 py-0.2 bg-[#E8B35E]/10 text-[#E8B35E] rounded">CAPACITY MAXED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Marginal Risk • 170 Analyst Slots Absorbed</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-code-md text-code-md font-bold text-[#E8B35E]">171 <span class="text-xs text-on-surface-variant font-normal">cases</span></div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">1.2% (94.2% Cap)</div>
+</div>
+</div>
+<!-- DESTINATION C: ROUTINE CLEAR (Instant Pass) -->
+<div class="bg-surface-container-low p-space-xs rounded flex items-center justify-between hover:bg-surface-container transition-colors shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-8 bg-[#68C99A] rounded-sm shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm font-bold text-[#68C99A]">ROUTINE_CLEAR</span>
+<span class="font-code-sm text-code-sm px-1 py-0.2 bg-[#68C99A]/10 text-[#68C99A] rounded">LOW_FRICTION</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Consensus Low Risk • Zero human intervention</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-code-md text-code-md font-bold text-[#68C99A]">12,467 <span class="text-xs text-on-surface-variant font-normal">cases</span></div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">84.1% of traffic</div>
+</div>
+</div>
+<!-- DESTINATION D: HELD / DEFERRED (Buffer Capped) -->
+<div class="bg-surface-container-low p-space-xs rounded flex items-center justify-between hover:bg-surface-container transition-colors shadow-sm">
+<div class="flex items-center gap-space-sm">
+<div class="w-2.5 h-8 bg-[#B4A0F8] rounded-sm shrink-0"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm font-bold text-[#B4A0F8]">HELD / DEFERRED</span>
+<span class="font-code-sm text-code-sm px-1 py-0.2 bg-[#B4A0F8]/10 text-[#B4A0F8] rounded">DISPUTE STAGED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">Disagreement &gt; 0.42 &amp; Capacity Capped</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<div class="font-code-md text-code-md font-bold text-[#B4A0F8]">1,840 <span class="text-xs text-on-surface-variant font-normal">cases</span></div>
+<div class="font-code-sm text-code-sm text-[#B4A0F8] font-bold">12.4% deferred</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Micro-Telemetry Bar on Topology -->
+<div class="pt-space-xs flex flex-wrap items-center justify-between gap-space-sm font-code-sm text-code-sm text-on-surface-variant">
+<div class="flex items-center gap-space-md">
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#F27870]"></span> Automated Freeze (No Analyst Cost)</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#E8B35E]"></span> Human Triage Bottleneck</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#68C99A]"></span> Frictionless Pass-Through</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#B4A0F8]"></span> Adaptive Dampening Reservoir</span>
+</div>
+<div class="text-outline">SIGNALGATE ROUTING KERNEL v4.19.0-SYNTH</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECONDARY MULTI-COLUMN TRI-PANE OPERATIONAL GRID -->
+<div class="px-margin-desktop py-space-sm pb-space-lg">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
+<!-- COLUMN 1: WORKLOAD CAPACITY MANAGEMENT (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container rounded p-space-md shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Shift Saturation Monitor</span>
+<span class="font-code-sm text-code-sm text-error font-bold">SLA RISK: MODERATE</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Human Review Capacity</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Real-time tracking of seated analyst bandwidth against incoming surge waves.
+          </p>
+<!-- Interactive Reviewer Gauge Bar -->
+<div class="mt-space-sm p-space-sm bg-surface-container-low rounded flex flex-col gap-space-xs">
+<div class="flex justify-between items-baseline">
+<span class="font-label-md text-label-md text-on-surface">Queue Saturation</span>
+<span class="font-code-md text-code-md text-error font-bold">170 / 180 <span class="text-xs text-on-surface-variant font-normal">slots active</span></span>
+</div>
+<!-- Segmented Gauge Bar -->
+<div class="grid grid-cols-10 gap-1 h-3 mt-1">
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-primary rounded-sm h-full"></div>
+<div class="bg-error rounded-sm h-full animate-pulse"></div>
+<div class="bg-surface-container-highest rounded-sm h-full"></div>
+</div>
+<div class="flex justify-between font-code-sm text-code-sm text-outline mt-1">
+<span>94.2% Total Utilization</span>
+<span>10 slots headroom</span>
+</div>
+</div>
+<!-- Dynamic Threshold Dampener Status Indicator -->
+<div class="p-space-sm bg-surface-container-low rounded flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant font-semibold">Auto-Triage Dampener</span>
+<span class="px-2 py-0.5 rounded bg-primary/10 text-primary font-code-sm text-code-sm font-bold uppercase tracking-wider">ENGAGED (Shift B-2)</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-tight">
+              Threshold τ dynamically adjusted from 0.35 → 0.42 to protect analyst backlog integrity.
+            </p>
+</div>
+<!-- Queue Latency Metrics -->
+<div class="grid grid-cols-2 gap-space-xs">
+<div class="p-space-xs bg-surface-container-low rounded">
+<span class="font-label-sm text-label-sm text-outline block">TARGET SLA</span>
+<span class="font-code-md text-code-md font-bold text-on-surface">3.4 min</span>
+</div>
+<div class="p-space-xs bg-surface-container-low rounded">
+<span class="font-label-sm text-label-sm text-outline block">CURRENT WAIT</span>
+<span class="font-code-md text-code-md font-bold text-error">4.1 min</span>
+</div>
+</div>
+</div>
+<div class="pt-space-xs">
+<a class="w-full h-8 px-space-sm bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1 font-semibold" data-path="shift-storm-replay" href="#">
+<span class="material-symbols-outlined text-sm">tune</span>
+<span>RECALIBRATE CAPACITY PROFILES</span>
+</a>
+</div>
+</div>
+<!-- COLUMN 2: LATEST SHIFT STORM SCENARIO PROFILE (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container rounded p-space-md shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Active Evaluation Vector</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high text-primary font-code-sm text-code-sm rounded font-bold">REPLAY BATCH #09</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">SYNTH_SCENARIO_09</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Scenario title: <span class="text-on-surface font-semibold">COLD_START_GEO_SURGE</span>. Synthetic multi-channel attack injection simulating new market expansion with minimal historical device history.
+          </p>
+<!-- Model Disagreement Distribution Chartlet -->
+<div class="mt-space-sm p-space-sm bg-surface-container-low rounded flex flex-col gap-space-xs">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-outline uppercase">MODEL DISAGREEMENT SPREAD</span>
+<span class="font-code-sm text-code-sm text-primary font-bold">MEDIAN: 0.384</span>
+</div>
+<!-- Custom Inline SVG Distribution Sparkline / Curve -->
+<div class="w-full h-16 flex items-end pt-1">
+<svg class="w-full h-full text-primary" fill="none" preserveaspectratio="none" viewbox="0 0 240 60">
+<!-- Grid guide lines -->
+<line stroke="currentColor" stroke-opacity="0.1" stroke-width="1" x1="0" x2="240" y1="50" y2="50"></line>
+<line stroke="currentColor" stroke-opacity="0.1" stroke-width="1" x1="0" x2="240" y1="25" y2="25"></line>
+<!-- Threshold cutoff marker at x=140 -->
+<line stroke="#B4A0F8" stroke-dasharray="3 3" stroke-width="1.5" x1="140" x2="140" y1="0" y2="60"></line>
+<text fill="#B4A0F8" font-family="Courier Prime" font-size="8" font-weight="bold" x="145" y="12">τ = 0.42</text>
+<!-- Curve Area Fill -->
+<path d="M0,50 Q40,48 70,40 T120,12 T150,22 T190,45 T240,50 L240,50 L0,50 Z" fill="currentColor" fill-opacity="0.08"></path>
+<!-- Curve Line -->
+<path d="M0,50 Q40,48 70,40 T120,12 T150,22 T190,45 T240,50" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+<div class="flex justify-between font-code-sm text-code-sm text-outline">
+<span>Agreement (Δ 0.0)</span>
+<span>Divergence (Δ 1.0)</span>
+</div>
+</div>
+<!-- Reason Code Weighting -->
+<div class="flex flex-col gap-1.5 mt-space-xs">
+<span class="font-label-sm text-label-sm text-outline uppercase">Top Synthesized Reason Vectors</span>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-xs">
+<span class="font-code-sm text-code-sm text-on-surface">GEO_MISMATCH</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-bold">42%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-primary h-full" style="width: 42%;"></div>
+</div>
+<div class="flex justify-between items-center text-xs mt-0.5">
+<span class="font-code-sm text-code-sm text-on-surface">VELOCITY_SPIKE</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-bold">31%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-secondary h-full" style="width: 31%;"></div>
+</div>
+<div class="flex justify-between items-center text-xs mt-0.5">
+<span class="font-code-sm text-code-sm text-on-surface">DEVICE_ANOMALY</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-bold">27%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded overflow-hidden">
+<div class="bg-outline h-full" style="width: 27%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-space-xs">
+<a class="w-full h-8 px-space-sm bg-primary-container text-on-primary font-label-md text-label-md uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1 font-bold shadow-sm" data-path="shift-storm-replay" href="#">
+<span class="material-symbols-outlined text-sm">history_toggle_off</span>
+<span>OPEN SHIFT STORM REPLAY</span>
+</a>
+</div>
+</div>
+<!-- COLUMN 3: PRIORITY TRIAGE ACTION QUEUE (4 Cols) -->
+<div class="lg:col-span-4 bg-surface-container rounded p-space-md shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">High-Urgency Synthetic Queue</span>
+<span class="font-code-sm text-code-sm text-primary font-bold">TOP 4 OF 142</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Live Case Sentinel</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Deterministic evaluation cases requiring rapid operational review or policy overrides.
+          </p>
+<!-- Quick Scan Telemetry Table -->
+<div class="mt-space-sm flex flex-col gap-space-xs">
+<!-- Row 1 -->
+<div class="bg-surface-container-low p-space-xs rounded flex flex-col gap-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#F27870]"></span>
+<span class="font-code-md text-code-md font-bold text-on-surface group-hover:text-primary transition-colors">CASE-8921-X</span>
+</div>
+<span class="font-code-sm text-code-sm px-1.5 py-0.2 bg-[#F27870]/10 text-[#F27870] rounded font-bold uppercase">FRAUD_ALERT</span>
+</div>
+<div class="flex justify-between items-center font-code-sm text-code-sm text-on-surface-variant pl-3.5">
+<span>Score: <span class="text-on-surface font-semibold">0.94</span> • ΔSpread: <span class="text-on-surface font-semibold">0.08</span></span>
+<span class="text-outline">IP_CLUSTER_SURGE</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="bg-surface-container-low p-space-xs rounded flex flex-col gap-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#B4A0F8]"></span>
+<span class="font-code-md text-code-md font-bold text-on-surface group-hover:text-primary transition-colors">CASE-8924-M</span>
+</div>
+<span class="font-code-sm text-code-sm px-1.5 py-0.2 bg-[#B4A0F8]/10 text-[#B4A0F8] rounded font-bold uppercase">HELD/DEFERRED</span>
+</div>
+<div class="flex justify-between items-center font-code-sm text-code-sm text-on-surface-variant pl-3.5">
+<span>Score: <span class="text-on-surface font-semibold">0.72</span> • ΔSpread: <span class="text-error font-semibold">0.64</span></span>
+<span class="text-[#B4A0F8]">Cap Overflow</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="bg-surface-container-low p-space-xs rounded flex flex-col gap-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#E8B35E]"></span>
+<span class="font-code-md text-code-md font-bold text-on-surface group-hover:text-primary transition-colors">CASE-8928-Q</span>
+</div>
+<span class="font-code-sm text-code-sm px-1.5 py-0.2 bg-[#E8B35E]/10 text-[#E8B35E] rounded font-bold uppercase">MANUAL_REVIEW</span>
+</div>
+<div class="flex justify-between items-center font-code-sm text-code-sm text-on-surface-variant pl-3.5">
+<span>Score: <span class="text-on-surface font-semibold">0.81</span> • ΔSpread: <span class="text-on-surface font-semibold">0.22</span></span>
+<span class="text-on-surface font-semibold">Analyst Vance</span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="bg-surface-container-low p-space-xs rounded flex flex-col gap-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#68C99A]"></span>
+<span class="font-code-md text-code-md font-bold text-on-surface group-hover:text-primary transition-colors">CASE-8931-A</span>
+</div>
+<span class="font-code-sm text-code-sm px-1.5 py-0.2 bg-[#68C99A]/10 text-[#68C99A] rounded font-bold uppercase">AUTO_DISPATCH</span>
+</div>
+<div class="flex justify-between items-center font-code-sm text-code-sm text-on-surface-variant pl-3.5">
+<span>Score: <span class="text-on-surface font-semibold">0.12</span> • ΔSpread: <span class="text-on-surface font-semibold">0.03</span></span>
+<span class="text-[#68C99A]">Verified VIP</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-space-xs flex gap-space-xs">
+<a class="flex-1 h-8 px-space-sm bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-md text-label-md uppercase tracking-wider rounded transition-colors flex items-center justify-center gap-1 font-semibold" data-path="case-explorer" href="#">
+<span class="material-symbols-outlined text-sm">manage_search</span>
+<span>INVESTIGATE IN CASE EXPLORER</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div></main></div><footer class="fixed bottom-0 left-0 right-0 z-50 h-7 bg-surface-container-low px-margin-desktop flex items-center justify-between shadow-[0_-1px_4px_rgba(0,0,0,0.5)]"><div class="flex items-center gap-space-md"><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-primary">verified_user</span><span class="font-code-sm text-code-sm uppercase tracking-wider text-on-surface-variant">EVALUATION DATASET: SYNTH_SMOKE_BATCH_8921 // LATENCY: 4.2ms // DETERMINISTIC SEED: 0x9F4A // AUDIT INTEGRITY: VERIFIED</span></div></div><div class="flex items-center gap-space-md"><span class="font-code-sm text-code-sm text-outline">DECISION CONTROL ROOM • ASIA_PACIFIC_CLUSTER_04</span></div></footer></body></html>

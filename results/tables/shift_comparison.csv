@@ -1,0 +1,4 @@
+scenario_id,scenario_name,status,sample_count,fraud_count,fraud_prevalence,b2_recall,signalgate_recall,delta_recall_vs_b2_pp,touched_rate,deferred_count
+S0,S0_untouched_reference,SYNTHETIC_SMOKE_ONLY,2000,111,0.0555,0.09009,0.09009,-0.0,0.065,974
+S3,S3_covariate_shift,SYNTHETIC_SHIFT,2000,111,0.0555,0.072072,0.099099,2.7027,0.065,990
+S1,S1_prevalence_burst,SYNTHETIC_SHIFT,1200,66,0.055,0.060606,0.075758,1.5152,0.065,603

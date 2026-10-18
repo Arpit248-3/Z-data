@@ -1,0 +1,297 @@
+:root {
+  /* -------------------------------------------------------------------------
+     Surface & Structural Hierarchy (Zero-Elevation Bedrock Floor)
+     ------------------------------------------------------------------------- */
+  --bg-canvas: #0A0F14;                  /* Deep charcoal bedrock floor */
+  --bg-surface-primary: #111922;          /* Primary cockpit panel surface */
+  --bg-surface-raised: #18232D;           /* Elevated cards, hovered rows, toolbars */
+  --bg-surface-elevated: #222E3B;         /* Dialogs, popovers, flyouts */
+  --bg-surface-subdued: #0D131A;          /* Inset wells, code blocks, 3D canvas backing */
+  --bg-surface-header: #151F2A;           /* Anchored card title bars */
+  --bg-overlay: rgba(10, 15, 20, 0.85);   /* Flat 85% opacity modal veil */
+
+  /* -------------------------------------------------------------------------
+     Precision Hairline Boundaries (Zero-Shadow Rule)
+     ------------------------------------------------------------------------- */
+  --border-subtle: #1C2733;              /* Internal cell dividers */
+  --border-default: #293743;             /* 1px precision structural perimeter */
+  --border-active: #3E5060;              /* Hovered containers or interactive borders */
+
+  /* -------------------------------------------------------------------------
+     Primary Interactive Accent (Surgical Teal)
+     ------------------------------------------------------------------------- */
+  --accent-primary: #68D8CB;             /* Primary interactive teal */
+  --accent-primary-bright: #86F5E7;      /* Focus rings, highlighted telemetry values */
+  --accent-primary-dim: #005D55;         /* Deep container borders / active fills */
+  --accent-primary-tint: rgba(104, 216, 203, 0.12); /* Subtle chip backgrounds */
+
+  /* -------------------------------------------------------------------------
+     Operational Semantic Spectrum (Decision Truth States)
+     ------------------------------------------------------------------------- */
+  /* 1. Fraud Alert / High Risk Escalation (Restrained Coral) */
+  --color-fraud-alert: #F27870;          /* Consensus high risk (decision-support escalation) */
+  --color-fraud-alert-bright: #FFB4AB;   /* High-visibility alert text */
+  --color-fraud-alert-dim: #93000A;      /* Dark alert border */
+  --color-fraud-alert-tint: rgba(242, 120, 112, 0.12); /* Badge fill */
+
+  /* 2. Manual Review / Escalation (Controlled Amber) */
+  --color-manual-review: #E8B35E;        /* Human-in-the-loop review queue cost */
+  --color-manual-review-bright: #F5C678; /* Amber metric highlight */
+  --color-manual-review-dim: #5C4308;    /* Dark amber border */
+  --color-manual-review-tint: rgba(232, 179, 94, 0.12); /* Badge fill */
+
+  /* 3. Epistemic Deferral & Capacity Throttling (Muted Violet) */
+  --color-epistemic-defer: #B4A0F8;      /* Discordance > tau, capacity shunted */
+  --color-epistemic-defer-bright: #CDBDFF;/* Violet telemetry highlight */
+  --color-epistemic-defer-dim: #352071;  /* Dark violet border */
+  --color-epistemic-defer-tint: rgba(180, 160, 248, 0.14); /* Badge fill */
+
+  /* 4. Routine / Consensus Low Risk (Technical Sage Green) */
+  --color-routine: #68C99A;              /* Frictionless clearance, consensus low risk */
+  --color-routine-bright: #84E0B2;       /* Green metric highlight */
+  --color-routine-dim: #004D36;          /* Dark green border */
+  --color-routine-tint: rgba(104, 201, 154, 0.12); /* Badge fill */
+  --color-routine-clear: var(--color-routine);
+  --color-routine-clear-bright: var(--color-routine-bright);
+  --color-routine-clear-dim: var(--color-routine-dim);
+  --color-routine-clear-tint: var(--color-routine-tint);
+
+  /* Compatibility Aliases for Existing Feature Components */
+  --accent-cyan: var(--accent-primary);
+  --accent-cyan-dim: var(--accent-primary-dim);
+  --accent-cyan-glow: var(--accent-primary-tint);
+
+  --accent-coral: var(--color-fraud-alert);
+  --accent-coral-dim: var(--color-fraud-alert-dim);
+  --accent-coral-glow: var(--color-fraud-alert-tint);
+
+  --accent-amber: var(--color-manual-review);
+  --accent-amber-dim: var(--color-manual-review-dim);
+  --accent-amber-glow: var(--color-manual-review-tint);
+
+  --accent-violet: var(--color-epistemic-defer);
+  --accent-violet-dim: var(--color-epistemic-defer-dim);
+  --accent-violet-glow: var(--color-epistemic-defer-tint);
+
+  --accent-green: var(--color-routine);
+  --accent-green-dim: var(--color-routine-dim);
+  --accent-green-glow: var(--color-routine-tint);
+
+  --accent-slate: #5A6982;
+
+  /* -------------------------------------------------------------------------
+     Supplementary Analytical Visualization Palette (Charts & Series)
+     ------------------------------------------------------------------------- */
+  --chart-blue: #7DAAFF;                /* Primary analytical comparison */
+  --chart-cyan: #55C9E8;                /* In-distribution baseline */
+  --chart-teal: #68D8CB;                /* SignalGate primary candidate */
+  --chart-violet: #B4A0F8;              /* Epistemic disagreement series */
+  --chart-amber: #E8B35E;               /* Capacity-constrained series */
+  --chart-coral: #F27870;               /* High-risk fraud benchmark */
+  --chart-sage: #68C99A;                /* Consensus clearance */
+  --chart-slate: #5A6982;               /* Subdued reference series */
+
+  /* -------------------------------------------------------------------------
+     High-Contrast Typography Palette (WCAG Contrast Verified)
+     ------------------------------------------------------------------------- */
+  --text-primary: #EDF2F6;               /* Primary ice white (contrast 13.5:1 against #111922) */
+  --text-secondary: #B6C5D1;             /* Enhanced slate for readable headers, descriptions, and labels (contrast 8.2:1) */
+  --text-tertiary: #8494A4;              /* High-contrast micro-metadata (contrast 5.1:1) */
+  --text-disabled: #4A5866;              /* Disabled controls */
+  --text-on-accent: #0A0F14;             /* High contrast dark text on surgical teal */
+  --text-inverse: #0A0F14;
+
+  /* -------------------------------------------------------------------------
+     Typography Family & Scale
+     ------------------------------------------------------------------------- */
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Courier Prime', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-display: 2.0rem;      /* 32px, tracking -0.02em, weight 700 */
+  --text-headline-lg: 1.375rem;/* 22px, tracking -0.01em, weight 700 */
+  --text-headline-md: 1.25rem; /* 20px, tracking -0.01em, weight 600 */
+  --text-headline-sm: 1.125rem;/* 18px, tracking 0em, weight 600 */
+  --text-body-lg: 1.0rem;      /* 16px, tracking 0em, weight 400 */
+  --text-body-md: 0.9375rem;   /* 15px, tracking 0em, weight 400 */
+  --text-body-sm: 0.875rem;    /* 14px, tracking 0em, weight 400 */
+  --text-label-md: 0.8125rem;  /* 13px, tracking 0.04em, weight 600 */
+  --text-label-sm: 0.75rem;    /* 12px, tracking 0.05em, weight 600 */
+
+  --text-code-lg: 0.9375rem;   /* 15px, tracking 0em, weight 700 */
+  --text-code-md: 0.875rem;    /* 14px, tracking 0em, weight 400/700 */
+  --text-code-sm: 0.75rem;     /* 12px, tracking 0.04em, weight 500/700 */
+
+  /* Legacy Scale Aliases */
+  --text-xs: 0.8125rem;   /* 13px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-md: 1.0625rem;   /* 17px */
+  --text-lg: 1.25rem;     /* 20px */
+  --text-xl: 1.375rem;    /* 22px */
+  --text-2xl: 1.625rem;   /* 26px */
+  --text-3xl: 2.0rem;     /* 32px */
+
+  /* -------------------------------------------------------------------------
+     Spacing Scale (4px/8px Module)
+     ------------------------------------------------------------------------- */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+
+  /* -------------------------------------------------------------------------
+     Disciplined Geometry & Restrained Radii (No Bubbly Cards)
+     ------------------------------------------------------------------------- */
+  --radius-xs: 2px;    /* Micro-chips, checkboxes, status tags */
+  --radius-sm: 4px;    /* Standard panels, cards, inputs, buttons */
+  --radius-md: 6px;    /* Modals, floating sheets */
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-full: 9999px;
+
+  /* -------------------------------------------------------------------------
+     Zero-Shadow System (Hairline Boundary Discipline)
+     ------------------------------------------------------------------------- */
+  --shadow-none: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-cyan-glow: none;
+  --shadow-coral-glow: none;
+
+  /* -------------------------------------------------------------------------
+     Layout Constants (Design System Section 5)
+     ------------------------------------------------------------------------- */
+  --header-height: 64px;
+  --topbar-height: 64px;
+  --footer-height: 28px;
+  --rail-width: 256px;
+  --sidebar-width: 256px;
+  --sidebar-width-collapsed: 64px;
+
+  /* Z-Index Hierarchy */
+  --z-base: 1;
+  --z-rail: 40;
+  --z-header: 50;
+  --z-footer: 50;
+  --z-drawer: 80;
+  --z-overlay: 90;
+  --z-modal: 100;
+  --z-tooltip: 200;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------------------------------------------------------------------------
+   Executive Light Theme Token Definition Block
+   Activated when [data-theme="light"] or .light-theme is present on <html>
+   --------------------------------------------------------------------------- */
+[data-theme="light"],
+.light-theme {
+  /* Surface & Structural Hierarchy (Light Bedrock & Crisp White Panels) */
+  --bg-canvas: #F1F5F9;                  /* Clean executive light slate bedrock */
+  --bg-surface-primary: #FFFFFF;          /* Pure crisp white cockpit panel surface */
+  --bg-surface-raised: #F8FAFC;           /* Elevated cards, hovered rows, toolbars */
+  --bg-surface-elevated: #FFFFFF;         /* Dialogs, popovers, flyouts, tooltips */
+  --bg-surface-subdued: #EEF2F6;          /* Inset wells, code blocks, 3D canvas backing */
+  --bg-surface-header: #F1F5F9;           /* Anchored card title bars, table headers */
+  --bg-overlay: rgba(15, 23, 42, 0.45);   /* Soft backdrop */
+
+  /* Precision Hairline Boundaries */
+  --border-subtle: #E2E8F0;              /* Internal cell dividers */
+  --border-default: #CBD5E1;             /* 1px structural perimeter */
+  --border-active: #94A3B8;              /* Hovered containers or interactive borders */
+
+  /* Primary Interactive Accent (Surgical Deep Teal - WCAG Verified on Light) */
+  --accent-primary: #0D9488;             /* Deep vibrant surgical teal */
+  --accent-primary-bright: #0F766E;      /* Focus rings, highlighted telemetry */
+  --accent-primary-dim: #99F6E4;         /* Soft container borders / active fills */
+  --accent-primary-tint: rgba(13, 148, 136, 0.12); /* Subtle chip backgrounds */
+
+  /* Operational Semantic Spectrum (High Contrast Decision Truth States) */
+  /* 1. Fraud Alert / High Risk Escalation (Bold Crimson Alert) */
+  --color-fraud-alert: #DC2626;          /* Consensus high risk */
+  --color-fraud-alert-bright: #B91C1C;   /* High-visibility alert text */
+  --color-fraud-alert-dim: #FECACA;      /* Alert border */
+  --color-fraud-alert-tint: rgba(220, 38, 38, 0.10); /* Badge fill */
+
+  /* 2. Manual Review / Escalation (Warm Amber) */
+  --color-manual-review: #D97706;        /* Human-in-the-loop review queue cost */
+  --color-manual-review-bright: #B45309; /* Amber metric highlight */
+  --color-manual-review-dim: #FDE68A;    /* Amber border */
+  --color-manual-review-tint: rgba(217, 119, 6, 0.12); /* Badge fill */
+
+  /* 3. Epistemic Deferral & Capacity Throttling (Vibrant Royal Purple) */
+  --color-epistemic-defer: #7C3AED;      /* Discordance > tau, capacity shunted */
+  --color-epistemic-defer-bright: #6D28D9;/* Violet telemetry highlight */
+  --color-epistemic-defer-dim: #DDD6FE;  /* Violet border */
+  --color-epistemic-defer-tint: rgba(124, 58, 237, 0.12); /* Badge fill */
+
+  /* 4. Routine / Consensus Low Risk (Deep Emerald Sage) */
+  --color-routine: #059669;              /* Frictionless clearance */
+  --color-routine-bright: #047857;       /* Green metric highlight */
+  --color-routine-dim: #A7F3D0;          /* Green border */
+  --color-routine-tint: rgba(5, 150, 105, 0.12); /* Badge fill */
+  --color-routine-clear: var(--color-routine);
+  --color-routine-clear-bright: var(--color-routine-bright);
+  --color-routine-clear-dim: var(--color-routine-dim);
+  --color-routine-clear-tint: var(--color-routine-tint);
+
+  /* Compatibility Aliases */
+  --accent-cyan: var(--accent-primary);
+  --accent-cyan-dim: var(--accent-primary-dim);
+  --accent-cyan-glow: var(--accent-primary-tint);
+
+  --accent-coral: var(--color-fraud-alert);
+  --accent-coral-dim: var(--color-fraud-alert-dim);
+  --accent-coral-glow: var(--color-fraud-alert-tint);
+
+  --accent-amber: var(--color-manual-review);
+  --accent-amber-dim: var(--color-manual-review-dim);
+  --accent-amber-glow: var(--color-manual-review-tint);
+
+  --accent-violet: var(--color-epistemic-defer);
+  --accent-violet-dim: var(--color-epistemic-defer-dim);
+  --accent-violet-glow: var(--color-epistemic-defer-tint);
+
+  --accent-green: var(--color-routine);
+  --accent-green-dim: var(--color-routine-dim);
+  --accent-green-glow: var(--color-routine-tint);
+
+  --accent-slate: #64748B;
+
+  /* Supplementary Analytical Visualization Palette (Light Mode Charts) */
+  --chart-blue: #2563EB;
+  --chart-cyan: #0284C7;
+  --chart-teal: #0D9488;
+  --chart-violet: #7C3AED;
+  --chart-amber: #D97706;
+  --chart-coral: #DC2626;
+  --chart-sage: #059669;
+  --chart-slate: #64748B;
+
+  /* High-Contrast Typography Palette (Light Mode - WCAG AAA/AA Verified) */
+  --text-primary: #0F172A;               /* Deep slate-black (contrast 16:1 against #FFFFFF) */
+  --text-secondary: #334155;             /* Slate for headers and labels (contrast 9:1) */
+  --text-tertiary: #64748B;              /* Micro-metadata (contrast 4.8:1) */
+  --text-disabled: #94A3B8;              /* Disabled controls */
+  --text-on-accent: #FFFFFF;             /* High contrast white text on saturated buttons */
+  --text-inverse: #FFFFFF;
+
+  /* Elevation & Shadows (Soft Micro-Elevation in Light Mode) */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-cyan-glow: 0 0 12px rgba(13, 148, 136, 0.2);
+  --shadow-coral-glow: 0 0 12px rgba(220, 38, 38, 0.2);
+}
+

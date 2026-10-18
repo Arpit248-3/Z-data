@@ -1,0 +1,6 @@
+policy,target_budget,total_transactions,escalated_count,touched_rate,total_fraud,caught_fraud,missed_fraud,recall_at_touched,precision,fpr,deferred_count,deferred_rate,confident_miss_count,routine_fraud_rate
+B1_fixed_threshold,0.06525,2000,126,0.063,111,10,101,0.09009,0.079365,0.061408,0,0.0,101,0.053895
+B2_top_b_risk,0.06525,2000,130,0.065,111,10,101,0.09009,0.076923,0.063526,0,0.0,101,0.054011
+B3a_confidence_deferral,0.06525,2000,130,0.065,111,10,101,0.09009,0.076923,0.063526,0,0.0,101,0.054011
+B4_random_control,0.06525,2000,130,0.065,111,6,105,0.054054,0.046154,0.065643,0,0.0,105,0.05615
+SignalGate_frozen,0.06525,2000,130,0.065,111,10,101,0.09009,0.076923,0.063526,974,0.487,49,0.054688

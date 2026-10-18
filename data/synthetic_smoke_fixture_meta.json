@@ -1,0 +1,17 @@
+{
+  "status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "generator_script": "data/generate_fixture.py",
+  "rows": 10000,
+  "columns": 84,
+  "target_column": "isFraud",
+  "id_column": "TransactionID",
+  "time_column": "TransactionDT",
+  "fraud_count": 476,
+  "fraud_prevalence": 0.0476,
+  "time_min": 86415,
+  "time_max": 384646,
+  "seed": 42,
+  "sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+  "notice": "This dataset is a deterministic synthetic smoke fixture for development, routing, API, and UI integration only. Metrics evaluated on this fixture must never be presented as benchmark performance."
+}

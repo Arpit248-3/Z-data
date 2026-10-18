@@ -1,0 +1,674 @@
+{
+  "status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "selected_method": "sigmoid",
+  "selection_rule": "Lowest validation Brier score (secondary: lowest validation ECE)",
+  "comparison": {
+    "uncalibrated": {
+      "method": "uncalibrated",
+      "description": "Raw uncalibrated base model probabilities",
+      "validation_metrics": {
+        "brier_score": 0.046496,
+        "ece": 0.027248,
+        "roc_auc": 0.583574,
+        "n_samples": 1000,
+        "fraud_count": 48,
+        "reliability_bins": [
+          {
+            "bin_idx": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 982,
+            "mean_pred": 0.01947,
+            "actual_rate": 0.04684,
+            "gap": 0.02737
+          },
+          {
+            "bin_idx": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 18,
+            "mean_pred": 0.13177,
+            "actual_rate": 0.11111,
+            "gap": 0.02066
+          },
+          {
+            "bin_idx": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "status": "EVALUATED"
+    },
+    "sigmoid": {
+      "method": "sigmoid",
+      "description": "Sigmoid calibration fitted on calibration split",
+      "validation_metrics": {
+        "brier_score": 0.04565,
+        "ece": 0.007729,
+        "roc_auc": 0.583574,
+        "n_samples": 1000,
+        "fraud_count": 48,
+        "reliability_bins": [
+          {
+            "bin_idx": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 1000,
+            "mean_pred": 0.05573,
+            "actual_rate": 0.048,
+            "gap": 0.00773
+          },
+          {
+            "bin_idx": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "status": "EVALUATED"
+    },
+    "isotonic": {
+      "method": "isotonic",
+      "description": "Isotonic calibration fitted on calibration split",
+      "validation_metrics": {
+        "brier_score": 0.045734,
+        "ece": 0.007422,
+        "roc_auc": 0.583924,
+        "n_samples": 1000,
+        "fraud_count": 48,
+        "reliability_bins": [
+          {
+            "bin_idx": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 969,
+            "mean_pred": 0.05277,
+            "actual_rate": 0.04747,
+            "gap": 0.0053
+          },
+          {
+            "bin_idx": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 31,
+            "mean_pred": 0.13839,
+            "actual_rate": 0.06452,
+            "gap": 0.07387
+          },
+          {
+            "bin_idx": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "status": "EVALUATED"
+    }
+  },
+  "saved_artifacts": {
+    "sigmoid": {
+      "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+      "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+      "is_synthetic": true,
+      "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+      "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+      "feature_count": 67,
+      "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+      "train_rows": 6000,
+      "calib_rows": 1000,
+      "val_rows": 1000,
+      "scikit_learn_version": "1.8.0",
+      "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY",
+      "calibration_method": "sigmoid",
+      "base_model_artifact": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\hgb_base.joblib",
+      "api_path": "sklearn.frozen.FrozenEstimator + CalibratedClassifierCV(method='sigmoid')",
+      "validation_metrics": {
+        "brier_score": 0.04565,
+        "ece": 0.007729,
+        "roc_auc": 0.583574,
+        "n_samples": 1000,
+        "fraud_count": 48,
+        "reliability_bins": [
+          {
+            "bin_idx": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 1000,
+            "mean_pred": 0.05573,
+            "actual_rate": 0.048,
+            "gap": 0.00773
+          },
+          {
+            "bin_idx": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "artifact_sha256": "00c519243765bfd7844ed877cec0dd3caa2e45310aa47e457647680c8b787fb4",
+      "artifact_path": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\calibrator_sigmoid.joblib",
+      "saved_at": "2026-10-17T03:24:30Z"
+    },
+    "isotonic": {
+      "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+      "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+      "is_synthetic": true,
+      "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+      "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+      "feature_count": 67,
+      "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+      "train_rows": 6000,
+      "calib_rows": 1000,
+      "val_rows": 1000,
+      "scikit_learn_version": "1.8.0",
+      "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY",
+      "calibration_method": "isotonic",
+      "base_model_artifact": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\hgb_base.joblib",
+      "api_path": "sklearn.frozen.FrozenEstimator + CalibratedClassifierCV(method='isotonic')",
+      "validation_metrics": {
+        "brier_score": 0.045734,
+        "ece": 0.007422,
+        "roc_auc": 0.583924,
+        "n_samples": 1000,
+        "fraud_count": 48,
+        "reliability_bins": [
+          {
+            "bin_idx": 0,
+            "range": [
+              0.0,
+              0.1
+            ],
+            "count": 969,
+            "mean_pred": 0.05277,
+            "actual_rate": 0.04747,
+            "gap": 0.0053
+          },
+          {
+            "bin_idx": 1,
+            "range": [
+              0.1,
+              0.2
+            ],
+            "count": 31,
+            "mean_pred": 0.13839,
+            "actual_rate": 0.06452,
+            "gap": 0.07387
+          },
+          {
+            "bin_idx": 2,
+            "range": [
+              0.2,
+              0.3
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 3,
+            "range": [
+              0.3,
+              0.4
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 4,
+            "range": [
+              0.4,
+              0.5
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 5,
+            "range": [
+              0.5,
+              0.6
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 6,
+            "range": [
+              0.6,
+              0.7
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 7,
+            "range": [
+              0.7,
+              0.8
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 8,
+            "range": [
+              0.8,
+              0.9
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          },
+          {
+            "bin_idx": 9,
+            "range": [
+              0.9,
+              1.0
+            ],
+            "count": 0,
+            "mean_pred": null,
+            "actual_rate": null,
+            "gap": null
+          }
+        ]
+      },
+      "artifact_sha256": "8b365160004f893500b1a2381ac58d52a7d1bf243f523ad2532bf55173d54ee2",
+      "artifact_path": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\calibrator_isotonic.joblib",
+      "saved_at": "2026-10-17T03:24:30Z"
+    }
+  },
+  "metadata": {
+    "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+    "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+    "is_synthetic": true,
+    "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+    "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+    "feature_count": 67,
+    "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+    "train_rows": 6000,
+    "calib_rows": 1000,
+    "val_rows": 1000,
+    "scikit_learn_version": "1.8.0",
+    "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+  "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+  "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+  "feature_count": 67,
+  "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+  "train_rows": 6000,
+  "calib_rows": 1000,
+  "val_rows": 1000,
+  "scikit_learn_version": "1.8.0",
+  "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY",
+  "n_members": 3,
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "fit_time_ms": 6611.61,
+  "disagreement_formula": "u = std(member_probabilities, axis=0, ddof=0)",
+  "diagnostics": {
+    "raw_u_distribution": {
+      "mean": 0.010887,
+      "std": 0.010567,
+      "min": 0.000634,
+      "p25": 0.004559,
+      "p50": 0.007389,
+      "p75": 0.013385,
+      "p95": 0.03059,
+      "max": 0.108914
+    },
+    "spearman_corr_p_raw_u": 0.451,
+    "spearman_pval_p_raw_u": 0.0,
+    "u2_distribution": {
+      "mean": 0.020675,
+      "std": 0.261396,
+      "min": -0.680757,
+      "p25": -0.1804,
+      "p50": 0.014626,
+      "p75": 0.225264,
+      "p95": 0.443644,
+      "max": 0.604156
+    },
+    "spearman_corr_p_u2": 0.0609,
+    "spearman_pval_p_u2": 0.054291,
+    "decorrelation_achieved": 0.3901
+  },
+  "artifact_sha256": "6c3a00b094e1242c1436a6adc5c4509f798065454e2554c6189abb805a5964c7",
+  "artifact_path": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\ensemble_members.joblib",
+  "saved_at": "2026-10-17T03:24:37Z"
+}

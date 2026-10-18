@@ -1,0 +1,281 @@
+"""SignalGate API Pydantic Schemas
+
+Defines request and response contracts strictly adhering to Blueprint Section 7 & 8:
+- Reusable, strongly typed models for all public endpoints.
+- Structured ErrorResponse with error code, message, and details.
+- Nullable representations with explicit status strings for unavailable data.
+- Strict leakage rejection on Sandbox scoring inputs.
+"""
+
+from typing import Any, Dict, List, Optional, Union
+from pydantic import BaseModel, Field, field_validator
+
+
+# ---------------------------------------------------------------------------
+# Error Model
+# ---------------------------------------------------------------------------
+class ErrorDetail(BaseModel):
+    code: str
+    message: str
+    details: Dict[str, Any] = Field(default_factory=dict)
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorDetail
+
+
+# ---------------------------------------------------------------------------
+# Health & Status
+# ---------------------------------------------------------------------------
+class HealthResponse(BaseModel):
+    service_name: str
+    version: str
+    status: str
+    timestamp: str
+
+
+class ReadinessStatusResponse(BaseModel):
+    service_name: str
+    version: str
+    overall_status: str
+    evidence_status: str
+    dependencies: Dict[str, Any]
+    hashes: Dict[str, Any]
+
+
+# ---------------------------------------------------------------------------
+# Overview & Results
+# ---------------------------------------------------------------------------
+class OverviewResponse(BaseModel):
+    dataset_status: str
+    is_synthetic: bool
+    evaluation_status: str
+    total_tested_transactions: Optional[int] = None
+    available_fraud_count: Optional[int] = None
+    fraud_prevalence: Optional[float] = None
+    primary_budget: Optional[float] = None
+    b2_recall: Optional[float] = None
+    signalgate_recall: Optional[float] = None
+    delta_recall_pp: Optional[float] = None
+    ci_95: Optional[List[float]] = None
+    ci_conclusive: Optional[bool] = None
+    touched_rate: Optional[float] = None
+    alert_rate: Optional[float] = None
+    review_rate: Optional[float] = None
+    deferred_rate: Optional[float] = None
+    confident_miss_count: Optional[int] = None
+    routine_fraud_rate: Optional[float] = None
+    latency_p95_ms: Optional[float] = None
+    frozen_config_hash: Optional[str] = None
+    split_hash: Optional[str] = None
+    status_fields: Dict[str, str] = Field(default_factory=dict)
+
+
+# ---------------------------------------------------------------------------
+# Policies & Comparison
+# ---------------------------------------------------------------------------
+class PolicyComparisonItem(BaseModel):
+    policy: str
+    target_budget: float
+    total_transactions: int
+    escalated_count: int
+    touched_rate: float
+    total_fraud: int
+    caught_fraud: int
+    missed_fraud: int
+    recall_at_touched: float
+    precision: float
+    fpr: Optional[float] = None
+    deferred_count: Optional[int] = None
+    deferred_rate: Optional[float] = None
+    confident_miss_count: Optional[int] = None
+    routine_fraud_rate: Optional[float] = None
+    threshold: Optional[float] = None
+
+
+class PolicyCompareResponse(BaseModel):
+    status: str
+    is_synthetic: bool
+    budget_multiple: str
+    target_budget: float
+    policies: List[PolicyComparisonItem]
+    disclaimer: str
+
+
+# ---------------------------------------------------------------------------
+# Scenarios
+# ---------------------------------------------------------------------------
+class ScenarioItem(BaseModel):
+    scenario_id: str
+    name: str
+    description: str
+    status: str
+    is_synthetic: bool
+    sample_count: int
+    fraud_count: int
+    fraud_prevalence: float
+    b2_recall: Optional[float] = None
+    signalgate_recall: Optional[float] = None
+    delta_recall_vs_b2_pp: Optional[float] = None
+    scenario_hash: str
+    replay_available: bool
+
+
+class ScenariosResponse(BaseModel):
+    status: str
+    scenarios: List[ScenarioItem]
+
+
+# ---------------------------------------------------------------------------
+# Cases Explorer
+# ---------------------------------------------------------------------------
+class CaseListItem(BaseModel):
+    case_id: str
+    timestamp: int
+    amount: float
+    product_cd: Optional[str] = None
+    card4: Optional[str] = None
+    scenario_id: str
+    p: float
+    u: Optional[float] = None
+    action: str
+    reason_code: str
+    governor_status: str
+    lane_rank: Optional[int] = None
+    offline_is_fraud: Optional[int] = None
+
+
+class CasesResponse(BaseModel):
+    total_cases: int
+    limit: int
+    offset: int
+    scenario_id: str
+    cases: List[CaseListItem]
+
+
+class CaseDetailResponse(BaseModel):
+    case_id: str
+    timestamp: int
+    amount: float
+    scenario_id: str
+    status: str
+    signals: Dict[str, Any]
+    decision: Dict[str, Any]
+    features: Dict[str, Any]
+    offline_evaluation: Optional[Dict[str, Any]] = None
+    explanations: Dict[str, Any]
+
+
+# ---------------------------------------------------------------------------
+# Shift Storm Replay
+# ---------------------------------------------------------------------------
+class ReplayRowItem(BaseModel):
+    row_id: int
+    case_id: str
+    timestamp: int
+    transaction_id: str
+    amount: float
+    product_cd: str
+    card4: str
+    p: float
+    u: float
+    u_method: str
+    action: str
+    reason_code: str
+    governor_status: str
+    lane_rank: Optional[int] = None
+    scenario_id: str
+    status: str
+    offline_ground_truth: Optional[Dict[str, Any]] = None
+
+
+class ReplayRowsResponse(BaseModel):
+    total_rows: int
+    offset: int
+    limit: int
+    scenario_id: str
+    status: str
+    rows: List[ReplayRowItem]
+
+
+# ---------------------------------------------------------------------------
+# Audit Trail
+# ---------------------------------------------------------------------------
+class AuditListResponse(BaseModel):
+    total_records: int
+    offset: int
+    limit: int
+    skipped_records: int = 0
+    records: List[Dict[str, Any]]
+
+
+import math
+
+
+# ---------------------------------------------------------------------------
+# Scoring Sandbox
+# ---------------------------------------------------------------------------
+FORBIDDEN_SCORING_FIELDS = {
+    "true_label",
+    "isfraud",
+    "target",
+    "label",
+    "y_true",
+    "ground_truth",
+    "transactionid",
+    "transactiondt",
+    "raw_transactiondt",
+    "rawtransactiondt",
+    "id",
+}
+
+
+def _check_forbidden_recursively(obj: Any) -> None:
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            k_norm = str(k).lower().replace("_", "").replace("-", "")
+            if k_norm in {f.replace("_", "").replace("-", "") for f in FORBIDDEN_SCORING_FIELDS}:
+                raise ValueError(
+                    f"LEAKAGE VIOLATION: Forbidden field '{k}' is strictly rejected from scoring inputs."
+                )
+            _check_forbidden_recursively(v)
+    elif isinstance(obj, (list, tuple, set)):
+        for item in obj:
+            _check_forbidden_recursively(item)
+
+
+class SandboxScoreRequest(BaseModel):
+    features: Dict[str, Any]
+
+    @field_validator("features")
+    def reject_forbidden_features(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        if not v:
+            raise ValueError("Feature payload cannot be empty.")
+        
+        # 1. Recursive leakage check
+        _check_forbidden_recursively(v)
+
+        # 2. Enforce scalar and finite-value constraints
+        for k, val in v.items():
+            if isinstance(val, (dict, list, tuple)):
+                raise ValueError(f"Feature '{k}' must be a scalar value (float, int, str, or null).")
+            if isinstance(val, float):
+                if math.isnan(val) or math.isinf(val):
+                    raise ValueError(f"Feature '{k}' contains non-finite value ({val}). Pass null to represent missing data.")
+            elif isinstance(val, str):
+                if val.strip().lower() in ("nan", "inf", "-inf", "+inf", "infinity", "-infinity"):
+                    raise ValueError(f"Feature '{k}' contains non-finite string representation '{val}'.")
+
+        return v
+
+
+class SandboxScoreResponse(BaseModel):
+    decision_id: str
+    timestamp: str
+    signals: Dict[str, Any]
+    decision: Dict[str, Any]
+    governor: Dict[str, Any]
+    latency_ms: float
+    provenance: Dict[str, Any]
+    audit_logged: bool
+    notice: str

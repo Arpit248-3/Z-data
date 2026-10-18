@@ -1,0 +1,82 @@
+project:
+  name: SignalGate
+  version: 0.1.0
+  phase: PHASE_1_PREFLIGHT
+  status: SYNTHETIC_SMOKE_ONLY
+budget_primary_multiple: 1.5
+budget_sweep:
+- 1.0
+- 1.5
+- 2.0
+- 3.0
+seeds:
+- 11
+- 22
+- 33
+- 44
+- 55
+split_pct:
+  train:
+  - 0
+  - 60
+  calib:
+  - 60
+  - 70
+  val:
+  - 70
+  - 80
+  test:
+  - 80
+  - 100
+acceptance:
+  AC1_pp: 2.0
+  AC2_reduction: 0.1
+  AC5_p95_ms: 50
+bootstrap_resamples: 1000
+features:
+  velocity: false
+  v_pruning: false
+explanations:
+  enabled: false
+  method: null
+backend: sklearn
+thresholds:
+  t_alert: 0.084705
+  t_review: 0.071002
+  u_threshold: 0.526773
+  disagreement_enabled: true
+  disagreement_variant: u2_rank_residual
+  novelty_enabled: false
+  n_threshold: null
+  target_budget: 0.06525
+  validation_metrics:
+    t_alert: 0.084705
+    t_review: 0.071002
+    u_threshold: 0.526773
+    disagreement_enabled: true
+    escalated_count: 64
+    touched_rate: 0.064
+    caught_fraud: 3
+    total_fraud: 48
+    recall: 0.0625
+    alert_count: 5
+    review_count: 44
+    disagreement_count: 15
+dataset:
+  name: SYNTHETIC_SMOKE_ONLY
+  is_synthetic: true
+  status: SYNTHETIC_SMOKE_ONLY
+  path: data/synthetic_smoke_fixture.csv
+  fallback_reason: IEEE-CIS Fraud Detection dataset not found in local workspace or
+    downloads
+  target_col: isFraud
+  time_col: TransactionDT
+  id_col: TransactionID
+  seed: 42
+  rows: 10000
+smoke_fit:
+  rows: 10000
+  model: HistGradientBoostingClassifier
+  calibration_method: sigmoid
+config_hash: 8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240
+phase: PHASE_4_POLICY_ROUTER

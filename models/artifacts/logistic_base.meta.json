@@ -1,0 +1,144 @@
+{
+  "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+  "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+  "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+  "feature_count": 67,
+  "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+  "train_rows": 6000,
+  "calib_rows": 1000,
+  "val_rows": 1000,
+  "scikit_learn_version": "1.8.0",
+  "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY",
+  "model_type": "LogisticRegression_Pipeline",
+  "parameters": {
+    "random_state": 11,
+    "max_iter": 100,
+    "scaler": "StandardScaler",
+    "imputer": "SimpleImputer(median)"
+  },
+  "fit_time_ms": 125.19,
+  "validation_metrics": {
+    "brier_score": 0.045428,
+    "ece": 0.004144,
+    "roc_auc": 0.627998,
+    "n_samples": 1000,
+    "fraud_count": 48,
+    "reliability_bins": [
+      {
+        "bin_idx": 0,
+        "range": [
+          0.0,
+          0.1
+        ],
+        "count": 961,
+        "mean_pred": 0.0425,
+        "actual_rate": 0.04579,
+        "gap": 0.00328
+      },
+      {
+        "bin_idx": 1,
+        "range": [
+          0.1,
+          0.2
+        ],
+        "count": 38,
+        "mean_pred": 0.12372,
+        "actual_rate": 0.10526,
+        "gap": 0.01846
+      },
+      {
+        "bin_idx": 2,
+        "range": [
+          0.2,
+          0.3
+        ],
+        "count": 1,
+        "mean_pred": 0.28763,
+        "actual_rate": 0.0,
+        "gap": 0.28763
+      },
+      {
+        "bin_idx": 3,
+        "range": [
+          0.3,
+          0.4
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 4,
+        "range": [
+          0.4,
+          0.5
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 5,
+        "range": [
+          0.5,
+          0.6
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 6,
+        "range": [
+          0.6,
+          0.7
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 7,
+        "range": [
+          0.7,
+          0.8
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 8,
+        "range": [
+          0.8,
+          0.9
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      },
+      {
+        "bin_idx": 9,
+        "range": [
+          0.9,
+          1.0
+        ],
+        "count": 0,
+        "mean_pred": null,
+        "actual_rate": null,
+        "gap": null
+      }
+    ]
+  },
+  "artifact_sha256": "14ae6440be988bb4464436f12ca727698d588e660d728dbc301ecb133fa2e4e3",
+  "artifact_path": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\logistic_base.joblib",
+  "saved_at": "2026-10-17T03:24:29Z"
+}

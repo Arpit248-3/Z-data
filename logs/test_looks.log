@@ -1,0 +1,15 @@
+[2026-10-17T03:40:47Z] TEST LOOK G3 (LOOK 1 OF 2 PRE-REGISTERED)
+  Purpose: Blueprint Gate G3 frozen policy validation check on held-out test split.
+  Frozen Config SHA-256: 8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240
+  Split Hash: 07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd
+  Test Rows: 2000 | Primary Budget: 0.06525 (6.525%)
+  Dataset Status: SYNTHETIC_SMOKE_ONLY
+  Notice: Strictly non-iterative test look; no thresholds or model features will be tuned in response.
+----------------------------------------------------------------------
+[2026-10-17T04:07:39Z] TEST LOOK G5 (LOOK 2 OF 2 PRE-REGISTERED - FINAL EVALUATION)
+  Purpose: Phase 5 final evaluation, paired bootstrap CIs, shift analysis, and latency benchmarking.
+  Frozen Config SHA-256: 8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240
+  Split Hash: 07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd
+  Test Rows: 2000 | Status: SYNTHETIC_SMOKE_ONLY
+  Notice: Final evaluation look using frozen policy. No retuning will be performed.
+----------------------------------------------------------------------

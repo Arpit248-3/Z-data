@@ -1,0 +1,11 @@
+segment_feature,segment_category,sample_size,fraud_count,fraud_prevalence,alert_count,review_count,routine_count,deferred_count,touched_rate,recall,precision
+ProductCD,W,1476,69,0.046748,10,93,670,703,0.069783,0.086957,0.058252
+ProductCD,C,233,25,0.107296,0,11,97,125,0.04721,0.12,0.272727
+ProductCD,R,146,10,0.068493,0,8,62,76,0.054795,0.0,0.0
+ProductCD,H,99,2,0.020202,0,5,49,45,0.050505,0.0,0.0
+ProductCD,S,46,5,0.108696,1,2,18,25,0.065217,0.2,0.333333
+card4,visa,1312,72,0.054878,9,82,581,640,0.06936,0.069444,0.054945
+card4,mastercard,539,32,0.059369,2,28,251,258,0.055659,0.125,0.133333
+card4,discover,86,5,0.05814,0,2,40,44,0.023256,0.0,0.0
+card4,american express,48,2,0.041667,0,6,19,23,0.125,0.5,0.166667
+card4,missing,15,0,0.0,0,1,5,9,0.066667,,0.0

@@ -1,0 +1,21 @@
+{
+  "dataset_source": "C:\\Users\\arpit\\Desktop\\project\\data\\synthetic_smoke_fixture.csv",
+  "dataset_status": "SYNTHETIC_SMOKE_ONLY",
+  "is_synthetic": true,
+  "dataset_sha256": "da00179ebf37970ec8907d11cfb366d170ddd5b2b41370e881bf92359b7d17de",
+  "config_sha256": "a49a92d86ae590841eae0666a5b18d5a1474c5a8bcb16dcd5615a3ca28efa18c",
+  "feature_count": 67,
+  "feature_manifest_sha256": "eb9b39dca71480208ea28d8137cd08867877426ad9d8271d039c867c5a391b52",
+  "train_rows": 6000,
+  "calib_rows": 1000,
+  "val_rows": 1000,
+  "scikit_learn_version": "1.8.0",
+  "evidence_classification": "SYNTHETIC_DEVELOPMENT_EVIDENCE_ONLY",
+  "method": "RankResidualizer",
+  "description": "Mapping from rank(p) to rank(u) on calibration split; residual u2 = r_u - hat{r}_u",
+  "n_calib_points": 1000,
+  "spearman_corr_p_u2_val": 0.0609,
+  "artifact_sha256": "10cadc14aa4f8781020079c9f23c030beb392a294066b56de18d4c972ee784a4",
+  "artifact_path": "C:\\Users\\arpit\\Desktop\\project\\models\\artifacts\\residualizer_u2.joblib",
+  "saved_at": "2026-10-17T03:24:37Z"
+}
