@@ -10,7 +10,7 @@ import {
   Sliders,
 } from 'lucide-react';
 import { useMode } from '../context/ModeContext';
-import { TOPOLOGY_DETAILS } from './topologyData';
+import { getTopologyDetails } from './topologyData';
 
 interface SignalCoreFallbackProps {
   onSelectNode?: (nodeKey: string) => void;
@@ -23,7 +23,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
   onSwitchTo3D,
   reason = '2D Vector Fallback Mode (SVG Topology Pipeline)',
 }) => {
-  const { isRealDataMode, isLiveDisconnected } = useMode();
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
@@ -33,8 +33,42 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
     onSelectNode?.(nextKey || '');
   };
 
+  const topologyDetails = getTopologyDetails(mode);
   const activeDetailKey = selectedKey || hoveredKey;
-  const activeDetail = activeDetailKey ? TOPOLOGY_DETAILS[activeDetailKey] : null;
+  const activeDetail = activeDetailKey ? topologyDetails[activeDetailKey] : null;
+
+  const outcomeCounts = isLiveDisconnected
+    ? {
+        alert: '0 cases',
+        alertSub: 'Stream disconnected • Inactive',
+        review: '0 cases',
+        reviewSub: 'Stream disconnected • Inactive',
+        routine: '0 cases',
+        routineSub: 'Stream disconnected • Inactive',
+        deferred: '0 cases',
+        deferredSub: 'Stream disconnected • Zero staged',
+      }
+    : isRealDataMode
+    ? {
+        alert: '1,280 cases',
+        alertSub: 'p ≥ 0.0847 • Direct Alert',
+        review: '4,713 cases',
+        reviewSub: 'Cap Saturated • Analyst Queue',
+        routine: '109,787 cases',
+        routineSub: 'Low Risk Clearance • Auto Pass',
+        deferred: '2,328 cases',
+        deferredSub: 'Capacity Saturated • 1.97% Staged',
+      }
+    : {
+        alert: '11 cases',
+        alertSub: 'p ≥ 0.0847 • Direct Alert',
+        review: '119 cases',
+        reviewSub: 'Cap Saturated • Analyst Queue',
+        routine: '896 cases',
+        routineSub: 'Low Risk Clearance • Auto Pass',
+        deferred: '974 cases',
+        deferredSub: 'Capacity Saturated • 48.7% Staged',
+      };
 
   // Active connector state calculation
   const isInputActive = selectedKey === 'stage_input' || hoveredKey === 'stage_input' || selectedKey === 'stage_core' || hoveredKey === 'stage_core';
@@ -270,7 +304,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                 onClick={() => handleSelect('lane_alert')}
                 onMouseEnter={() => setHoveredKey('lane_alert')}
                 onMouseLeave={() => setHoveredKey(null)}
-                aria-label="Outcome Lane 1: Fraud Alert. 11 cases, p >= 0.0847."
+                aria-label={`Outcome Lane 1: Fraud Alert. ${outcomeCounts.alert}, p >= 0.0847.`}
                 aria-pressed={selectedKey === 'lane_alert'}
               >
                 <div className="lane-accent-bar" style={{ backgroundColor: 'var(--color-fraud-alert)' }} />
@@ -278,9 +312,9 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                   <div className="lane-main-line">
                     <ShieldAlert size={13} style={{ color: 'var(--color-fraud-alert)', flexShrink: 0 }} />
                     <span className="lane-action-name">Fraud Alert</span>
-                    <span className="lane-count-tag count-alert">11 cases</span>
+                    <span className="lane-count-tag count-alert">{outcomeCounts.alert}</span>
                   </div>
-                  <div className="lane-sub-line">p &ge; 0.0847 &bull; Direct Alert</div>
+                  <div className="lane-sub-line">{outcomeCounts.alertSub}</div>
                 </div>
               </button>
 
@@ -291,7 +325,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                 onClick={() => handleSelect('lane_review')}
                 onMouseEnter={() => setHoveredKey('lane_review')}
                 onMouseLeave={() => setHoveredKey(null)}
-                aria-label="Outcome Lane 2: Manual Review. 119 cases, quota cap saturated."
+                aria-label={`Outcome Lane 2: Manual Review. ${outcomeCounts.review}, quota cap saturated.`}
                 aria-pressed={selectedKey === 'lane_review'}
               >
                 <div className="lane-accent-bar" style={{ backgroundColor: 'var(--color-manual-review)' }} />
@@ -299,9 +333,9 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                   <div className="lane-main-line">
                     <UserCheck size={13} style={{ color: 'var(--color-manual-review)', flexShrink: 0 }} />
                     <span className="lane-action-name">Manual Review</span>
-                    <span className="lane-count-tag count-review">119 cases</span>
+                    <span className="lane-count-tag count-review">{outcomeCounts.review}</span>
                   </div>
-                  <div className="lane-sub-line">Cap Saturated &bull; Analyst Queue</div>
+                  <div className="lane-sub-line">{outcomeCounts.reviewSub}</div>
                 </div>
               </button>
 
@@ -312,7 +346,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                 onClick={() => handleSelect('lane_routine')}
                 onMouseEnter={() => setHoveredKey('lane_routine')}
                 onMouseLeave={() => setHoveredKey(null)}
-                aria-label="Outcome Lane 3: Routine Clearance. 896 cases, automated pass."
+                aria-label={`Outcome Lane 3: Routine Clearance. ${outcomeCounts.routine}, automated pass.`}
                 aria-pressed={selectedKey === 'lane_routine'}
               >
                 <div className="lane-accent-bar" style={{ backgroundColor: 'var(--color-routine)' }} />
@@ -320,9 +354,9 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                   <div className="lane-main-line">
                     <CheckCircle size={13} style={{ color: 'var(--color-routine)', flexShrink: 0 }} />
                     <span className="lane-action-name">Routine</span>
-                    <span className="lane-count-tag count-routine">896 cases</span>
+                    <span className="lane-count-tag count-routine">{outcomeCounts.routine}</span>
                   </div>
-                  <div className="lane-sub-line">Low Risk Clearance &bull; Auto Pass</div>
+                  <div className="lane-sub-line">{outcomeCounts.routineSub}</div>
                 </div>
               </button>
 
@@ -333,7 +367,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                 onClick={() => handleSelect('lane_deferred')}
                 onMouseEnter={() => setHoveredKey('lane_deferred')}
                 onMouseLeave={() => setHoveredKey(null)}
-                aria-label="Outcome Lane 4: Held / Deferred. 974 cases, capacity buffer."
+                aria-label={`Outcome Lane 4: Held / Deferred. ${outcomeCounts.deferred}, capacity buffer.`}
                 aria-pressed={selectedKey === 'lane_deferred'}
               >
                 <div className="lane-accent-bar" style={{ backgroundColor: 'var(--color-epistemic-defer)' }} />
@@ -341,9 +375,9 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
                   <div className="lane-main-line">
                     <Filter size={13} style={{ color: 'var(--color-epistemic-defer)', flexShrink: 0 }} />
                     <span className="lane-action-name">Held / Deferred</span>
-                    <span className="lane-count-tag count-deferred">974 cases</span>
+                    <span className="lane-count-tag count-deferred">{outcomeCounts.deferred}</span>
                   </div>
-                  <div className="lane-sub-line">Capacity Saturated &bull; 48.7% Staged</div>
+                  <div className="lane-sub-line">{outcomeCounts.deferredSub}</div>
                 </div>
               </button>
             </div>

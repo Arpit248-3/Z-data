@@ -300,42 +300,105 @@ export const OverviewPage: React.FC = () => {
           category: 'DRIFT-AWARE TRIAGE & ISOLATION',
           icon: <Filter size={18} />,
           accentColor: 'var(--color-epistemic-defer)',
-          shortDesc: 'Measures transaction volume diverted away from brittle automated execution. Cases exceeding epistemic ensemble threshold (u₂ ≥ 0.5268) or human capacity ceiling (Rule R6) enter safe asynchronous quarantine.',
-          formula: 'Deferral_Ratio = N_deferred / N_total = 974 / 2,000 (48.7%)',
-          parameters: [
-            { label: 'Total Deferred Volume', value: '974 cases (48.7% of evaluation set)' },
-            { label: 'Epistemic Gate (u_th)', value: '0.5268 (Ensemble Disagreement Cutoff)' },
-            { label: 'Review Spillover Cases', value: 'Diverted via Rule R6 Capacity Ceiling' },
-            { label: 'Execution Mode', value: 'Safe Held / Epistemic Async Inspection' },
-          ],
+          shortDesc: isRealDataMode
+            ? 'Measures transaction volume diverted away from brittle automated execution. Cases exceeding epistemic ensemble threshold or human capacity ceiling (Rule R6) enter safe asynchronous quarantine (2,328 cases on IEEE-CIS test partition).'
+            : isLiveDisconnected
+            ? 'Live production banking feed is disconnected. Zero deferred cases active.'
+            : 'Measures transaction volume diverted away from brittle automated execution. Cases exceeding epistemic ensemble threshold (u₂ ≥ 0.5268) or human capacity ceiling (Rule R6) enter safe asynchronous quarantine.',
+          formula: isRealDataMode
+            ? 'Deferral_Ratio = N_deferred / N_total = 2,328 / 118,108 (1.97%)'
+            : isLiveDisconnected
+            ? 'Deferral_Ratio = N_deferred / N_total = 0 / 0 (Stream Disconnected)'
+            : 'Deferral_Ratio = N_deferred / N_total = 974 / 2,000 (48.7%)',
+          parameters: isRealDataMode
+            ? [
+                { label: 'Total Deferred Volume', value: '2,328 cases (1.97% of evaluation set)' },
+                { label: 'Epistemic Gate (u_th)', value: '0.5268 (Ensemble Disagreement Cutoff)' },
+                { label: 'Review Spillover Cases', value: 'Diverted via Rule R6 Capacity Ceiling' },
+                { label: 'Execution Mode', value: 'Safe Held / Epistemic Async Inspection' },
+              ]
+            : isLiveDisconnected
+            ? [
+                { label: 'Total Deferred Volume', value: '0 cases (Stream Disconnected)' },
+                { label: 'Epistemic Gate (u_th)', value: '0.5268 (Ensemble Disagreement Cutoff)' },
+                { label: 'Review Spillover Cases', value: '0 cases (Ingestion Quenched)' },
+                { label: 'Execution Mode', value: 'Fail-Closed Disconnect Hold' },
+              ]
+            : [
+                { label: 'Total Deferred Volume', value: '974 cases (48.7% of evaluation set)' },
+                { label: 'Epistemic Gate (u_th)', value: '0.5268 (Ensemble Disagreement Cutoff)' },
+                { label: 'Review Spillover Cases', value: 'Diverted via Rule R6 Capacity Ceiling' },
+                { label: 'Execution Mode', value: 'Safe Held / Epistemic Async Inspection' },
+              ],
           telemetryNotes: [
             'Eliminates catastrophic false-negative leaks under unseen covariate shifts (S1/S2/S3).',
             'Quarantines anomalous distributions for secondary offline analysis.',
             'Provides audit-verifiable isolation with cryptographic hash references.',
           ],
-          partitionInfo: 'Test Look Partition: 974 / 2,000 Deferred',
+          partitionInfo: isRealDataMode
+            ? 'IEEE-CIS Test Partition: 2,328 / 118,108 Deferred'
+            : isLiveDisconnected
+            ? 'Live Feed: Disconnected'
+            : 'Test Look Partition: 974 / 2,000 Deferred',
         };
 
         const precisionTouchedDetail: TiltGlassCardDetail = {
           title: 'Precision @ Touched Performance Benchmark',
-          subtitle: 'Active Investigation Yield on Canonical Test Set',
+          subtitle: 'Active Intervention Yield on Canonical Test Set',
           category: 'ACTIVE INTERVENTION FIDELITY',
           icon: <Crosshair size={18} />,
           accentColor: 'var(--accent-primary-bright)',
-          shortDesc: 'Quantifies confirmed fraud instances intercepted within the 130 cases actively touched by human investigators on the frozen test look partition, capturing 10 of 111 total ground-truth fraud occurrences.',
-          formula: 'Precision@Touched = TP / (TP + FP) = 10 / 130 (7.69%)',
-          parameters: [
-            { label: 'True Positives Caught', value: '10 confirmed fraud cases' },
-            { label: 'Active Queue Volume', value: '130 touched cases' },
-            { label: 'Recall @ Touched', value: '9.01% (10 of 111 total ground-truth fraud)' },
-            { label: 'Intervention Precision', value: '7.69% (10 of 130 touched)' },
-          ],
-          telemetryNotes: [
-            'Verified frozen benchmark on canonical G3 test look partition.',
-            'Matches B2 Top-B baseline recall while adding 974 safe deferrals.',
-            'Conclusive superiority test flag: false (honest smoke protocol reporting).',
-          ],
-          partitionInfo: 'Frozen Benchmark: G3 Test Look Partition',
+          shortDesc: isRealDataMode
+            ? 'Quantifies confirmed fraud instances intercepted within the 5,993 cases actively touched by human investigators on the frozen test partition, capturing 2,067 of 4,064 total ground-truth fraud occurrences.'
+            : isLiveDisconnected
+            ? 'Live production banking stream is currently disconnected. No real-time precision metrics available.'
+            : 'Quantifies confirmed fraud instances intercepted within the 130 cases actively touched by human investigators on the frozen test look partition, capturing 10 of 111 total ground-truth fraud occurrences.',
+          formula: isRealDataMode
+            ? 'Precision@Touched = TP / (TP + FP) = 2,067 / 5,993 (34.49%)'
+            : isLiveDisconnected
+            ? 'Precision@Touched = TP / (TP + FP) = 0 / 0 (Offline)'
+            : 'Precision@Touched = TP / (TP + FP) = 10 / 130 (7.69%)',
+          parameters: isRealDataMode
+            ? [
+                { label: 'True Positives Caught', value: '2,067 confirmed fraud cases' },
+                { label: 'Active Queue Volume', value: '5,993 touched cases' },
+                { label: 'Recall @ Touched', value: '50.86% (2,067 of 4,064 total ground-truth fraud)' },
+                { label: 'Intervention Precision', value: '34.49% (2,067 of 5,993 touched)' },
+              ]
+            : isLiveDisconnected
+            ? [
+                { label: 'True Positives Caught', value: '0 confirmed fraud cases' },
+                { label: 'Active Queue Volume', value: '0 touched cases' },
+                { label: 'Recall @ Touched', value: 'N/A (Stream Disconnected)' },
+                { label: 'Intervention Precision', value: 'N/A (Stream Disconnected)' },
+              ]
+            : [
+                { label: 'True Positives Caught', value: '10 confirmed fraud cases' },
+                { label: 'Active Queue Volume', value: '130 touched cases' },
+                { label: 'Recall @ Touched', value: '9.01% (10 of 111 total ground-truth fraud)' },
+                { label: 'Intervention Precision', value: '7.69% (10 of 130 touched)' },
+              ],
+          telemetryNotes: isRealDataMode
+            ? [
+                'Verified frozen benchmark on IEEE-CIS 118,108 test partition.',
+                'Matches B2 Top-B baseline recall (50.86%) under identical workload multiple.',
+                'Conclusive paired bootstrap CI: [0.0, 0.0] under frozen zero-lambda threshold.',
+              ]
+            : isLiveDisconnected
+            ? [
+                'Live streaming edge is disconnected (fail-closed).',
+                'Ingestion pipeline safely paused to prevent unverified processing.',
+              ]
+            : [
+                'Verified frozen benchmark on canonical G3 test look partition.',
+                'Matches B2 Top-B baseline recall while adding 974 safe deferrals.',
+                'Conclusive superiority test flag: false (honest smoke protocol reporting).',
+              ],
+          partitionInfo: isRealDataMode
+            ? 'Frozen Benchmark: IEEE-CIS Test Partition (118,108 tx)'
+            : isLiveDisconnected
+            ? 'Live Feed: Disconnected'
+            : 'Frozen Benchmark: G3 Test Look Partition (2,000 tx)',
         };
 
 

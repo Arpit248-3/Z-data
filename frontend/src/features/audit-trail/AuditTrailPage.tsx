@@ -25,6 +25,32 @@ import { ErrorState } from '../../components/ErrorState';
 
 const PAGE_SIZE = 25;
 
+const formatTimestamp = (timestamp?: string, ts?: number, seq?: number) => {
+  if (timestamp) {
+    try {
+      const d = new Date(timestamp);
+      if (!isNaN(d.getTime())) {
+        const hours = String(d.getUTCHours()).padStart(2, '0');
+        const mins = String(d.getUTCMinutes()).padStart(2, '0');
+        const secs = String(d.getUTCSeconds()).padStart(2, '0');
+        const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        return `${month}/${day} ${hours}:${mins}:${secs} UTC`;
+      }
+    } catch {
+      // Fallback
+    }
+    return String(timestamp).replace('T', ' ').slice(0, 19);
+  }
+  if (typeof ts === 'number') {
+    return `+${ts.toLocaleString()}s`;
+  }
+  if (typeof seq === 'number') {
+    return `Seq #${seq}`;
+  }
+  return '—';
+};
+
 export const AuditTrailPage: React.FC = () => {
   const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [records, setRecords] = useState<AuditRecordItem[]>([]);
@@ -344,7 +370,9 @@ export const AuditTrailPage: React.FC = () => {
                       <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: '13.5px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Clock size={14} style={{ color: 'var(--text-tertiary)' }} />
-                          <span>+{typeof r.ts === 'number' ? r.ts : 0}s</span>
+                          <span title={r.timestamp ? String(r.timestamp) : undefined}>
+                            {formatTimestamp(r.timestamp as string | undefined, r.ts as number | undefined, r.seq as number | undefined)}
+                          </span>
                         </div>
                       </td>
 
@@ -635,7 +663,14 @@ export const AuditTrailPage: React.FC = () => {
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12.5px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
                   <Clock size={13} />
-                  <span>Offset: +{typeof selectedRecord.ts === 'number' ? selectedRecord.ts : 0}s</span>
+                  <span>
+                    {selectedRecord.timestamp
+                      ? `Time: ${selectedRecord.timestamp}`
+                      : `Offset: +${typeof selectedRecord.ts === 'number' ? selectedRecord.ts : 0}s`}
+                  </span>
+                  {typeof selectedRecord.seq === 'number' && (
+                    <span style={{ color: 'var(--text-tertiary)', marginLeft: '6px' }}>&bull; Block #{selectedRecord.seq}</span>
+                  )}
                 </div>
               </div>
 
