@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useMode } from '../context/ModeContext';
 import {
   ChevronDown,
   ChevronLeft,
@@ -67,6 +68,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   onCloseMobile,
 }) => {
+  const { isRealDataMode, isLiveDisconnected } = useMode();
+
   // Collapsible & Hideable Capacity state with localStorage persistence
   const [capacityCollapsed, setCapacityCollapsed] = useState<boolean>(() => {
     return localStorage.getItem('signalgate_capacity_collapsed') === 'true';
@@ -127,7 +130,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <Eye size={12} />
                 <span>Show Capacity</span>
-                <span className="capacity-mini-badge">130</span>
+                <span className="capacity-mini-badge">{isRealDataMode ? '5.9k' : isLiveDisconnected ? '0' : '130'}</span>
               </button>
             </div>
           ) : (
@@ -148,8 +151,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     Evaluation Capacity
                   </span>
                   {capacityCollapsed && (
-                    <span className="capacity-pill-summary" title="Review queue saturated at 130 / 130">
-                      130 / 130 [Sat]
+                    <span className="capacity-pill-summary" title={isRealDataMode ? 'Review queue saturated at 5,993 / 5,993' : isLiveDisconnected ? 'Capacity idle (stream disconnected)' : 'Review queue saturated at 130 / 130'}>
+                      {isRealDataMode ? '5,993 / 5,993 [Sat]' : isLiveDisconnected ? '0 / 0 [Idle]' : '130 / 130 [Sat]'}
                     </span>
                   )}
                 </button>
@@ -169,40 +172,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="capacity-telemetry-box animate-fade-in">
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Review Budget:</span>
-                    <span className="capacity-metric-value" title="1.5x training prevalence target budget (6.525%)">
-                      130 (6.525%)
+                    <span className="capacity-metric-value" title={isRealDataMode ? '1.5x training prevalence target budget (5.075%)' : isLiveDisconnected ? 'Live feed disconnected' : '1.5x training prevalence target budget (6.525%)'}>
+                      {isRealDataMode ? '5,993 (5.075%)' : isLiveDisconnected ? '0 (Offline)' : '130 (6.525%)'}
                     </span>
                   </div>
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Queue Consumption:</span>
-                    <span className="capacity-metric-value saturated" title="Governor consumed 130 of 130 review slots on test partition">
-                      130 / 130 [Saturated]
+                    <span className={`capacity-metric-value ${isLiveDisconnected ? '' : 'saturated'}`} title={isRealDataMode ? 'Governor consumed 5,993 of 5,993 review slots on test partition' : isLiveDisconnected ? 'Queue idle (0 slots)' : 'Governor consumed 130 of 130 review slots on test partition'}>
+                      {isRealDataMode ? '5,993 / 5,993 [Saturated]' : isLiveDisconnected ? '0 / 0 [Idle]' : '130 / 130 [Saturated]'}
                     </span>
                   </div>
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Admitted Alerts:</span>
-                    <span className="capacity-metric-value">11</span>
+                    <span className="capacity-metric-value">{isRealDataMode ? '899' : isLiveDisconnected ? '0' : '11'}</span>
                   </div>
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Admitted Reviews:</span>
-                    <span className="capacity-metric-value">119</span>
+                    <span className="capacity-metric-value">{isRealDataMode ? '5,094' : isLiveDisconnected ? '0' : '119'}</span>
                   </div>
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Capacity Deferred:</span>
                     <span className="capacity-metric-value" style={{ color: 'var(--color-epistemic-defer)' }}>
-                      974
+                      {isRealDataMode ? '5,020' : isLiveDisconnected ? '0' : '974'}
                     </span>
                   </div>
                   <div className="capacity-metric-row" style={{ marginTop: '2px', paddingTop: '4px', borderTop: '1px solid var(--border-subtle)' }}>
                     <span className="capacity-metric-label">Ingest Caserate:</span>
                     <span className="capacity-metric-value unavailable" title="Live stream ingestion is unbacked in offline synthetic mode">
-                      Unavailable (Offline)
+                      {isLiveDisconnected ? 'Disconnected' : isRealDataMode ? 'Benchmark Stream' : 'Unavailable (Offline)'}
                     </span>
                   </div>
                   <div className="capacity-metric-row">
                     <span className="capacity-metric-label">Anomaly Velocity:</span>
                     <span className="capacity-metric-value unavailable" title="Real-time anomaly rate unbacked in offline test harness">
-                      Unavailable (Offline)
+                      {isLiveDisconnected ? 'Disconnected' : isRealDataMode ? 'S0–S3 Multi-Scenario' : 'Unavailable (Offline)'}
                     </span>
                   </div>
                 </div>

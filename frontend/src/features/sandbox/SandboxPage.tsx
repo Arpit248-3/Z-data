@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useRef } from 'react';
+import React, { useState, useEffect, useMemo, Suspense, useRef } from 'react';
 import {
   FlaskConical,
   Play,
@@ -29,10 +29,95 @@ interface PresetTransaction {
   features: Record<string, any>;
 }
 
-const PRESETS: PresetTransaction[] = [
+const SYNTHETIC_PRESETS: PresetTransaction[] = [
   {
     name: 'Clean Routine Transaction',
-    description: 'Low-risk domestic debit purchase with normal velocity and zero disputes. Evaluates to ROUTINE (p ≈ 0.0047) via R5_LOW_RISK_RELIABLE.',
+    description: 'Low-risk retail transaction ($12.98) from synthetic smoke fixture. Evaluates to ROUTINE (p ≈ 0.0497) via R5_LOW_RISK_RELIABLE.',
+    features: {
+      TransactionAmt: 12.98,
+      card1: 1044,
+      card2: 321.0,
+      card3: 150.0,
+      card5: 166.0,
+      addr1: 494.0,
+      addr2: 87.0,
+      ProductCD: 'W',
+      card4: 'visa',
+      card6: 'debit',
+      P_emaildomain: 'gmail.com',
+      C1: 1.0,
+      C2: 3.0,
+      C5: 2.0,
+      C13: 4.0,
+      D1: 45.4558,
+      D15: 59.0629,
+      V1: 0.1491,
+      V2: -2.0042,
+      V3: -1.0128,
+      V12: 0.2471,
+      V30: -1.2384,
+    },
+  },
+  {
+    name: 'Borderline Review Escalation',
+    description: 'Moderate commercial purchase ($49.30) landing in review zone (p ≈ 0.0727) between t_review (0.0710) and t_alert (0.0847). Routes to MANUAL_REVIEW via R2_INTERMEDIATE_RISK.',
+    features: {
+      TransactionAmt: 49.3,
+      card1: 17436,
+      card2: 111.0,
+      card3: 150.0,
+      card5: 117.0,
+      addr1: 315.0,
+      addr2: 87.0,
+      ProductCD: 'C',
+      card4: 'mastercard',
+      card6: 'debit',
+      P_emaildomain: 'yahoo.com',
+      C1: 1.0,
+      C2: 4.0,
+      C5: 1.0,
+      C13: 0.0,
+      D4: 52.6923,
+      V1: 1.0359,
+      V2: -1.0227,
+      V3: 1.4766,
+      V12: -1.5215,
+      V30: 1.0215,
+    },
+  },
+  {
+    name: 'High-Risk Alert Candidate',
+    description: 'Elevated risk transaction ($19.34) with extreme anomaly features (p ≈ 0.1340). Directly escalates to FRAUD_ALERT via R1_HIGH_RISK.',
+    features: {
+      TransactionAmt: 19.34,
+      card1: 19070,
+      card3: 150.0,
+      card5: 226.0,
+      addr1: 315.0,
+      dist1: 0.0,
+      ProductCD: 'W',
+      card4: 'visa',
+      card6: 'debit',
+      P_emaildomain: 'gmail.com',
+      C1: 2.0,
+      C2: 0.0,
+      C5: 1.0,
+      C13: 1.0,
+      D1: 3.8038,
+      D2: 120.2257,
+      V1: 0.6307,
+      V2: 0.0413,
+      V3: 0.1104,
+      V12: -0.8661,
+      V30: -1.7154,
+    },
+  },
+];
+
+const IEEE_CIS_PRESETS: PresetTransaction[] = [
+  {
+    name: 'Clean Routine Transaction',
+    description: 'Low-risk domestic debit purchase ($45.00) from IEEE-CIS offline benchmark with normal velocity. Evaluates to ROUTINE (p ≈ 0.0047) via R5_LOW_RISK_RELIABLE.',
     features: {
       TransactionAmt: 45.0,
       ProductCD: 'W',
@@ -63,7 +148,7 @@ const PRESETS: PresetTransaction[] = [
   },
   {
     name: 'Borderline Review Escalation',
-    description: 'Intermediate credit transaction ($115.00) landing in the critical review zone (p ≈ 0.0750) between t_review (0.0710) and t_alert (0.0847). Routed to MANUAL_REVIEW via R2_INTERMEDIATE_RISK.',
+    description: 'Intermediate commercial purchase ($115.00) from IEEE-CIS offline benchmark in the critical review zone (p ≈ 0.0750) between t_review (0.0710) and t_alert (0.0847). Routed to MANUAL_REVIEW via R2_INTERMEDIATE_RISK.',
     features: {
       TransactionAmt: 115.0,
       ProductCD: 'W',
@@ -94,7 +179,7 @@ const PRESETS: PresetTransaction[] = [
   },
   {
     name: 'High-Risk Alert Candidate',
-    description: 'High-value commercial transaction ($980.50) with elevated cross-border velocity and high counts (p ≈ 0.4658). Directly escalated to FRAUD_ALERT via R1_HIGH_RISK.',
+    description: 'High-value commercial transaction ($980.50) from IEEE-CIS offline benchmark with elevated cross-border velocity and high counts (p ≈ 0.4658). Directly escalated to FRAUD_ALERT via R1_HIGH_RISK.',
     features: {
       TransactionAmt: 980.5,
       ProductCD: 'C',
@@ -125,11 +210,70 @@ const PRESETS: PresetTransaction[] = [
   },
 ];
 
+const LIVE_DISCONNECTED_PRESETS: PresetTransaction[] = [
+  {
+    name: 'Live Core Ingress (Routine Example)',
+    description: 'Production POS payment authorization vector ($28.50). In live disconnected mode, online scoring fails closed to protect audit integrity.',
+    features: {
+      TransactionAmt: 28.50,
+      channel: 'POS_TERMINAL',
+      merchant_category: 'GROCERY_5411',
+      card_present: true,
+      entry_mode: 'CHIP_CONTACTLESS',
+      terminal_country: 'US',
+      account_velocity_24h: 2,
+      device_trust_score: 98.4,
+      ip_geo_match: true,
+      network_token_used: true,
+    },
+  },
+  {
+    name: 'Live Core Ingress (Review Challenge Example)',
+    description: 'Production e-commerce transaction ($185.00) requiring step-up verification. Scoring disabled while live stream is disconnected.',
+    features: {
+      TransactionAmt: 185.00,
+      channel: 'WEB_CHECKOUT',
+      merchant_category: 'ELECTRONICS_5732',
+      card_present: false,
+      entry_mode: 'ECOMMERCE_3DS',
+      terminal_country: 'US',
+      account_velocity_24h: 6,
+      device_trust_score: 54.2,
+      ip_geo_match: false,
+      billing_shipping_mismatch: true,
+    },
+  },
+  {
+    name: 'Live Core Ingress (High-Velocity Alert Example)',
+    description: 'Production cross-border transfer ($4,850.00) with untrusted device history. Scoring disabled while live stream is disconnected.',
+    features: {
+      TransactionAmt: 4850.00,
+      channel: 'CROSS_BORDER_WIRE',
+      merchant_category: 'WIRE_TRANSFER_4829',
+      card_present: false,
+      entry_mode: 'OPEN_BANKING_API',
+      terminal_country: 'CY',
+      account_velocity_24h: 19,
+      device_trust_score: 4.8,
+      ip_geo_match: false,
+      tor_exit_node: true,
+      crypto_exchange_outflow: true,
+    },
+  },
+];
+
 export const SandboxPage: React.FC = () => {
   const { mode, isRealDataMode, isLiveDisconnected } = useMode();
-  const [features, setFeatures] = useState<Record<string, any>>(PRESETS[0].features);
-  const [featureJson, setFeatureJson] = useState<string>(JSON.stringify(PRESETS[0].features, null, 2));
-  const [activePresetName, setActivePresetName] = useState<string>(PRESETS[0].name);
+
+  const currentPresets = useMemo(() => {
+    if (isRealDataMode) return IEEE_CIS_PRESETS;
+    if (isLiveDisconnected) return LIVE_DISCONNECTED_PRESETS;
+    return SYNTHETIC_PRESETS;
+  }, [isRealDataMode, isLiveDisconnected]);
+
+  const [features, setFeatures] = useState<Record<string, any>>(currentPresets[0].features);
+  const [featureJson, setFeatureJson] = useState<string>(JSON.stringify(currentPresets[0].features, null, 2));
+  const [activePresetName, setActivePresetName] = useState<string>(currentPresets[0].name);
   const [jsonError, setJsonError] = useState<string | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [formatSuccess, setFormatSuccess] = useState<boolean>(false);
@@ -138,6 +282,17 @@ export const SandboxPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const gutterRef = useRef<HTMLDivElement>(null);
+
+  // Synchronize active preset & JSON payload automatically when Operational Evidence Mode changes
+  useEffect(() => {
+    const defaultPreset = currentPresets[0];
+    setActivePresetName(defaultPreset.name);
+    setFeatures(defaultPreset.features);
+    setFeatureJson(JSON.stringify(defaultPreset.features, null, 2));
+    setJsonError(null);
+    setScoringResult(null);
+    setApiError(null);
+  }, [currentPresets]);
 
   const handlePresetSelect = (preset: PresetTransaction) => {
     setActivePresetName(preset.name);
@@ -168,7 +323,7 @@ export const SandboxPage: React.FC = () => {
   };
 
   const handleResetJson = () => {
-    const preset = PRESETS.find((p) => p.name === activePresetName) || PRESETS[0];
+    const preset = currentPresets.find((p) => p.name === activePresetName) || currentPresets[0];
     setFeatures(preset.features);
     setFeatureJson(JSON.stringify(preset.features, null, 2));
     setJsonError(null);
@@ -286,7 +441,7 @@ export const SandboxPage: React.FC = () => {
           </span>
         </div>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          {PRESETS.map((p) => {
+          {currentPresets.map((p) => {
             const isSelected = activePresetName === p.name;
             return (
               <button
@@ -306,6 +461,24 @@ export const SandboxPage: React.FC = () => {
             );
           })}
         </div>
+        {(() => {
+          const activePreset = currentPresets.find((p) => p.name === activePresetName) || currentPresets[0];
+          return activePreset?.description ? (
+            <div
+              style={{
+                fontSize: '12.5px',
+                color: 'var(--text-secondary)',
+                padding: '8px 12px',
+                background: 'var(--bg-surface-raised)',
+                borderRadius: 'var(--radius-xs)',
+                borderLeft: '3px solid var(--accent-primary)',
+                lineHeight: 1.5,
+              }}
+            >
+              {activePreset.description}
+            </div>
+          ) : null;
+        })()}
       </div>
 
       {/* 3. Stacked Layout: Transaction Payload Editor on Top & Decision Rationale Below */}

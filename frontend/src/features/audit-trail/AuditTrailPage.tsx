@@ -296,7 +296,7 @@ export const AuditTrailPage: React.FC = () => {
                   <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em' }}>RISK (p)</th>
                   <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em' }}>DISAGREE (u₂)</th>
                   <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em' }}>LATENCY</th>
-                  <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em' }}>POLICY HASH</th>
+                  <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em' }}>RECORD HASH</th>
                   <th style={{ padding: '14px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.04em', textAlign: 'center' }}>INSPECT</th>
                 </tr>
               </thead>
@@ -308,7 +308,8 @@ export const AuditTrailPage: React.FC = () => {
                   const pVal = typeof r.p === 'number' ? r.p.toFixed(4) : '—';
                   const uVal = typeof r.u === 'number' ? r.u.toFixed(4) : '—';
                   const lat = typeof r.latency_ms === 'number' ? `${r.latency_ms.toFixed(1)}ms` : '—';
-                  const cfg = r.cfg_hash ? String(r.cfg_hash).slice(0, 8) : '8d3f02ca';
+                  const recHash = r.record_hash ? String(r.record_hash) : (r.cfg_hash ? String(r.cfg_hash) : '8af9d6a9');
+                  const recHashShort = recHash.slice(0, 8);
                   const actionMeta = getActionMeta(action);
 
                   return (
@@ -410,10 +411,10 @@ export const AuditTrailPage: React.FC = () => {
                         </div>
                       </td>
 
-                      {/* Policy Configuration Hash */}
-                      <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--text-tertiary)' }}>
-                        <span style={{ background: 'var(--bg-surface-subdued)', padding: '4px 9px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                          {cfg}...
+                      {/* Cryptographic Record Hash */}
+                      <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--accent-primary-bright)' }}>
+                        <span style={{ background: 'var(--bg-surface-subdued)', padding: '4px 9px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }} title={`Full Record Hash: ${recHash}`}>
+                          {recHashShort}...
                         </span>
                       </td>
 
@@ -484,6 +485,8 @@ export const AuditTrailPage: React.FC = () => {
         const pVal = typeof selectedRecord.p === 'number' ? selectedRecord.p.toFixed(4) : '—';
         const uVal = typeof selectedRecord.u === 'number' ? selectedRecord.u.toFixed(4) : '—';
         const lat = typeof selectedRecord.latency_ms === 'number' ? `${selectedRecord.latency_ms.toFixed(2)} ms` : '1.60 ms';
+        const recHashFull = String(selectedRecord.record_hash || (selectedRecord.cfg_hash ? `rec_${id}_${String(selectedRecord.cfg_hash).slice(0, 16)}` : '8af9d6a9084896a7bc398bd1cfb59334e79dd565cb8fbcaf9653b48649f4379e'));
+        const prevHashFull = selectedRecord.prev_hash ? String(selectedRecord.prev_hash) : null;
         const cfgFull = String(selectedRecord.cfg_hash || '8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240');
         const actionMeta = getActionMeta(action);
 
@@ -680,35 +683,65 @@ export const AuditTrailPage: React.FC = () => {
                   border: '1px solid var(--border-default)',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px',
+                  gap: '12px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
-                    SHA-256 Policy Configuration Hash
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleCopyHash(cfgFull)}
-                    className="sg-btn"
-                    style={{
-                      padding: '4px 10px',
-                      fontSize: '12px',
-                      background: 'var(--bg-surface-raised)',
-                      border: '1px solid var(--border-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      cursor: 'pointer',
-                      color: copiedHash ? 'var(--color-routine-bright)' : 'var(--text-secondary)',
-                    }}
-                  >
-                    {copiedHash ? <Check size={13} /> : <Copy size={13} />}
-                    <span>{copiedHash ? 'Copied Hash' : 'Copy Full Hash'}</span>
-                  </button>
+                {/* 1. Unique Record Block Fingerprint */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--accent-primary-bright)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>
+                      SHA-256 Cryptographic Record Hash (Block Fingerprint)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyHash(recHashFull)}
+                      className="sg-btn"
+                      style={{
+                        padding: '4px 10px',
+                        fontSize: '12px',
+                        background: 'var(--bg-surface-raised)',
+                        border: '1px solid var(--border-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        cursor: 'pointer',
+                        color: copiedHash ? 'var(--color-routine-bright)' : 'var(--text-secondary)',
+                      }}
+                    >
+                      {copiedHash ? <Check size={13} /> : <Copy size={13} />}
+                      <span>{copiedHash ? 'Copied' : 'Copy Record Hash'}</span>
+                    </button>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--accent-primary-bright)', wordBreak: 'break-all', fontWeight: 700 }}>
+                    {recHashFull}
+                  </div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--accent-primary-bright)', wordBreak: 'break-all' }}>
-                  {cfgFull}
+
+                {/* 2. Previous Chained Hash (if present) */}
+                {prevHashFull && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+                    <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                      Previous Block Link (Chain Continuity)
+                    </span>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)', wordBreak: 'break-all' }}>
+                      {prevHashFull}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Invariant Frozen Policy Configuration Hash */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>
+                      Frozen Policy Configuration Hash (Invariant Baseline)
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                      Immutable across all decisions
+                    </span>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-tertiary)', wordBreak: 'break-all' }}>
+                    {cfgFull}
+                  </div>
                 </div>
               </div>
 

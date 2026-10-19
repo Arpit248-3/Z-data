@@ -4,6 +4,7 @@ Reads and exports auditable JSONL records strictly conforming to Blueprint Secti
 """
 
 import csv
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -38,6 +39,9 @@ class AuditService:
                     continue
                 try:
                     rec = json.loads(line)
+                    if not rec.get("record_hash"):
+                        raw_sig = f"{rec.get('id')}:{rec.get('ts') or rec.get('timestamp')}:{rec.get('p')}:{rec.get('action')}:{rec.get('cfg_hash')}"
+                        rec["record_hash"] = hashlib.sha256(raw_sig.encode("utf-8")).hexdigest()
                     records.append(rec)
                 except Exception:
                     skipped += 1

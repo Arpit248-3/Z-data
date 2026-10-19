@@ -447,8 +447,8 @@ export const OverviewPage: React.FC = () => {
               <UserCheck size={18} style={{ color: 'var(--color-manual-review)' }} />
               <span>Review Capacity Allocation</span>
             </div>
-            <span className="badge badge-caution" style={{ fontSize: '11px' }}>
-              <span>CAP REACHED</span>
+            <span className={`badge ${isLiveDisconnected ? 'badge-alert' : 'badge-caution'}`} style={{ fontSize: '11px' }}>
+              <span>{isLiveDisconnected ? 'IDLE / OFFLINE' : 'CAP REACHED'}</span>
             </span>
           </div>
 
@@ -456,14 +456,20 @@ export const OverviewPage: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <span style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>Primary Workload Budget B:</span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                130 Reviews (6.525%)
+                {isLiveDisconnected ? '0 Reviews (Offline)' : isRealDataMode ? '5,993 Reviews (5.075%)' : '130 Reviews (6.525%)'}
               </span>
             </div>
 
             {/* Stepped Capacity Segmented Bar */}
             <div style={{ width: '100%', height: '10px', background: 'var(--bg-surface-subdued)', borderRadius: '3px', overflow: 'hidden', display: 'flex', border: '1px solid var(--border-default)' }}>
-              <div style={{ width: '8.4%', background: 'var(--color-fraud-alert)' }} title="11 Alerts (0.55% of all cases)" />
-              <div style={{ width: '91.6%', background: 'var(--color-manual-review)' }} title="119 Reviews (5.95% of all cases; 100% capacity consumed)" />
+              <div
+                style={{ width: isLiveDisconnected ? '0%' : isRealDataMode ? '15%' : '8.4%', background: 'var(--color-fraud-alert)' }}
+                title={`${isLiveDisconnected ? 0 : isRealDataMode ? 899 : 11} Alerts`}
+              />
+              <div
+                style={{ width: isLiveDisconnected ? '0%' : isRealDataMode ? '85%' : '91.6%', background: 'var(--color-manual-review)' }}
+                title={`${isLiveDisconnected ? 0 : isRealDataMode ? 5094 : 119} Reviews`}
+              />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '6px' }}>
@@ -473,7 +479,7 @@ export const OverviewPage: React.FC = () => {
                   <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>FRAUD_ALERT</span>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 800, color: 'var(--color-fraud-alert-bright)', marginTop: '4px' }}>
-                  11 <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', fontWeight: 400 }}>cases</span>
+                  {isLiveDisconnected ? 0 : isRealDataMode ? 899 : 11} <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', fontWeight: 400 }}>cases</span>
                 </div>
               </div>
 
@@ -483,13 +489,18 @@ export const OverviewPage: React.FC = () => {
                   <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>MANUAL_REVIEW</span>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 800, color: 'var(--color-manual-review-bright)', marginTop: '4px' }}>
-                  119 <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', fontWeight: 400 }}>/ 119 slots</span>
+                  {isLiveDisconnected ? '0 / 0' : isRealDataMode ? '5,094 / 5,094' : '119 / 119'} <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', fontWeight: 400 }}>slots</span>
                 </div>
               </div>
             </div>
 
             <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', margin: '6px 0 0 0', lineHeight: 1.5 }}>
-              <strong>Zero Leakage Guarantee:</strong> When analyst queue reaches 119 slots, all additional review escalations shunt to <strong>HELD / DEFERRED</strong> (974 cases); never silently passed into Routine.
+              <strong>Zero Leakage Guarantee:</strong>{' '}
+              {isLiveDisconnected
+                ? 'Live production banking feed is disconnected; capacity governor is idle with 0 active review slots.'
+                : isRealDataMode
+                ? 'When analyst queue reaches 5,094 slots, all additional review escalations shunt to HELD / DEFERRED (5,020 cases); never silently passed into Routine.'
+                : 'When analyst queue reaches 119 slots, all additional review escalations shunt to HELD / DEFERRED (974 cases); never silently passed into Routine.'}
             </p>
           </div>
         </div>
@@ -563,7 +574,7 @@ export const OverviewPage: React.FC = () => {
               <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dataset Fixture</div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: 'var(--color-epistemic-defer-bright)', marginTop: '4px' }}>
-                  {status?.dependencies.dataset.status || 'SYNTHETIC'}
+                  {status?.dependencies?.dataset?.status || (isRealDataMode ? 'IEEE_CIS_OFFLINE_BENCHMARK' : isLiveDisconnected ? 'DISCONNECTED' : 'SYNTHETIC_SMOKE_ONLY')}
                 </div>
               </div>
 

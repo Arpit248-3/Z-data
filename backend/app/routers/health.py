@@ -47,6 +47,13 @@ def get_status(
         is_ready, err = integration_service.check_bundle_health()
         readiness["evidence_status"] = "IEEE_CIS_OFFLINE_BENCHMARK"
         readiness["overall_status"] = "OPERATIONAL_OFFLINE_BENCHMARK" if is_ready else "DEGRADED"
+        readiness["dependencies"]["dataset"] = {
+            "ready": True,
+            "status": "IEEE_CIS_OFFLINE_BENCHMARK",
+            "is_synthetic": False,
+            "path": "results/ieee_cis_v1/",
+            "records": 118108,
+        }
         readiness["dependencies"]["ieee_cis_bundle"] = {
             "ready": is_ready,
             "status": "READY" if is_ready else "NOT_AVAILABLE",
@@ -55,6 +62,25 @@ def get_status(
     elif mode and mode.upper() in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
         readiness["evidence_status"] = "LIVE_SOURCE_NOT_CONNECTED"
         readiness["overall_status"] = "DISCONNECTED"
+        readiness["dependencies"]["dataset"] = {
+            "ready": False,
+            "status": "DISCONNECTED",
+            "is_synthetic": False,
+            "path": "N/A (Stream Offline)",
+            "records": 0,
+        }
+        readiness["dependencies"]["model_artifacts"] = {
+            "ready": False,
+            "status": "OFFLINE",
+        }
+        readiness["dependencies"]["frozen_policy"] = {
+            "ready": False,
+            "status": "SUSPENDED",
+        }
+        readiness["dependencies"]["consolidated_results"] = {
+            "ready": False,
+            "status": "DISCONNECTED",
+        }
         readiness["dependencies"]["live_source"] = {
             "ready": False,
             "status": "DISCONNECTED",

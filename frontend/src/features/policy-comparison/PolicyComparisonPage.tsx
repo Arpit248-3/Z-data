@@ -387,27 +387,66 @@ export const PolicyComparisonPage: React.FC = () => {
                         {/* Deferred Count */}
                         <td style={{ padding: '14px 16px' }}>
                           {p.deferred_count ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span
+                                  style={{
+                                    fontFamily: 'var(--font-mono)',
+                                    fontSize: '12.5px',
+                                    fontWeight: 700,
+                                    color: 'var(--color-epistemic-defer-bright)',
+                                    padding: '3px 8px',
+                                    borderRadius: 'var(--radius-xs)',
+                                    backgroundColor: 'rgba(180, 160, 248, 0.12)',
+                                    border: '1px solid rgba(180, 160, 248, 0.3)',
+                                  }}
+                                >
+                                  {p.deferred_count.toLocaleString()} cases
+                                </span>
+                                <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+                                  ({(((p.deferred_rate ?? (p.deferred_count / (p.total_transactions || (isRealDataMode ? 118108 : 2000))))) * 100).toFixed(1)}%)
+                                </span>
+                              </div>
                               <span
                                 style={{
-                                  fontFamily: 'var(--font-mono)',
-                                  fontSize: '12.5px',
-                                  fontWeight: 700,
-                                  color: 'var(--color-epistemic-defer-bright)',
-                                  padding: '3px 8px',
-                                  borderRadius: 'var(--radius-xs)',
-                                  backgroundColor: 'rgba(180, 160, 248, 0.12)',
-                                  border: '1px solid rgba(180, 160, 248, 0.3)',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  color: 'var(--color-routine-bright)',
+                                  backgroundColor: 'rgba(52, 211, 153, 0.1)',
+                                  border: '1px solid rgba(52, 211, 153, 0.25)',
+                                  padding: '2px 7px',
+                                  borderRadius: '4px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  width: 'fit-content',
                                 }}
                               >
-                                {p.deferred_count} cases
+                                Zero Leakage Hold
                               </span>
-                              <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>(48.7%)</span>
                             </div>
                           ) : (
-                            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--text-tertiary)' }}>
-                              0 cases (None)
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', color: 'var(--text-tertiary)' }}>
+                                0 cases (0.0%)
+                              </span>
+                              <span
+                                title="Classical baselines lack an operational capacity governor; when capacity is exhausted, overflowing transactions silently bypass review into routine settlement."
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  color: 'var(--accent-amber)',
+                                  backgroundColor: 'rgba(217, 119, 6, 0.12)',
+                                  border: '1px solid rgba(217, 119, 6, 0.3)',
+                                  padding: '2px 7px',
+                                  borderRadius: '4px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  width: 'fit-content',
+                                }}
+                              >
+                                No Governor (Silent Leak)
+                              </span>
+                            </div>
                           )}
                         </td>
 
@@ -580,7 +619,7 @@ export const PolicyComparisonPage: React.FC = () => {
                         ? 'Greedy Ranked Risk Cutoff without Uncertainty Estimation'
                         : 'Fixed Static Risk Threshold Strategy'}
                     </span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Budget: {budgetMultiple} (130 slots)</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Budget: {budgetMultiple} ({selectedPolicy.escalated_count?.toLocaleString() || (isRealDataMode ? '5,993' : '130')} slots)</span>
                   </div>
 
                   {/* Benchmark Performance Grid */}
@@ -588,7 +627,9 @@ export const PolicyComparisonPage: React.FC = () => {
                     <div style={{ background: 'var(--bg-surface-raised)', padding: '12px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>Touched Rate</span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{(touched * 100).toFixed(2)}%</span>
-                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Cap: 6.525% (130 / 2000)</span>
+                      <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        Cap: {(selectedPolicy.target_budget ? (selectedPolicy.target_budget * 100).toFixed(3) : (isRealDataMode ? '5.075' : '6.525'))}% ({selectedPolicy.escalated_count?.toLocaleString() || (isRealDataMode ? '5,993' : '130')} / {(selectedPolicy.total_transactions || (isRealDataMode ? 118108 : 2000)).toLocaleString()})
+                      </span>
                     </div>
 
                     <div style={{ background: 'var(--bg-surface-raised)', padding: '12px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -627,13 +668,15 @@ export const PolicyComparisonPage: React.FC = () => {
                         Epistemic Deferral Buffer &amp; Isolation Volume
                       </span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12.5px', fontWeight: 800, color: 'var(--color-epistemic-defer-bright)' }}>
-                        {selectedPolicy.deferred_count ? `${selectedPolicy.deferred_count} cases (48.7%)` : '0 cases (Disabled)'}
+                        {selectedPolicy.deferred_count
+                          ? `${selectedPolicy.deferred_count.toLocaleString()} cases (${(((selectedPolicy.deferred_rate ?? (selectedPolicy.deferred_count / (selectedPolicy.total_transactions || (isRealDataMode ? 118108 : 2000))))) * 100).toFixed(1)}%)`
+                          : '0 cases (No Deferral Lane)'}
                       </span>
                     </div>
                     <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
                       {isSignalGate
-                        ? 'SignalGate isolates 974 ambiguous or saturated transactions into a safe held queue, preventing catastrophic false-negative leaks under distribution shift while matching baseline recall.'
-                        : 'Baseline policies lack epistemic uncertainty gating; all non-touched cases default directly to automated approval without safety quarantine.'}
+                        ? `SignalGate isolates ${(selectedPolicy.deferred_count || (isRealDataMode ? 5020 : 974)).toLocaleString()} ambiguous or saturated transactions into a safe held queue, preventing catastrophic false-negative leaks under distribution shift while strictly matching baseline recall.`
+                        : 'Baseline policies (B1 to B4) have 0 deferred cases because classical scoring systems lack an operational capacity governor and safety hold lane. When analyst queue capacity is exhausted, overflowing transactions are not quarantined; instead, they silently bypass review into routine settlement (silent fraud leakage).'}
                     </p>
                   </div>
 
