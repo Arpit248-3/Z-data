@@ -285,7 +285,11 @@ export const DriftShiftPage: React.FC = () => {
                   { label: 'Perturbed Subspace', value: s.shiftedFeatures.length > 0 ? s.shiftedFeatures.join(', ') : 'Untouched Nominal Features' },
                 ],
                 telemetryNotes: [
-                  'Evaluated under matched capacity budget of 130 human reviews (6.525%).',
+                  isRealDataMode
+                    ? 'Evaluated under matched capacity budget of 5,993 human reviews (5.075%).'
+                    : isLiveDisconnected
+                    ? 'Evaluated with streaming ingestion offline (0 active reviews, fail-closed).'
+                    : 'Evaluated under matched capacity budget of 130 human reviews (6.525%).',
                   'Perturbations injected strictly into offline test partition without contamination.',
                   s.deltaRecallPp > 0
                     ? `SignalGate epistemic disagreement residual successfully recovered +${s.deltaRecallPp} pp recall.`

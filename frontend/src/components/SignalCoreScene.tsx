@@ -12,6 +12,7 @@ import {
   Database,
   Sliders,
 } from 'lucide-react';
+import { useMode } from '../context/ModeContext';
 
 // ---------------------------------------------------------------------------
 // Error Boundary for WebGL/Canvas Failures
@@ -254,6 +255,7 @@ const DecisionCore3D: React.FC<DecisionCore3DProps> = ({
 // Main SignalCoreScene Component (Hybrid 2.5D Topology)
 // ---------------------------------------------------------------------------
 export const SignalCoreScene: React.FC = () => {
+  const { isRealDataMode, isLiveDisconnected } = useMode();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [forceFallback, setForceFallback] = useState<boolean>(false);
@@ -290,9 +292,19 @@ export const SignalCoreScene: React.FC = () => {
         <div className="signal-core-header-left">
           <Sliders size={14} className="signal-core-header-icon" />
           <span className="signal-core-title">Decision Topology: Shift-Aware Triage Pipeline</span>
-          <span className="badge badge-synthetic">
-            <span>Synthetic Fixture</span>
-          </span>
+          {isRealDataMode ? (
+            <span className="badge badge-ready">
+              <span>IEEE-CIS Offline Benchmark</span>
+            </span>
+          ) : isLiveDisconnected ? (
+            <span className="badge badge-alert">
+              <span>Live Ingestion Disconnected</span>
+            </span>
+          ) : (
+            <span className="badge badge-synthetic">
+              <span>Synthetic Fixture</span>
+            </span>
+          )}
           <span className="badge badge-ready">
             <span className="badge-dot" />
             <span>v2.1 Topology</span>
@@ -493,12 +505,14 @@ export const SignalCoreScene: React.FC = () => {
               onClick={() => setSelectedKey(selectedKey === 'stage_input' ? null : 'stage_input')}
               onMouseEnter={() => setHoveredKey('stage_input')}
               onMouseLeave={() => setHoveredKey(null)}
-              aria-label="Stage 1: Input Ingestion. 2,000 offline test cases with zero-trust validation."
+              aria-label={`Stage 1: Input Ingestion. ${isRealDataMode ? '118,108 benchmark' : isLiveDisconnected ? '0 live' : '2,000 offline'} test cases with zero-trust validation.`}
               aria-pressed={selectedKey === 'stage_input'}
             >
               <div className="input-card-header">
                 <span className="stage-num-badge">STAGE 1</span>
-                <span className="input-cases-pill">2,000 cases</span>
+                <span className="input-cases-pill">
+                  {isRealDataMode ? '118,108 cases' : isLiveDisconnected ? '0 cases' : '2,000 cases'}
+                </span>
               </div>
               <div className="input-card-title-row">
                 <Database size={15} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
@@ -680,7 +694,11 @@ export const SignalCoreScene: React.FC = () => {
               <strong>Operational Decision Flow:</strong> Input &rarr; Risk/Disagreement Core &rarr; Capacity-Aware Routing. Select any stage or lane to inspect decision logic.
             </span>
             <span className="detail-default-meta">
-              Offline Test Partition: 2,000 Cases &bull; Primary Review Budget: 130 Slots (6.525%)
+              {isRealDataMode
+                ? 'IEEE-CIS Offline Partition: 118,108 Cases • Primary Review Budget: 5,993 Slots (5.075%)'
+                : isLiveDisconnected
+                ? 'Live Ingestion Bus: Disconnected • Primary Review Budget: 0 Slots (Fail-Closed)'
+                : 'Offline Test Partition: 2,000 Cases • Primary Review Budget: 130 Slots (6.525%)'}
             </span>
           </div>
         )}

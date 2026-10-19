@@ -234,7 +234,7 @@ export const PolicyComparisonPage: React.FC = () => {
                 </span>
               </div>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-secondary)' }}>
-                Target Capacity: {data?.target_budget ? `${(data.target_budget * 100).toFixed(3)}%` : '6.525%'}
+                Target Capacity: {data?.target_budget ? `${(data.target_budget * 100).toFixed(3)}%` : isRealDataMode ? '5.075%' : isLiveDisconnected ? '0.000% (Offline)' : '6.525%'}
               </span>
             </div>
 
@@ -372,25 +372,34 @@ export const PolicyComparisonPage: React.FC = () => {
                         </td>
 
                         {/* Touched Rate with Micro-Meter */}
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '12.5px' }}>
-                              <span style={{ color: touched >= 0.065 ? 'var(--color-manual-review)' : 'var(--text-primary)', fontWeight: 700 }}>
-                                {(touched * 100).toFixed(2)}%
-                              </span>
-                              <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)' }}>/ 6.525%</span>
-                            </div>
-                            <div style={{ width: '90px', height: '6px', backgroundColor: 'var(--bg-surface-subdued)', borderRadius: '3px', overflow: 'hidden' }}>
-                              <div
-                                style={{
-                                  width: `${Math.min(100, (touched / 0.06525) * 100)}%`,
-                                  height: '100%',
-                                  backgroundColor: touched >= 0.065 ? 'var(--color-manual-review)' : 'var(--color-routine)',
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </td>
+                        {(() => {
+                          const targetBudgetCap = p.target_budget ?? data?.target_budget ?? (isRealDataMode ? 0.050745 : isLiveDisconnected ? 0.0001 : 0.06525);
+                          const targetCapLabel = (targetBudgetCap * 100).toFixed(3);
+                          const isNearCap = isLiveDisconnected ? false : touched >= targetBudgetCap * 0.99;
+                          return (
+                            <td style={{ padding: '14px 16px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: '12.5px' }}>
+                                  <span style={{ color: isNearCap ? 'var(--color-manual-review)' : 'var(--text-primary)', fontWeight: 700 }}>
+                                    {(touched * 100).toFixed(2)}%
+                                  </span>
+                                  <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)' }}>
+                                    / {isLiveDisconnected ? 'Offline' : `${targetCapLabel}%`}
+                                  </span>
+                                </div>
+                                <div style={{ width: '90px', height: '6px', backgroundColor: 'var(--bg-surface-subdued)', borderRadius: '3px', overflow: 'hidden' }}>
+                                  <div
+                                    style={{
+                                      width: isLiveDisconnected ? '0%' : `${Math.min(100, (touched / targetBudgetCap) * 100)}%`,
+                                      height: '100%',
+                                      backgroundColor: isNearCap ? 'var(--color-manual-review)' : 'var(--color-routine)',
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                          );
+                        })()}
 
                         {/* Caught / Total Fraud */}
                         <td style={{ padding: '14px 16px' }}>
@@ -669,7 +678,7 @@ export const PolicyComparisonPage: React.FC = () => {
                       <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>Touched Rate</span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{(touched * 100).toFixed(2)}%</span>
                       <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                        Cap: {(selectedPolicy.target_budget ? (selectedPolicy.target_budget * 100).toFixed(3) : (isRealDataMode ? '5.075' : '6.525'))}% ({selectedPolicy.escalated_count?.toLocaleString() || (isRealDataMode ? '5,993' : '130')} / {(selectedPolicy.total_transactions || (isRealDataMode ? 118108 : 2000)).toLocaleString()})
+                        Cap: {(selectedPolicy.target_budget ? (selectedPolicy.target_budget * 100).toFixed(3) : (isRealDataMode ? '5.075' : isLiveDisconnected ? '0.000' : '6.525'))}% ({selectedPolicy.escalated_count?.toLocaleString() || (isRealDataMode ? '5,993' : isLiveDisconnected ? '0' : '130')} / {(selectedPolicy.total_transactions || (isRealDataMode ? 118108 : isLiveDisconnected ? 0 : 2000)).toLocaleString()})
                       </span>
                     </div>
 

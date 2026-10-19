@@ -5,6 +5,7 @@ import { ApiStatusIndicator } from './ApiStatusIndicator';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { ModeSwitcher } from './ModeSwitcher';
 import { useApiStatus } from '../lib/api/hooks';
+import { useMode } from '../context/ModeContext';
 
 interface TopBarProps {
   onToggleMobile: () => void;
@@ -24,6 +25,7 @@ const PRIMARY_TABS: PrimaryNavTab[] = [
 
 export const TopBar: React.FC<TopBarProps> = ({ onToggleMobile }) => {
   const { status, health } = useApiStatus();
+  const { isRealDataMode, isLiveDisconnected } = useMode();
 
   // Real local clock updated every second in 24h format
   const [localTime, setLocalTime] = useState<string>('');
@@ -99,10 +101,22 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobile }) => {
         {/* Primary Evaluation Budget Indicator */}
         <div
           className="budget-chip"
-          title="Canonical Evaluation Review Capacity: 130 reviews (1.5x training prevalence, 6.525% touched rate on 2,000 test cases)"
+          title={
+            isRealDataMode
+              ? 'IEEE-CIS Offline Benchmark Review Capacity: 5,993 reviews (1.5x training prevalence, 5.075% touched rate on 118,108 test cases)'
+              : isLiveDisconnected
+              ? 'Live Production Ingestion Disconnected: Review queue is offline with 0 active tickets (fail-closed guard active)'
+              : 'Synthetic Smoke Fixture Review Capacity: 130 reviews (1.5x training prevalence, 6.525% touched rate on 2,000 test cases)'
+          }
         >
           <span className="budget-chip-label">CAP:</span>
-          <span className="budget-chip-val">130 (6.525%)</span>
+          <span className="budget-chip-val">
+            {isRealDataMode
+              ? '5,993 (5.075%)'
+              : isLiveDisconnected
+              ? '0 (Offline)'
+              : '130 (6.525%)'}
+          </span>
         </div>
 
         {/* Local Clock */}

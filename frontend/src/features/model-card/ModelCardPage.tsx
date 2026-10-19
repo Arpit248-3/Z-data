@@ -960,7 +960,7 @@ export const ModelCardPage: React.FC = () => {
                           02
                         </span>
                         <span style={{ fontSize: '13.5px', lineHeight: 1.6, color: 'var(--text-secondary)' }}>
-                          <strong>Capacity Load Governor:</strong> Human investigator workload ceiling enforced at 130 cases (1.5× multiplier of 6.525% budget). If capacity saturates, rule R6 shunts spillover to safe quarantine.
+                          <strong>Capacity Load Governor:</strong> Human investigator workload ceiling enforced at {isRealDataMode ? '5,993 cases (1.5× multiplier of 5.075% budget)' : isLiveDisconnected ? '0 cases (Ingestion stream offline)' : '130 cases (1.5× multiplier of 6.525% budget)'}. If capacity saturates, rule R6 shunts spillover to safe quarantine.
                         </span>
                       </div>
 

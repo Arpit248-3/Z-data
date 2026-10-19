@@ -138,20 +138,46 @@ export const OverviewPage: React.FC = () => {
           category: 'HUMAN-IN-THE-LOOP GOVERNANCE',
           icon: <UserCheck size={18} />,
           accentColor: 'var(--color-manual-review)',
-          shortDesc: 'Imposes a hard quota ceiling on human investigator review slots (130 cases across 2,000 cases, representing a 1.5× multiplier on 6.525% budget). When saturated, Rule R6 triggers automated epistemic deferral.',
-          formula: 'Capacity_Max = 1.5 × Baseline = 130 cases (6.525% budget on N=2,000)',
-          parameters: [
-            { label: 'Max Review Slots', value: '130 cases (100% Saturated: 130 / 130)' },
-            { label: 'Budget Multiplier', value: '1.5× baseline capacity ceiling' },
-            { label: 'Current Queue Pressure', value: '100% Saturated (Governor Active)' },
-            { label: 'Overflow Routing Policy', value: 'Rule R6: Epistemic Deferral Fallback' },
-          ],
+          shortDesc: isRealDataMode
+            ? 'Imposes a hard quota ceiling on human investigator review slots (5,993 cases across 118,108 cases, representing a 1.5× multiplier on 5.075% budget). When saturated, Rule R6 triggers automated epistemic deferral.'
+            : isLiveDisconnected
+            ? 'Live edge broker disconnected. Review capacity governor is armed with 0 active tickets in queue under fail-closed safety constraints.'
+            : 'Imposes a hard quota ceiling on human investigator review slots (130 cases across 2,000 cases, representing a 1.5× multiplier on 6.525% budget). When saturated, Rule R6 triggers automated epistemic deferral.',
+          formula: isRealDataMode
+            ? 'Capacity_Max = 1.5 × Baseline = 5,993 cases (5.075% budget on N=118,108)'
+            : isLiveDisconnected
+            ? 'Capacity_Max = 0 cases (Live Ingestion Offline - Fail-Closed)'
+            : 'Capacity_Max = 1.5 × Baseline = 130 cases (6.525% budget on N=2,000)',
+          parameters: isRealDataMode
+            ? [
+                { label: 'Max Review Slots', value: '5,993 cases (100% Saturated: 5,993 / 5,993)' },
+                { label: 'Budget Multiplier', value: '1.5× baseline capacity ceiling (5.075%)' },
+                { label: 'Current Queue Pressure', value: '100% Saturated (Governor Active)' },
+                { label: 'Overflow Routing Policy', value: 'Rule R6: Epistemic Deferral Fallback' },
+              ]
+            : isLiveDisconnected
+            ? [
+                { label: 'Max Review Slots', value: '0 cases (Offline)' },
+                { label: 'Budget Multiplier', value: 'N/A (Stream Disconnected)' },
+                { label: 'Current Queue Pressure', value: '0% (Ingestion Quenched)' },
+                { label: 'Overflow Routing Policy', value: 'Fail-Closed Disconnect Hold' },
+              ]
+            : [
+                { label: 'Max Review Slots', value: '130 cases (100% Saturated: 130 / 130)' },
+                { label: 'Budget Multiplier', value: '1.5× baseline capacity ceiling (6.525%)' },
+                { label: 'Current Queue Pressure', value: '100% Saturated (Governor Active)' },
+                { label: 'Overflow Routing Policy', value: 'Rule R6: Epistemic Deferral Fallback' },
+              ],
           telemetryNotes: [
             'Prevents cognitive fatigue and review quality degradation under volume spikes.',
             'Excess cases route to safe held quarantine instead of unverified auto-approval.',
             'Governor quota admission flag recorded immutably in append-only ledger.',
           ],
-          partitionInfo: 'Primary Review Queue Budget: 130 Slots',
+          partitionInfo: isRealDataMode
+            ? 'Primary Review Queue Budget: 5,993 Slots (5.075%)'
+            : isLiveDisconnected
+            ? 'Primary Review Queue Budget: 0 Slots (Offline)'
+            : 'Primary Review Queue Budget: 130 Slots (6.525%)',
         };
 
         const deferralRatioDetail: TiltGlassCardDetail = {

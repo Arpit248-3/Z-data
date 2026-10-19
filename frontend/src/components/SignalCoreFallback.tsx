@@ -9,6 +9,7 @@ import {
   Database,
   Sliders,
 } from 'lucide-react';
+import { useMode } from '../context/ModeContext';
 import { TOPOLOGY_DETAILS } from './topologyData';
 
 interface SignalCoreFallbackProps {
@@ -22,6 +23,7 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
   onSwitchTo3D,
   reason = '2D Vector Fallback Mode (SVG Topology Pipeline)',
 }) => {
+  const { isRealDataMode, isLiveDisconnected } = useMode();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
@@ -198,12 +200,14 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
               onClick={() => handleSelect('stage_input')}
               onMouseEnter={() => setHoveredKey('stage_input')}
               onMouseLeave={() => setHoveredKey(null)}
-              aria-label="Stage 1: Input Ingestion. 2,000 offline test cases with zero-trust validation."
+              aria-label={`Stage 1: Input Ingestion. ${isRealDataMode ? '118,108 benchmark' : isLiveDisconnected ? '0 live' : '2,000 offline'} test cases with zero-trust validation.`}
               aria-pressed={selectedKey === 'stage_input'}
             >
               <div className="input-card-header">
                 <span className="stage-num-badge">STAGE 1</span>
-                <span className="input-cases-pill">2,000 cases</span>
+                <span className="input-cases-pill">
+                  {isRealDataMode ? '118,108 cases' : isLiveDisconnected ? '0 cases' : '2,000 cases'}
+                </span>
               </div>
               <div className="input-card-title-row">
                 <Database size={15} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
@@ -384,7 +388,11 @@ export const SignalCoreFallback: React.FC<SignalCoreFallbackProps> = ({
               <strong>Operational Decision Flow (2D Vector):</strong> Input &rarr; Risk/Disagreement Core &rarr; Capacity-Aware Routing. Select any stage or lane to inspect decision logic.
             </span>
             <span className="detail-default-meta">
-              Offline Test Partition: 2,000 Cases &bull; Primary Review Budget: 130 Slots (6.525%)
+              {isRealDataMode
+                ? 'IEEE-CIS Offline Partition: 118,108 Cases • Primary Review Budget: 5,993 Slots (5.075%)'
+                : isLiveDisconnected
+                ? 'Live Ingestion Bus: Disconnected • Primary Review Budget: 0 Slots (Fail-Closed)'
+                : 'Offline Test Partition: 2,000 Cases • Primary Review Budget: 130 Slots (6.525%)'}
             </span>
           </div>
         )}
