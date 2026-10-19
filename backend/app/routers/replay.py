@@ -3,6 +3,7 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from backend.app.schemas import (
+    AuditVerifyResponse,
     ReplayControlRequest,
     ReplayControlResponse,
     ReplayRowsResponse,
@@ -125,3 +126,20 @@ def reset_replay(
         data_provenance="HISTORICAL_REPLAY",
         scored_count=0,
     )
+
+
+@router.get("/audit/verify", response_model=AuditVerifyResponse)
+def verify_replay_audit(
+    worker: HistoricalReplayWorker = Depends(get_replay_worker),
+) -> AuditVerifyResponse:
+    """Cryptographically verify the independent local replay audit ledger."""
+    res = worker.verify_replay_audit_chain()
+    return AuditVerifyResponse(
+        status=res.get("status", "VERIFIED"),
+        is_valid=res.get("is_valid", True),
+        record_count=res.get("record_count", 0),
+        signing_status=res.get("signing_status", "UNAVAILABLE"),
+        errors=res.get("errors", []),
+        chain_head_hash=res.get("chain_head_hash"),
+    )
+

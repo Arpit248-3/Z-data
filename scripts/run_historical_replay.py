@@ -132,6 +132,28 @@ def cmd_stream(base_url: str, limit: int, delay_ms: int) -> None:
         print(f"[*] Final scored records: {final_st.get('scored_count')}")
 
 
+def cmd_verify(base_url: str) -> None:
+    canonical = make_request(base_url, "/api/audit/verify?ledger=canonical")
+    replay = make_request(base_url, "/api/replay/audit/verify")
+    print("=" * 70)
+    print("SIGNALGATE — AUDIT LEDGER CRYPTOGRAPHIC VERIFICATION")
+    print("=" * 70)
+    print(f"Canonical Ledger (results/ieee_cis_v1/audit_chain.jsonl):")
+    print(f"  Status:         {canonical.get('status')}")
+    print(f"  Valid:          {canonical.get('is_valid')}")
+    print(f"  Record Count:   {canonical.get('record_count')}")
+    print(f"  Signing Status: {canonical.get('signing_status')}")
+    print(f"  Errors:         {canonical.get('errors')}")
+    print()
+    print(f"Replay Ledger (results/local_replay/audit_chain.jsonl):")
+    print(f"  Status:         {replay.get('status')}")
+    print(f"  Valid:          {replay.get('is_valid')}")
+    print(f"  Record Count:   {replay.get('record_count')}")
+    print(f"  Signing Status: {replay.get('signing_status')}")
+    print(f"  Errors:         {replay.get('errors')}")
+    print("=" * 70)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="SignalGate Historical Replay Controller")
     parser.add_argument("--url", default="http://127.0.0.1:8000", help="Base URL of FastAPI backend")
@@ -139,6 +161,7 @@ def main() -> None:
     parser.add_argument("--stop", action="store_true", help="Stop replay worker and exit")
     parser.add_argument("--reset", action="store_true", help="Reset replay worker cursor and counters")
     parser.add_argument("--step", action="store_true", help="Score exactly 1 historical record and exit")
+    parser.add_argument("--verify", action="store_true", help="Verify cryptographic integrity of audit ledgers")
     parser.add_argument("--limit", type=int, default=100, help="Max records to replay (default: 100)")
     parser.add_argument("--delay", type=int, default=100, help="Delay between records in milliseconds (default: 100)")
 
@@ -152,6 +175,8 @@ def main() -> None:
         cmd_reset(args.url)
     elif args.step:
         cmd_step(args.url)
+    elif args.verify:
+        cmd_verify(args.url)
     else:
         cmd_stream(args.url, limit=args.limit, delay_ms=args.delay)
 

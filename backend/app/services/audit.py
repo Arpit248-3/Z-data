@@ -21,6 +21,8 @@ class AuditService:
         mode_upper = (mode or "SYNTHETIC_SMOKE_ONLY").strip().upper()
         if mode_upper in ("IEEE_CIS_OFFLINE_BENCHMARK", "IEEE_CIS", "REAL"):
             audit_path = self.artifacts.project_root / "results" / "ieee_cis_v1" / "audit_chain.jsonl"
+        elif mode_upper in ("HISTORICAL_REPLAY", "LOCAL_REPLAY", "REPLAY"):
+            audit_path = self.artifacts.project_root / "results" / "local_replay" / "audit_chain.jsonl"
         elif mode_upper in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
             return [], 0
         else:

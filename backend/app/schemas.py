@@ -227,6 +227,8 @@ class ReplayStatusResponse(BaseModel):
     live_source_readiness: bool = False
     live_source_status: str = "DISCONNECTED"
     external_live_source_status: str = "DISCONNECTED"
+    audit_ledger_path: Optional[str] = None
+    audit_record_count: Optional[int] = None
     notice: str
 
 

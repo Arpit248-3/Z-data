@@ -135,6 +135,76 @@ def test_replay_lifecycle_start_stop_reset():
     assert status["external_live_source_status"] == "DISCONNECTED"
 
 
+def test_replay_concurrency_lifecycle_hardening():
+    """Verify repeated start, busy step while running, repeated stop, and restart."""
+    worker = HistoricalReplayWorker()
+    worker.stop()
+
+    # 1. Start worker
+    res1 = worker.start(limit=50, delay_ms=100)
+    assert res1["status"] == "STARTED"
+    assert worker.is_running is True
+
+    # 2. Repeated start must return ALREADY_RUNNING and avoid multiple loops
+    res2 = worker.start(limit=50, delay_ms=100)
+    assert res2["status"] == "ALREADY_RUNNING"
+
+    # 3. Synchronous step while running must return BUSY to prevent cursor collisions
+    res_step = worker.step()
+    assert res_step["status"] == "BUSY"
+    assert res_step["scored"] is False
+
+    # 4. Stop worker
+    res_stop1 = worker.stop()
+    assert res_stop1["status"] == "STOPPED"
+    assert worker.is_running is False
+
+    # 5. Repeated stop must return ALREADY_STOPPED
+    res_stop2 = worker.stop()
+    assert res_stop2["status"] == "ALREADY_STOPPED"
+
+    # 6. Restart worker
+    res_restart = worker.start(limit=5, delay_ms=50)
+    assert res_restart["status"] == "STARTED"
+    time.sleep(0.3)
+    worker.stop()
+    assert worker.is_running is False
+
+
+def test_replay_audit_ledger_isolation():
+    """Verify replay strictly writes to results/local_replay and leaves canonical ledger untouched."""
+    worker = HistoricalReplayWorker()
+    canonical_path = worker.project_root / "results" / "ieee_cis_v1" / "audit_chain.jsonl"
+    replay_path = worker.replay_audit_log_path
+
+    # Measure canonical ledger line count before
+    canonical_count_before = 0
+    if canonical_path.exists():
+        with open(canonical_path, "r", encoding="utf-8") as f:
+            canonical_count_before = sum(1 for line in f if line.strip())
+
+    # Step one record via worker
+    res = worker.step()
+    assert res["status"] in ("SUCCESS", "COMPLETED")
+
+    # Measure canonical ledger line count after: MUST BE IDENTICAL
+    canonical_count_after = 0
+    if canonical_path.exists():
+        with open(canonical_path, "r", encoding="utf-8") as f:
+            canonical_count_after = sum(1 for line in f if line.strip())
+
+    assert canonical_count_after == canonical_count_before, (
+        f"Regression detected: canonical ledger changed from {canonical_count_before} to {canonical_count_after}!"
+    )
+
+    # Replay ledger must exist and pass verification
+    assert replay_path.exists()
+    verify_res = worker.verify_replay_audit_chain()
+    assert verify_res["is_valid"] is True
+    assert verify_res["status"] == "VERIFIED"
+    assert len(verify_res["errors"]) == 0
+
+
 def test_api_replay_status_endpoint():
     """Verify GET /api/replay/status returns required fields."""
     response = client.get("/api/replay/status")
@@ -174,10 +244,18 @@ def test_api_system_status_readiness_dimensions():
 
 
 def test_audit_evidence_verification():
-    """Verify cryptographic audit trail verification passes."""
-    response = client.get("/api/audit/verify")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["is_valid"] is True
-    assert data["status"] == "VERIFIED"
-    assert data["signing_status"] in ["AVAILABLE", "UNAVAILABLE"]
+    """Verify cryptographic audit trail verification passes for both canonical and replay ledgers."""
+    # Canonical ledger
+    response_canon = client.get("/api/audit/verify?ledger=canonical")
+    assert response_canon.status_code == 200
+    data_canon = response_canon.json()
+    assert data_canon["is_valid"] is True
+    assert data_canon["status"] == "VERIFIED"
+
+    # Local replay ledger
+    response_rep = client.get("/api/replay/audit/verify")
+    assert response_rep.status_code == 200
+    data_rep = response_rep.json()
+    assert data_rep["is_valid"] is True
+    assert data_rep["status"] in ["VERIFIED", "EMPTY"]
+

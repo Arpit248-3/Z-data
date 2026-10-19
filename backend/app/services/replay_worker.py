@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 from backend.app.config import settings
 from backend.app.services.integration import IntegrationService
+from integrations.ibm_architecture.governance.audit_chain import AuditChain
 
 logger = logging.getLogger("signalgate.replay_worker")
 
@@ -80,6 +81,54 @@ class HistoricalReplayWorker:
         self._event_timestamps: collections.deque = collections.deque(maxlen=200)
         self._latencies: collections.deque = collections.deque(maxlen=100)
         self.errors: List[str] = []
+
+        # Independent local replay audit ledger
+        self.replay_results_dir = self.project_root / "results" / "local_replay"
+        self.replay_audit_log_path = self.replay_results_dir / "audit_chain.jsonl"
+        self._audit_chain: AuditChain = self._init_replay_audit_chain()
+
+    # --------------------------------------------------------------------------
+    # Replay Audit Chain Ledger Management
+    # --------------------------------------------------------------------------
+    def _init_replay_audit_chain(self) -> AuditChain:
+        """Initialize or load independent audit ledger for local replay."""
+        self.replay_results_dir.mkdir(parents=True, exist_ok=True)
+        if self.replay_audit_log_path.exists():
+            try:
+                return AuditChain.load_jsonl(self.replay_audit_log_path)
+            except Exception as exc:
+                logger.warning(f"Could not load existing replay audit chain: {exc}")
+        return AuditChain()
+
+    def _save_replay_audit_chain(self) -> None:
+        """Export replay audit ledger to results/local_replay/audit_chain.jsonl."""
+        self.replay_results_dir.mkdir(parents=True, exist_ok=True)
+        self._audit_chain.export_jsonl(self.replay_audit_log_path)
+
+    def verify_replay_audit_chain(self) -> Dict[str, Any]:
+        """Cryptographically verify the independent local replay audit ledger."""
+        if not self.replay_audit_log_path.exists():
+            return {
+                "status": "EMPTY",
+                "is_valid": True,
+                "record_count": 0,
+                "signing_status": self._audit_chain.signing_status,
+                "errors": [],
+                "ledger_path": str(self.replay_audit_log_path),
+                "chain_head_hash": None,
+            }
+        chain = AuditChain.load_jsonl(self.replay_audit_log_path)
+        is_valid, errors = chain.verify_chain()
+        chain_head = chain.records[-1].record_hash if chain.records else None
+        return {
+            "status": "VERIFIED" if is_valid else "CORRUPTED",
+            "is_valid": is_valid,
+            "record_count": len(chain),
+            "signing_status": chain.signing_status,
+            "errors": errors,
+            "ledger_path": str(self.replay_audit_log_path),
+            "chain_head_hash": chain_head,
+        }
 
     # --------------------------------------------------------------------------
     # Prerequisite & Readiness Checks
@@ -217,14 +266,30 @@ class HistoricalReplayWorker:
 
         # 4. Invoke Scoring Service (Trained IEEE-CIS Model + Platt Calibration + Router)
         t0 = time.perf_counter()
-        result, audit_seq = self.integration_service.score_ieee_cis_transaction(
+        scoring_svc = self.integration_service.get_scoring_service()
+        result = scoring_svc.score_single(
             features=cleaned_features,
             transaction_id=tx_id,
         )
         latency_ms = (time.perf_counter() - t0) * 1000.0
 
-        # Update telemetry
+        # 5. Seal into independent replay audit ledger (results/local_replay/audit_chain.jsonl)
         with self._lock:
+            audit_entry = self._audit_chain.append_decision(
+                record_id=f"replay_{tx_id}",
+                action=result.action,
+                reason=result.reason,
+                p=result.p,
+                u=result.u2,
+                u2=result.u2,
+                n=result.n,
+                latency_ms=round(latency_ms, 2),
+                cfg_hash=result.cfg_hash,
+            )
+            self._save_replay_audit_chain()
+            audit_seq = audit_entry.seq
+
+            # Update telemetry
             self.scored_count += 1
             self._latencies.append(latency_ms)
             self._event_timestamps.append(now_ts)
@@ -264,6 +329,12 @@ class HistoricalReplayWorker:
             raise RuntimeError(f"Replay worker prerequisites not satisfied: {err}")
 
         with self._lock:
+            if self._state == "RUNNING":
+                return {
+                    "status": "BUSY",
+                    "scored": False,
+                    "message": "Cannot step while continuous replay is running. Stop replay first.",
+                }
             self._ensure_cursor_open()
             try:
                 row = next(self._csv_reader)
@@ -445,6 +516,8 @@ class HistoricalReplayWorker:
             "live_source_readiness": False,  # Replay is NOT live banking
             "live_source_status": "DISCONNECTED",
             "external_live_source_status": "DISCONNECTED",
+            "audit_ledger_path": "results/local_replay/audit_chain.jsonl",
+            "audit_record_count": len(self._audit_chain),
             "notice": (
                 "HISTORICAL_REPLAY: Deterministic local replay worker streaming genuine unlabeled IEEE-CIS transactions. "
                 "External live banking connections remain disconnected (fail-closed)."

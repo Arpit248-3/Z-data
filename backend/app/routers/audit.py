@@ -12,9 +12,22 @@ router = APIRouter(prefix="/audit", tags=["Audit Trail"])
 
 @router.get("/verify", response_model=AuditVerifyResponse)
 def verify_audit_chain(
+    ledger: Optional[str] = Query("canonical", description="Ledger to verify: 'canonical' or 'local_replay'."),
     integration_service: IntegrationService = Depends(get_integration_service),
 ) -> AuditVerifyResponse:
     """Verify sequential continuity and cryptographic integrity of the decision audit ledger."""
+    if ledger in ("local_replay", "replay"):
+        from backend.app.dependencies import get_replay_worker
+        worker = get_replay_worker()
+        res = worker.verify_replay_audit_chain()
+        return AuditVerifyResponse(
+            status=res.get("status", "VERIFIED"),
+            is_valid=res.get("is_valid", True),
+            record_count=res.get("record_count", 0),
+            signing_status=res.get("signing_status", "UNAVAILABLE"),
+            errors=res.get("errors", []),
+            chain_head_hash=res.get("chain_head_hash"),
+        )
     return integration_service.verify_audit_chain()
 
 

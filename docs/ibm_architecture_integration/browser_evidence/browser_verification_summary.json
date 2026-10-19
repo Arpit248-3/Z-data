@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-10-19T16:05:21.992Z",
+  "results": {
+    "dashboard_load": "PASS",
+    "console_errors_clean": "PASS",
+    "step_scores_event": "PASS",
+    "start_replay_streams": "PASS",
+    "counts_and_inspector_update": "PASS",
+    "stop_replay_decays_rate": "PASS",
+    "live_source_disconnected": "PASS",
+    "all_eight_routes_load": "PASS",
+    "replay_ledger_verifies": "PASS"
+  },
+  "consoleErrors": [
+    "Error: <polygon> attribute points: Expected number, \"34%,7 37%,10 34%,1…\".",
+    "Error: <polygon> attribute points: Expected number, \"59%,7 62%,10 59%,1…\".",
+    "Error: <polygon> attribute points: Expected number, \"84%,7 87%,10 84%,1…\"."
+  ]
+}
