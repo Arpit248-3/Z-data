@@ -6,10 +6,12 @@ evaluation benchmarks, replay streams, and audit logs to the frontend dashboard.
 
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend.app.config import settings
 from backend.app.schemas import ErrorDetail, ErrorResponse
@@ -124,6 +126,24 @@ def create_app() -> FastAPI:
     app.include_router(audit.router, prefix=api_prefix)
     app.include_router(scoring.router, prefix=api_prefix)
     app.include_router(integration.router, prefix=api_prefix)
+
+    # 4. Mount Frontend Static Assets & SPA Fallback (Production Single-Service Serving)
+    frontend_dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+    if frontend_dist.exists() and (frontend_dist / "index.html").exists():
+        assets_dir = frontend_dist / "assets"
+        if assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+        models_dir = frontend_dist / "models"
+        if models_dir.exists():
+            app.mount("/models", StaticFiles(directory=str(models_dir)), name="models")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def serve_spa(full_path: str):
+            target = frontend_dist / full_path
+            if full_path and target.is_file():
+                return FileResponse(target)
+            return FileResponse(frontend_dist / "index.html")
 
     return app
 

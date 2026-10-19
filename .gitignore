@@ -28,7 +28,9 @@ node_modules/
 frontend/node_modules/
 dist/
 dist-ssr/
-frontend/dist/
+# frontend/dist/ included for standalone zero-node cloud production deployment
+!frontend/dist/
+!frontend/dist/**
 *.local
 
 # Data Exclusions (Raw IEEE-CIS Competition Dataset & Archives)
