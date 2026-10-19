@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import {
   Shield,
   Sliders,
@@ -22,96 +22,269 @@ const ModelCard3DVisualizer = React.lazy(() =>
   import('../../components/ModelCard3DVisualizer').then((m) => ({ default: m.ModelCard3DVisualizer }))
 );
 
-const ARCHITECTURE_SPECS: TiltGlassCardDetail[] = [
-  {
-    title: 'Primary Estimator',
-    subtitle: 'HistGradientBoostingClassifier',
-    category: 'Supervised Learning / Boosting',
-    icon: <Cpu size={16} />,
-    accentColor: 'var(--accent-primary, #68D8CB)',
-    shortDesc: 'Fitted on 6,000 synthetic training rows using IEEE-CIS transaction features with native histogram binning for non-linear interactions.',
-    formula: 'F_M(x) = \\sum_{m=1}^M \\gamma_m h_m(x), \\quad h_m \\in \\text{Histogram Decision Trees}',
-    parameters: [
-      { label: 'Max Iterations', value: '100 trees' },
-      { label: 'Learning Rate', value: '0.1' },
-      { label: 'Max Bins', value: '255 native bins' },
-      { label: 'Loss Function', value: 'Log-loss (Cross-entropy)' },
-      { label: 'Feature Columns', value: 'Amount, ProductCD, card4, C1-C2, D1-D2, V1-V3' },
-      { label: 'Leakage Guardrail', value: 'isFraud, TransactionID strictly excluded' },
-    ],
-    telemetryNotes: [
-      'Trained strictly on partition 0 (6,000 cases) without lookahead or target leakage.',
-      'Native histogram binning accelerates gradient computation without explicit one-hot encoding.',
-      'Inference latency benchmark: P95 <= 1.8ms on offline fixture.',
-    ],
-    partitionInfo: 'Train Partition: 6,000 rows • SHA-256 Verified',
-  },
-  {
-    title: 'Risk Calibrator',
-    subtitle: 'Platt Scaling (Sigmoid Logistic)',
-    category: 'Posterior Probability Calibration',
-    icon: <Scale size={16} />,
-    accentColor: 'var(--color-manual-review, #E8B35E)',
-    shortDesc: 'Transforms raw boosting decision margins into posterior probabilities p in [0, 1] calibrated on held-out validation data.',
-    formula: 'p(y=1 | f) = \\frac{1}{1 + \\exp(A \\cdot f(x) + B)}, \\quad (A, B) \\text{ fitted on Val 2K}',
-    parameters: [
-      { label: 'Validation Partition', value: '2,000 held-out rows' },
-      { label: 'Optimization Solver', value: 'L-BFGS maximum likelihood' },
-      { label: 'Calibration Metric', value: 'ECE < 0.02 (Expected Calibration Error)' },
-      { label: 'Monotonicity', value: 'Strictly order-preserving' },
-      { label: 'Domain', value: 'p \\in [0.0, 1.0] continuous probability' },
-    ],
-    telemetryNotes: [
-      'Calibrated posterior p is strictly continuous and interpretable as empirical fraud likelihood.',
-      'Platt scaling prevents overconfident predictions on distribution boundaries.',
-      'Tested against Brier score target thresholds on validation set.',
-    ],
-    partitionInfo: 'Validation Partition: 2,000 rows • Platt Parameters Frozen',
-  },
-  {
-    title: 'Epistemic Disagreement',
-    subtitle: 'Rank-Residualized Ensemble (u₂)',
-    category: 'Uncertainty Decomposition',
-    icon: <Layers size={16} />,
-    accentColor: 'var(--color-epistemic-defer, #B4A0F8)',
-    shortDesc: 'Captures inter-model prediction variance residualized against risk rank to isolate true uncertainty from mere high risk.',
-    formula: 'u_2 = \\sigma_{\\text{ensemble}}^2 - g(\\text{rank}(p)), \\quad g \\text{ empirical residual baseline}',
-    parameters: [
-      { label: 'Ensemble Base', value: 'HistGBDT + Shadow Sub-Models' },
-      { label: 'Residual Metric', value: 'Rank-conditioned variance u₂' },
-      { label: 'Decision Threshold', value: 'u_threshold = 0.526773' },
-      { label: 'Escalation Action', value: 'Diverts ambiguous cases to R3_MODEL_DISAGREEMENT' },
-    ],
-    telemetryNotes: [
-      'Separates aleatoric (data noise) from epistemic (model lack of knowledge) risk.',
-      'Flags covariate shift in perturbed subspaces where individual models diverge.',
-      'Active in Scenario S3 to maintain high recall under unseen feature distributions.',
-    ],
-    partitionInfo: 'Ensemble Variance Estimator: Frozen in frozen_policy.json',
-  },
-  {
-    title: 'Capacity Governor',
-    subtitle: 'Matched Quota Enforcer (B=130)',
-    category: 'Queue & Triage Resource Allocation',
-    icon: <Shield size={16} />,
-    accentColor: 'var(--color-routine, #68C99A)',
-    shortDesc: 'Strictly limits human analyst queue to 130 slots (6.525% budget). Overflow escalations divert to HELD/DEFERRED (R6).',
-    formula: 'Q_t = \\sum_{i=1}^t \\mathbb{I}(\\text{action}_i = \\text{MANUAL\\_REVIEW}) \\le B \\quad (B = 130)',
-    parameters: [
-      { label: 'Review Quota (B)', value: '130 review slots' },
-      { label: 'Touched Rate Cap', value: '6.525% of 2,000 test cases' },
-      { label: 'Prevalence Multiplier', value: '1.5x training prevalence target' },
-      { label: 'Saturated Consumption', value: '130 / 130 slots consumed' },
-      { label: 'Capacity Deferred', value: '974 cases diverted (R6)' },
-    ],
-    telemetryNotes: [
-      'Strictly guarantees that analyst capacity is never exceeded.',
-      'Eliminates silent queue overflows or unhandled backlog.',
-      'Deferred transactions are cryptographically recorded in the append-only ledger.',
-    ],
-    partitionInfo: 'Canonical Governor Budget: 130 slots (6.525%)',
-  },
-];
+export function getArchitectureSpecs(isRealDataMode: boolean, isLiveDisconnected: boolean): TiltGlassCardDetail[] {
+  if (isLiveDisconnected) {
+    return [
+      {
+        title: 'Primary Estimator',
+        subtitle: 'DISCONNECTED STREAM',
+        category: 'Live Edge Ingestion',
+        icon: <Cpu size={16} />,
+        accentColor: 'var(--color-fraud-alert, #F27870)',
+        shortDesc: 'Live production banking feed is disconnected. In accordance with Master Spec § C, no simulated live inference is permitted.',
+        formula: '\\text{Status} = \\text{DISCONNECTED}, \\quad \\text{Inference} = \\emptyset',
+        parameters: [
+          { label: 'Feed State', value: 'OFFLINE / DISCONNECTED' },
+          { label: 'Active Pipeline', value: 'Suspended (Fail-Closed)' },
+          { label: 'Live Transactions', value: '0 incoming' },
+          { label: 'Synthetic Fallback', value: 'Prohibited in live mode' },
+        ],
+        telemetryNotes: [
+          'Live edge ingestion is verified disconnected.',
+          'Fail-closed security guarantees zero unauthorized data clearance.',
+          'No synthetic or benchmark transactions masquerade as live production.',
+        ],
+        partitionInfo: 'Live Ingestion: Disconnected • Fail-Closed',
+      },
+      {
+        title: 'Risk Calibrator',
+        subtitle: 'OFFLINE',
+        category: 'Posterior Probability Calibration',
+        icon: <Scale size={16} />,
+        accentColor: 'var(--text-tertiary)',
+        shortDesc: 'Live posterior calibration is suspended while banking feed is disconnected.',
+        formula: 'p(y=1 | f) = \\text{N/A (Stream Disconnected)}',
+        parameters: [
+          { label: 'Calibration State', value: 'Suspended' },
+          { label: 'Live Scoring', value: 'Disabled (HTTP 400)' },
+        ],
+        telemetryNotes: [
+          'Live scoring requests fail closed with HTTP 400 INVALID_FEATURE_PAYLOAD.',
+        ],
+        partitionInfo: 'Calibrator: Suspended',
+      },
+      {
+        title: 'Epistemic Disagreement',
+        subtitle: 'OFFLINE',
+        category: 'Uncertainty Decomposition',
+        icon: <Layers size={16} />,
+        accentColor: 'var(--text-tertiary)',
+        shortDesc: 'Ensemble disagreement monitoring is offline until genuine live streaming is established.',
+        formula: 'u_2 = \\text{N/A}',
+        parameters: [
+          { label: 'Disagreement Engine', value: 'Offline' },
+          { label: 'Live Stream', value: 'Disconnected' },
+        ],
+        telemetryNotes: [
+          'No epistemic residual computation on live feed.',
+        ],
+        partitionInfo: 'Uncertainty Engine: Suspended',
+      },
+      {
+        title: 'Capacity Governor',
+        subtitle: 'OFFLINE (Quota 0)',
+        category: 'Queue & Triage Resource Allocation',
+        icon: <Shield size={16} />,
+        accentColor: 'var(--text-tertiary)',
+        shortDesc: 'Human review queue governor is idle with 0 active live tickets.',
+        formula: 'B = 0, \\quad Q_t = 0',
+        parameters: [
+          { label: 'Active Queue', value: '0 review slots' },
+          { label: 'Stream Status', value: 'Disconnected' },
+        ],
+        telemetryNotes: [
+          'Zero queue tickets permitted without live payment ingestion.',
+        ],
+        partitionInfo: 'Governor: Idle',
+      },
+    ];
+  }
+
+  if (isRealDataMode) {
+    return [
+      {
+        title: 'Primary Estimator',
+        subtitle: 'Heterogeneous Calibrated Ensemble',
+        category: 'Supervised Learning / Calibrated Ensemble',
+        icon: <Cpu size={16} />,
+        accentColor: 'var(--accent-primary, #68D8CB)',
+        shortDesc: 'Trained on 354,324 genuine IEEE-CIS transactions with zero target leakage, combining HistGradientBoosting, ExtraTrees, and LogisticRegression across 391 features.',
+        formula: 'p_{\\text{raw}}(x) = w_1 h_{\\text{HGB}}(x) + w_2 h_{\\text{ET}}(x) + w_3 h_{\\text{LR}}(x), \\quad \\sum w_i = 1',
+        parameters: [
+          { label: 'Training Partition', value: '354,324 real IEEE-CIS rows' },
+          { label: 'Ensemble Members', value: 'HistGB + ExtraTrees + LogReg' },
+          { label: 'Total Features', value: '391 features (377 num, 14 cat)' },
+          { label: 'Optimization Solver', value: 'Cross-entropy with Platt calibration' },
+          { label: 'Leakage Guardrail', value: 'isFraud, TransactionID/DT strictly excluded' },
+          { label: 'Model Artifact Hash', value: 'd34bc0426e647121 (Verified)' },
+        ],
+        telemetryNotes: [
+          'Trained strictly on chronological train partition (354,324 rows) without lookahead.',
+          'Evaluated against 118,108 held-out test partition rows (4,064 fraud, 3.44% prevalence).',
+          'Achieves 0.8805 ROC-AUC and 0.4608 PR-AUC on final test partition.',
+        ],
+        partitionInfo: 'Train Partition: 354,324 rows • SHA-256 Verified',
+      },
+      {
+        title: 'Risk Calibrator',
+        subtitle: 'Platt Scaling (Sigmoid Logistic)',
+        category: 'Posterior Probability Calibration',
+        icon: <Scale size={16} />,
+        accentColor: 'var(--color-manual-review, #E8B35E)',
+        shortDesc: 'Transforms raw ensemble decision margins into posterior probabilities p in [0, 1] calibrated on 59,054 held-out calibration transactions.',
+        formula: 'p(y=1 | f) = \\frac{1}{1 + \\exp(A \\cdot f(x) + B)}, \\quad (A, B) \\text{ fitted on Cal 59K}',
+        parameters: [
+          { label: 'Calibration Partition', value: '59,054 held-out IEEE-CIS rows' },
+          { label: 'Optimization Solver', value: 'L-BFGS maximum likelihood' },
+          { label: 'Expected Cal Error (ECE)', value: '0.0089 (< 0.02 threshold)' },
+          { label: 'Brier Score', value: '0.0246 (High posterior reliability)' },
+          { label: 'Monotonicity', value: 'Strictly order-preserving' },
+        ],
+        telemetryNotes: [
+          'Calibrated posterior p is strictly continuous and represents empirical fraud likelihood.',
+          'Sigmoid scaling eliminates overconfident predictions on distribution boundaries.',
+          'Validated on held-out 59,054 validation partition prior to test freeze.',
+        ],
+        partitionInfo: 'Calibration Partition: 59,054 rows • Platt Parameters Frozen',
+      },
+      {
+        title: 'Epistemic Disagreement',
+        subtitle: 'Rank-Residualized Ensemble (u₂)',
+        category: 'Uncertainty Decomposition',
+        icon: <Layers size={16} />,
+        accentColor: 'var(--color-epistemic-defer, #B4A0F8)',
+        shortDesc: 'Measures inter-model prediction variance across heterogeneous architectures residualized against risk rank to isolate true uncertainty.',
+        formula: 'u_2 = \\sigma_{\\text{ensemble}}^2 - g(\\text{rank}(p)), \\quad g \\text{ empirical residual baseline}',
+        parameters: [
+          { label: 'Ensemble Base', value: 'HistGB + ExtraTrees + LogReg' },
+          { label: 'Residual Metric', value: 'Rank-conditioned variance u₂' },
+          { label: 'Decision Threshold', value: 'u_threshold = 0.526773' },
+          { label: 'Escalation Action', value: 'Diverts ambiguous cases to R3_MODEL_DISAGREEMENT' },
+        ],
+        telemetryNotes: [
+          'Separates aleatoric (data noise) from epistemic (model lack of knowledge) risk.',
+          'Flags covariate shift in perturbed subspaces where individual models diverge.',
+          'Active in Scenario S3 to maintain high recall under unseen feature distributions.',
+        ],
+        partitionInfo: 'Ensemble Variance Estimator: Frozen in frozen_policy.json',
+      },
+      {
+        title: 'Capacity Governor',
+        subtitle: 'Matched Quota Enforcer (B=5,993)',
+        category: 'Queue & Triage Resource Allocation',
+        icon: <Shield size={16} />,
+        accentColor: 'var(--color-routine, #68C99A)',
+        shortDesc: 'Strictly limits human analyst queue to 5,993 slots (5.075% budget on 118,108 cases). Overflow escalations divert to HELD/DEFERRED (R6).',
+        formula: 'Q_t = \\sum_{i=1}^t \\mathbb{I}(\\text{action}_i = \\text{MANUAL\\_REVIEW}) \\le B \\quad (B = 5,993)',
+        parameters: [
+          { label: 'Review Quota (B)', value: '5,993 review slots' },
+          { label: 'Touched Rate Cap', value: '5.075% of 118,108 test cases' },
+          { label: 'Prevalence Multiplier', value: '1.5x training prevalence target' },
+          { label: 'Saturated Consumption', value: '5,993 / 5,993 slots consumed' },
+          { label: 'Capacity Deferred', value: '5,020 cases diverted (R6)' },
+        ],
+        telemetryNotes: [
+          'Strictly guarantees that analyst capacity is never exceeded under volume surges.',
+          'Eliminates silent queue overflows or unhandled operational backlog.',
+          'Deferred transactions are cryptographically recorded in the append-only ledger.',
+        ],
+        partitionInfo: 'Canonical Governor Budget: 5,993 slots (5.075%)',
+      },
+    ];
+  }
+
+  // Synthetic smoke default
+  return [
+    {
+      title: 'Primary Estimator',
+      subtitle: 'HistGradientBoostingClassifier',
+      category: 'Supervised Learning / Boosting',
+      icon: <Cpu size={16} />,
+      accentColor: 'var(--accent-primary, #68D8CB)',
+      shortDesc: 'Fitted on 6,000 synthetic training rows using IEEE-CIS transaction features with native histogram binning for non-linear interactions.',
+      formula: 'F_M(x) = \\sum_{m=1}^M \\gamma_m h_m(x), \\quad h_m \\in \\text{Histogram Decision Trees}',
+      parameters: [
+        { label: 'Max Iterations', value: '100 trees' },
+        { label: 'Learning Rate', value: '0.1' },
+        { label: 'Max Bins', value: '255 native bins' },
+        { label: 'Loss Function', value: 'Log-loss (Cross-entropy)' },
+        { label: 'Feature Columns', value: 'Amount, ProductCD, card4, C1-C2, D1-D2, V1-V3' },
+        { label: 'Leakage Guardrail', value: 'isFraud, TransactionID strictly excluded' },
+      ],
+      telemetryNotes: [
+        'Trained strictly on partition 0 (6,000 cases) without lookahead or target leakage.',
+        'Native histogram binning accelerates gradient computation without explicit one-hot encoding.',
+        'Inference latency benchmark: P95 <= 1.8ms on offline fixture.',
+      ],
+      partitionInfo: 'Train Partition: 6,000 rows • SHA-256 Verified',
+    },
+    {
+      title: 'Risk Calibrator',
+      subtitle: 'Platt Scaling (Sigmoid Logistic)',
+      category: 'Posterior Probability Calibration',
+      icon: <Scale size={16} />,
+      accentColor: 'var(--color-manual-review, #E8B35E)',
+      shortDesc: 'Transforms raw boosting decision margins into posterior probabilities p in [0, 1] calibrated on held-out validation data.',
+      formula: 'p(y=1 | f) = \\frac{1}{1 + \\exp(A \\cdot f(x) + B)}, \\quad (A, B) \\text{ fitted on Val 2K}',
+      parameters: [
+        { label: 'Validation Partition', value: '2,000 held-out rows' },
+        { label: 'Optimization Solver', value: 'L-BFGS maximum likelihood' },
+        { label: 'Calibration Metric', value: 'ECE < 0.02 (Expected Calibration Error)' },
+        { label: 'Monotonicity', value: 'Strictly order-preserving' },
+        { label: 'Domain', value: 'p \\in [0.0, 1.0] continuous probability' },
+      ],
+      telemetryNotes: [
+        'Calibrated posterior p is strictly continuous and interpretable as empirical fraud likelihood.',
+        'Platt scaling prevents overconfident predictions on distribution boundaries.',
+        'Tested against Brier score target thresholds on validation set.',
+      ],
+      partitionInfo: 'Validation Partition: 2,000 rows • Platt Parameters Frozen',
+    },
+    {
+      title: 'Epistemic Disagreement',
+      subtitle: 'Rank-Residualized Ensemble (u₂)',
+      category: 'Uncertainty Decomposition',
+      icon: <Layers size={16} />,
+      accentColor: 'var(--color-epistemic-defer, #B4A0F8)',
+      shortDesc: 'Captures inter-model prediction variance residualized against risk rank to isolate true uncertainty from mere high risk.',
+      formula: 'u_2 = \\sigma_{\\text{ensemble}}^2 - g(\\text{rank}(p)), \\quad g \\text{ empirical residual baseline}',
+      parameters: [
+        { label: 'Ensemble Base', value: 'HistGBDT + Shadow Sub-Models' },
+        { label: 'Residual Metric', value: 'Rank-conditioned variance u₂' },
+        { label: 'Decision Threshold', value: 'u_threshold = 0.526773' },
+        { label: 'Escalation Action', value: 'Diverts ambiguous cases to R3_MODEL_DISAGREEMENT' },
+      ],
+      telemetryNotes: [
+        'Separates aleatoric (data noise) from epistemic (model lack of knowledge) risk.',
+        'Flags covariate shift in perturbed subspaces where individual models diverge.',
+        'Active in Scenario S3 to maintain high recall under unseen feature distributions.',
+      ],
+      partitionInfo: 'Ensemble Variance Estimator: Frozen in frozen_policy.json',
+    },
+    {
+      title: 'Capacity Governor',
+      subtitle: 'Matched Quota Enforcer (B=130)',
+      category: 'Queue & Triage Resource Allocation',
+      icon: <Shield size={16} />,
+      accentColor: 'var(--color-routine, #68C99A)',
+      shortDesc: 'Strictly limits human analyst queue to 130 slots (6.525% budget). Overflow escalations divert to HELD/DEFERRED (R6).',
+      formula: 'Q_t = \\sum_{i=1}^t \\mathbb{I}(\\text{action}_i = \\text{MANUAL\\_REVIEW}) \\le B \\quad (B = 130)',
+      parameters: [
+        { label: 'Review Quota (B)', value: '130 review slots' },
+        { label: 'Touched Rate Cap', value: '6.525% of 2,000 test cases' },
+        { label: 'Prevalence Multiplier', value: '1.5x training prevalence target' },
+        { label: 'Saturated Consumption', value: '130 / 130 slots consumed' },
+        { label: 'Capacity Deferred', value: '974 cases diverted (R6)' },
+      ],
+      telemetryNotes: [
+        'Strictly guarantees that analyst capacity is never exceeded.',
+        'Eliminates silent queue overflows or unhandled backlog.',
+        'Deferred transactions are cryptographically recorded in the append-only ledger.',
+      ],
+      partitionInfo: 'Canonical Governor Budget: 130 slots (6.525%)',
+    },
+  ];
+}
 
 interface FrozenRuleDef {
   id: string;
@@ -125,63 +298,68 @@ interface FrozenRuleDef {
   color: string;
 }
 
-const FROZEN_RULES: FrozenRuleDef[] = [
-  {
-    id: 'R1',
-    name: 'R1_HIGH_RISK',
-    condition: 'p ≥ 0.084705 (t_alert)',
-    action: 'FRAUD_ALERT',
-    actionClass: 'badge-alert',
-    capacityTreatment: 'Exempt from analyst review quota',
-    riskRange: 'p ∈ [0.0847, 1.0000]',
-    visualWidth: '85%',
-    color: 'var(--color-fraud-alert)',
-  },
-  {
-    id: 'R2',
-    name: 'R2_INTERMEDIATE_RISK',
-    condition: 'p ≥ 0.071002 (t_review)',
-    action: 'MANUAL_REVIEW',
-    actionClass: 'badge-caution',
-    capacityTreatment: 'Consumes analyst review quota B',
-    riskRange: 'p ∈ [0.0710, 0.0847)',
-    visualWidth: '55%',
-    color: 'var(--color-manual-review)',
-  },
-  {
-    id: 'R3',
-    name: 'R3_MODEL_DISAGREEMENT',
-    condition: 'u₂ ≥ 0.526773 (u_threshold)',
-    action: 'MANUAL_REVIEW',
-    actionClass: 'badge-caution',
-    capacityTreatment: 'Consumes analyst review quota B',
-    riskRange: 'Epistemic u₂ Residual Bypass',
-    visualWidth: '70%',
-    color: 'var(--color-epistemic-defer)',
-  },
-  {
-    id: 'R5',
-    name: 'R5_LOW_RISK_RELIABLE',
-    condition: 'p < 0.071002 AND u₂ < 0.526773',
-    action: 'ROUTINE',
-    actionClass: 'badge-ready',
-    capacityTreatment: 'Zero-touch automated clearance',
-    riskRange: 'p < 0.0710, u₂ < 0.5268',
-    visualWidth: '25%',
-    color: 'var(--color-routine)',
-  },
-  {
-    id: 'R6',
-    name: 'R6_CAPACITY_DEFERRED',
-    condition: 'Review escalations > B (130 slots)',
-    action: 'HELD / DEFERRED',
-    actionClass: 'badge-synthetic',
-    capacityTreatment: 'Held for deferred audit; zero silent leakage',
-    riskRange: 'Queue Saturation Trigger',
-    visualWidth: '95%',
-    color: 'var(--color-epistemic-defer)',
-  },
-];
+export function getFrozenRules(isRealDataMode: boolean, _isLiveDisconnected?: boolean): FrozenRuleDef[] {
+  const quotaLabel = isRealDataMode ? '5,993 slots' : '130 slots';
+  const quotaLimit = isRealDataMode ? '5,993' : '130';
+
+  return [
+    {
+      id: 'R1',
+      name: 'R1_HIGH_RISK',
+      condition: 'p ≥ 0.084705 (t_alert)',
+      action: 'FRAUD_ALERT',
+      actionClass: 'badge-alert',
+      capacityTreatment: 'Exempt from analyst review quota',
+      riskRange: 'p ∈ [0.0847, 1.0000]',
+      visualWidth: '85%',
+      color: 'var(--color-fraud-alert)',
+    },
+    {
+      id: 'R2',
+      name: 'R2_INTERMEDIATE_RISK',
+      condition: `p ≥ 0.071002 (t_review) • Quota ≤ ${quotaLimit}`,
+      action: 'MANUAL_REVIEW',
+      actionClass: 'badge-caution',
+      capacityTreatment: `Consumes analyst review quota B (≤ ${quotaLimit})`,
+      riskRange: 'p ∈ [0.0710, 0.0847)',
+      visualWidth: '55%',
+      color: 'var(--color-manual-review)',
+    },
+    {
+      id: 'R3',
+      name: 'R3_MODEL_DISAGREEMENT',
+      condition: `u₂ ≥ 0.526773 (u_threshold) • Quota ≤ ${quotaLimit}`,
+      action: 'MANUAL_REVIEW',
+      actionClass: 'badge-caution',
+      capacityTreatment: `Consumes analyst review quota B (≤ ${quotaLimit})`,
+      riskRange: 'Epistemic u₂ Residual Bypass',
+      visualWidth: '70%',
+      color: 'var(--color-epistemic-defer)',
+    },
+    {
+      id: 'R5',
+      name: 'R5_LOW_RISK_RELIABLE',
+      condition: 'p < 0.071002 AND u₂ < 0.526773',
+      action: 'ROUTINE',
+      actionClass: 'badge-ready',
+      capacityTreatment: 'Zero-touch automated clearance',
+      riskRange: 'p < 0.0710, u₂ < 0.5268',
+      visualWidth: '25%',
+      color: 'var(--color-routine)',
+    },
+    {
+      id: 'R6',
+      name: 'R6_CAPACITY_DEFERRED',
+      condition: `Review escalations > B (${quotaLabel})`,
+      action: 'HELD / DEFERRED',
+      actionClass: 'badge-synthetic',
+      capacityTreatment: 'Held for deferred audit; zero silent leakage',
+      riskRange: 'Queue Saturation Trigger',
+      visualWidth: '95%',
+      color: 'var(--color-epistemic-defer)',
+    },
+  ];
+}
 
 export const ModelCardPage: React.FC = () => {
   const { mode, isRealDataMode, isLiveDisconnected } = useMode();
@@ -189,8 +367,10 @@ export const ModelCardPage: React.FC = () => {
   const [modelCard, setModelCard] = useState<ModelCardResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const architectureSpecs = useMemo(() => getArchitectureSpecs(isRealDataMode, isLiveDisconnected), [isRealDataMode, isLiveDisconnected]);
+  const frozenRules = useMemo(() => getFrozenRules(isRealDataMode, isLiveDisconnected), [isRealDataMode, isLiveDisconnected]);
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
-  const [inspectRule, setInspectRule] = useState<typeof FROZEN_RULES[number] | null>(null);
+  const [inspectRule, setInspectRule] = useState<FrozenRuleDef | null>(null);
 
   // Close modal on Escape
   useEffect(() => {
@@ -288,7 +468,7 @@ export const ModelCardPage: React.FC = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-4)' }}>
-              {ARCHITECTURE_SPECS.map((spec) => (
+              {architectureSpecs.map((spec) => (
                 <TiltGlassCard key={spec.title} detail={spec} />
               ))}
             </div>
@@ -392,7 +572,7 @@ export const ModelCardPage: React.FC = () => {
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-epistemic-defer)' }} />
-                  <span>Governor Saturation: <strong>&gt; 130 reviews</strong> diverts to HELD/DEFERRED (R6)</span>
+                  <span>Governor Saturation: <strong>&gt; {isRealDataMode ? '5,993 reviews' : '130 reviews'}</strong> diverts to HELD/DEFERRED (R6)</span>
                 </span>
               </div>
             </div>
@@ -411,7 +591,7 @@ export const ModelCardPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {FROZEN_RULES.map((rule) => {
+                  {frozenRules.map((rule) => {
                     const isSelected = selectedRule === rule.id;
                     return (
                       <tr
@@ -634,7 +814,9 @@ export const ModelCardPage: React.FC = () => {
 
                     <div style={{ background: 'var(--bg-surface-raised)', padding: '12px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>Threshold Derivation</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14.5px', fontWeight: 700, color: 'var(--accent-primary-bright)' }}>Quantile Tuned (Val N=2k)</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '14.5px', fontWeight: 700, color: 'var(--accent-primary-bright)' }}>
+                        {isRealDataMode ? 'Quantile Tuned (Cal N=59k)' : 'Quantile Tuned (Val N=2k)'}
+                      </span>
                       <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Zero Test Contamination</span>
                     </div>
                   </div>

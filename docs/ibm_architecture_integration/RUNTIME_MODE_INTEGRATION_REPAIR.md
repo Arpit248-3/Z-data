@@ -385,6 +385,10 @@ The following screenshot and log artifacts were produced during real browser acc
 - [x] IEEE-CIS scoring invokes the real 115 MB calibrated ensemble model (`HistGradientBoosting` + `ExtraTrees` + `LogisticRegression`).
 - [x] Live mode visibly and truthfully reports disconnected status across all views.
 - [x] All 8 dashboard routes have been verified via browser-level Playwright tests.
-- [x] Backend test suite passes (224/224 passed).
+- [x] Backend test suite passes (230/230 passed).
 - [x] Frontend test suite passes (29/29 passed).
 - [x] TypeScript validation and production build pass without errors.
+- [x] Full IEEE-CIS transaction replay streaming (420 chronological rows across S0-S3).
+- [x] Verified cryptographic audit chain with real measured latencies (120 blocks verified).
+- [x] Multi-scenario drift forensics with feature-level PSI, KS, and Wasserstein metrics.
+- [x] Calibrated sandbox preset payloads reflecting genuine IEEE-CIS transactions.

@@ -46,24 +46,32 @@ export const DriftShiftPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    api.getResults()
+    api.getResults(mode)
       .then((res: any) => {
         if (!isMounted) return;
         const shiftMap = res?.shift_scenarios || {};
         const parsed: ShiftScenarioData[] = [];
 
         for (const [sId, sData] of Object.entries<any>(shiftMap)) {
+          const sampleCount = sData.sample_count || sData.total_rows || 0;
+          const fraudCount = sData.fraud_count || sData.total_fraud || 0;
+          const prevalence = sData.fraud_prevalence || sData.prevalence || 0;
+          const b2Recall = Number(((sData.b2_recall || 0) * 100).toFixed(2));
+          const signalgateRecall = Number(((sData.signalgate_recall || sData.p5_recall || 0) * 100).toFixed(2));
+          const deltaRecallPp = Number((sData.delta_recall_vs_b2_pp !== undefined ? sData.delta_recall_vs_b2_pp : (signalgateRecall - b2Recall)).toFixed(2));
+
+          const cleanId = sId.split('_')[0];
           parsed.push({
-            id: sId,
-            name: sData.name || sId,
-            sampleCount: sData.sample_count || 0,
-            fraudCount: sData.fraud_count || 0,
-            prevalence: sData.fraud_prevalence || 0,
-            b2Recall: Number(((sData.b2_recall || 0) * 100).toFixed(2)),
-            signalgateRecall: Number(((sData.signalgate_recall || 0) * 100).toFixed(2)),
-            deltaRecallPp: Number((sData.delta_recall_vs_b2_pp || 0).toFixed(2)),
-            shiftedFeatures: sData.metadata?.shifted_features || [],
-            status: sData.status || 'SYNTHETIC_SHIFT',
+            id: cleanId,
+            name: sData.name || sData.description || sId,
+            sampleCount,
+            fraudCount,
+            prevalence,
+            b2Recall,
+            signalgateRecall,
+            deltaRecallPp,
+            shiftedFeatures: sData.metadata?.shifted_features || (cleanId === 'S3' ? ['Covariate Noise Perturbation'] : cleanId === 'S2' ? ['ProductCD', 'TransactionAmt Segment Shift'] : cleanId === 'S1' ? ['Temporal Fraud Concentration'] : []),
+            status: sData.status || (isRealDataMode ? 'IEEE_CIS_OFFLINE_BENCHMARK' : 'SYNTHETIC_SHIFT'),
           });
         }
         setScenarios(parsed);
@@ -76,7 +84,7 @@ export const DriftShiftPage: React.FC = () => {
       });
 
     return () => { isMounted = false; };
-  }, []);
+  }, [mode, isRealDataMode]);
 
   useEffect(() => {
     let isMounted = true;
@@ -209,7 +217,7 @@ export const DriftShiftPage: React.FC = () => {
                     fontFamily="var(--font-mono)"
                     unit="%"
                     tickLine={false}
-                    domain={[0, 14]}
+                    domain={[0, isRealDataMode ? 70 : 14]}
                   />
                   <Tooltip
                     contentStyle={{
@@ -356,6 +364,62 @@ export const DriftShiftPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Feature-Level Drift Forensics Table */}
+                {driftReport.feature_reports && driftReport.feature_reports.length > 0 && (
+                  <div style={{ marginTop: '6px', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-xs)', overflow: 'hidden' }}>
+                    <div style={{ padding: '8px 14px', background: 'var(--bg-surface-header)', borderBottom: '1px solid var(--border-default)', fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>FEATURE-LEVEL DRIFT FORENSICS</span>
+                      <span>METHODOLOGY: PSI + 2-SAMPLE KS + WASSERSTEIN</span>
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
+                        <thead>
+                          <tr style={{ background: 'var(--bg-surface-subdued)', color: 'var(--text-tertiary)', borderBottom: '1px solid var(--border-subtle)' }}>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>FEATURE</th>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>PSI</th>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>KS STATISTIC</th>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>KS P-VALUE</th>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>WASSERSTEIN</th>
+                            <th style={{ padding: '8px 12px', fontWeight: 600 }}>STATUS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {driftReport.feature_reports.map((fr: any, idx: number) => {
+                            const isDrift = (fr.psi ?? 0) >= 0.2 || fr.drift_category === 'significant_drift';
+                            const isMod = ((fr.psi ?? 0) >= 0.1 && (fr.psi ?? 0) < 0.2) || fr.drift_category === 'moderate_drift';
+                            const badgeColor = isDrift ? 'var(--color-fraud-alert-bright)' : isMod ? 'var(--color-manual-review-bright)' : 'var(--color-routine-bright)';
+                            const badgeBg = isDrift ? 'var(--color-fraud-alert-tint)' : isMod ? 'var(--color-manual-review-tint)' : 'var(--color-routine-tint)';
+                            return (
+                              <tr key={fr.feature || idx} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                                <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                  {fr.feature || fr.feature_name}
+                                </td>
+                                <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', color: isDrift ? 'var(--color-fraud-alert-bright)' : 'var(--text-secondary)' }}>
+                                  {(fr.psi ?? 0).toFixed(4)}
+                                </td>
+                                <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                                  {(fr.ks_statistic ?? 0).toFixed(4)}
+                                </td>
+                                <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-tertiary)' }}>
+                                  {typeof fr.ks_pvalue === 'number' ? (fr.ks_pvalue < 0.0001 ? '<0.0001' : fr.ks_pvalue.toFixed(4)) : '—'}
+                                </td>
+                                <td style={{ padding: '8px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
+                                  {(fr.wasserstein_distance ?? 0).toFixed(4)}
+                                </td>
+                                <td style={{ padding: '8px 12px' }}>
+                                  <span style={{ fontSize: '10.5px', fontFamily: 'var(--font-mono)', fontWeight: 700, padding: '2px 6px', borderRadius: '2px', color: badgeColor, background: badgeBg }}>
+                                    {isDrift ? 'SIGNIFICANT' : isMod ? 'MODERATE' : 'STABLE'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
 
                 {/* Statutory Guardrail Callout */}
                 <div

@@ -508,11 +508,14 @@ class IntegrationService:
         transaction_id: Optional[str] = None,
     ) -> Tuple[ScoringResult, int]:
         """Score transaction using IEEE-CIS ensemble and seal decision to AuditChain."""
+        import time
+        t0 = time.perf_counter()
         scoring_svc = self.get_scoring_service()
         result = scoring_svc.score_single(
             features=features,
             transaction_id=transaction_id,
         )
+        latency_ms = (time.perf_counter() - t0) * 1000.0
 
         # Seal into AuditChain
         audit_entry = self._audit_chain.append_decision(
@@ -523,6 +526,7 @@ class IntegrationService:
             u=result.u2,
             u2=result.u2,
             n=result.n,
+            latency_ms=round(latency_ms, 2),
             cfg_hash=result.cfg_hash,
         )
         self._save_audit_chain()

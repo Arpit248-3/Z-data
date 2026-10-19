@@ -55,6 +55,7 @@ class AuditRecord(BaseModel):
     u_method: Optional[str] = Field(default="u2_rank_residual", description="Disagreement method name")
     action: Action = Field(description="Deterministic routed action")
     reason: ReasonCode = Field(description="Action justification reason code")
+    latency_ms: Optional[float] = Field(default=None, description="Inference latency in milliseconds")
     cfg_hash: str = Field(pattern=SHA256_PATTERN, description="Frozen policy configuration hash")
     split_hash: str = Field(pattern=SHA256_PATTERN, description="Partition split hash")
     record_hash: str = Field(

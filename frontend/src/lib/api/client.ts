@@ -133,12 +133,21 @@ export const api = {
     const qs = searchParams.toString();
     return request<PolicyCompareResponse>(`/api/policies/compare${qs ? `?${qs}` : ''}`);
   },
-  getScenarios: () => request<ScenariosResponse>('/api/scenarios'),
-  getReplayRows: (params?: { scenario?: string; offset?: number; limit?: number }) => {
+  getScenarios: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<ScenariosResponse>(`/api/scenarios${query}`);
+  },
+  getReplayRows: (params?: {
+    scenario?: string;
+    offset?: number;
+    limit?: number;
+    mode?: OperatingMode | string;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.scenario) searchParams.set('scenario', params.scenario);
     if (params?.offset !== undefined) searchParams.set('offset', String(params.offset));
     if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params?.mode) searchParams.set('mode', params.mode);
     const qs = searchParams.toString();
     return request<ReplayRowsResponse>(`/api/replay/rows${qs ? `?${qs}` : ''}`);
   },

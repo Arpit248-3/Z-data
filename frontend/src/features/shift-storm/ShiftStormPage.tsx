@@ -108,20 +108,23 @@ export const ShiftStormPage: React.FC = () => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load scenarios on mount
+  // Load scenarios on mount or mode change
   useEffect(() => {
     let isMounted = true;
-    api.getScenarios()
+    api.getScenarios(mode)
       .then((res) => {
         if (isMounted && res.scenarios) {
           setScenarios(res.scenarios);
+          if (res.scenarios.length > 0 && !res.scenarios.some(s => s.scenario_id === selectedScenario)) {
+            setSelectedScenario(res.scenarios[0].scenario_id);
+          }
         }
       })
       .catch((err) => {
         console.warn('Could not load scenarios list:', err);
       });
     return () => { isMounted = false; };
-  }, []);
+  }, [mode]);
 
   // Fetch replay rows for the selected scenario
   const fetchRows = useCallback(async (scenarioId: string) => {
@@ -130,7 +133,7 @@ export const ShiftStormPage: React.FC = () => {
     setIsPlaying(false);
     setCurrentIndex(0);
     try {
-      const res = await api.getReplayRows({ scenario: scenarioId, offset: 0, limit: 200 });
+      const res = await api.getReplayRows({ scenario: scenarioId, offset: 0, limit: 200, mode });
       if (res && res.rows) {
         setRows(res.rows);
       } else {
@@ -141,7 +144,7 @@ export const ShiftStormPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     fetchRows(selectedScenario);

@@ -65,6 +65,7 @@ class AuditChain:
         u: Optional[float] = None,
         u2: Optional[float] = None,
         n: Optional[float] = None,
+        latency_ms: Optional[float] = None,
         cfg_hash: str = ZERO_HASH,
         split_hash: str = ZERO_HASH,
         timestamp: Optional[datetime] = None,
@@ -84,6 +85,7 @@ class AuditChain:
             u=u,
             u2=u2,
             n=n,
+            latency_ms=latency_ms,
             u_method="u2_rank_residual",
             action=action,  # type: ignore[arg-type]
             reason=reason,  # type: ignore[arg-type]
@@ -107,6 +109,7 @@ class AuditChain:
             u=draft.u,
             u2=draft.u2,
             n=draft.n,
+            latency_ms=draft.latency_ms,
             u_method=draft.u_method,
             action=draft.action,
             reason=draft.reason,

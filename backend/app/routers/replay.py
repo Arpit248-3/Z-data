@@ -13,6 +13,7 @@ def get_replay_rows(
     scenario: str = Query("S0", description="Scenario identifier (e.g. S0, S1, S3)."),
     offset: int = Query(0, ge=0, description="Offset for chronological row retrieval."),
     limit: int = Query(100, ge=1, le=500, description="Number of rows to stream (max 500)."),
+    mode: str = Query(None, description="Operating mode filter."),
     replay_service: ReplayService = Depends(get_replay_service),
 ) -> ReplayRowsResponse:
     """Retrieve ordered transaction rows from saved replay artifacts for frontend stream visualization."""
@@ -20,4 +21,5 @@ def get_replay_rows(
         scenario=scenario,
         offset=offset,
         limit=limit,
+        mode=mode,
     )

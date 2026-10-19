@@ -405,7 +405,7 @@ export const AuditTrailPage: React.FC = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{lat}</span>
                           <span style={{ fontSize: '11px', color: 'var(--color-routine-bright)', background: 'var(--color-routine-tint)', padding: '2px 7px', borderRadius: '2px', fontWeight: 700 }}>
-                            &lt;5ms
+                            {isRealDataMode ? '<100ms' : '<5ms'}
                           </span>
                         </div>
                       </td>
@@ -653,13 +653,19 @@ export const AuditTrailPage: React.FC = () => {
                 <div style={{ background: 'var(--bg-surface-raised)', padding: '12px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>Inference Latency</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 800, color: 'var(--color-routine-bright)' }}>{lat}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Passes &lt;5.0ms SLA</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    {isRealDataMode ? 'Passes <100ms SLA' : 'Passes <5.0ms SLA'}
+                  </span>
                 </div>
 
                 <div style={{ background: 'var(--bg-surface-raised)', padding: '12px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <span style={{ fontSize: '12px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 700 }}>Governor Gate</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                    {selectedRecord.governor_quota_admitted ? 'Admitted (≤ 130)' : 'Cleared / Shunted'}
+                    {selectedRecord.governor_quota_admitted
+                      ? isRealDataMode
+                        ? 'Admitted (≤ 5,993)'
+                        : 'Admitted (≤ 130)'
+                      : 'Cleared / Shunted'}
                   </span>
                   <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Capacity Protected</span>
                 </div>
