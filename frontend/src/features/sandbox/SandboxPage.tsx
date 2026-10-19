@@ -657,7 +657,7 @@ export const SandboxPage: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <ShieldCheck size={13} style={{ color: 'var(--accent-primary)' }} />
-                  <span>Schema: Strict 67-Dim Ingestion Bus</span>
+                  <span>Schema: {isRealDataMode ? 'Strict 391-Dim IEEE-CIS Pipeline' : 'Strict 67-Dim Ingestion Bus'}</span>
                 </div>
               </div>
             </div>

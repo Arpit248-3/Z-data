@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """SignalGate Overview Service
 
 Provides summary metrics derived strictly from validated results.json.
@@ -5,14 +7,37 @@ Provides summary metrics derived strictly from validated results.json.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TYPE_CHECKING
 from backend.app.schemas import OverviewResponse
 from backend.app.services.artifacts import ArtifactService
 
+if TYPE_CHECKING:
+    from backend.app.services.replay_worker import HistoricalReplayWorker
+
 
 class OverviewService:
-    def __init__(self, artifact_service: ArtifactService):
+    def __init__(
+        self,
+        artifact_service: ArtifactService,
+        replay_worker: Optional[HistoricalReplayWorker] = None,
+    ):
         self.artifacts = artifact_service
+        self.replay_worker = replay_worker
+
+    def _get_replay_fields(self) -> Dict[str, str]:
+        if not self.replay_worker:
+            return {}
+        w_st = self.replay_worker.get_status()
+        return {
+            "replay_state": w_st["replay_state"],
+            "data_provenance": w_st["data_provenance"],
+            "replay_source": w_st["source_file"],
+            "replay_scored_count": str(w_st["scored_count"]),
+            "replay_received_count": str(w_st["received_count"]),
+            "recent_caserate": f"{w_st['recent_caserate']:.1f}",
+            "avg_latency_ms": f"{w_st['avg_latency_ms']:.1f}" if w_st["avg_latency_ms"] is not None else "0.0",
+            "live_source_status": "DISCONNECTED",
+        }
 
     def get_overview(self, mode: Optional[str] = None) -> OverviewResponse:
         mode_upper = (mode or "SYNTHETIC_SMOKE_ONLY").strip().upper()
@@ -74,6 +99,7 @@ class OverviewService:
                             "architecture": "EraBaggedHeterogeneousEnsemble (391 features)",
                             "calibrator": "PlattCalibrator",
                             "evaluation_partition": "Test Partition (118,108 rows)",
+                            **self._get_replay_fields(),
                         },
                     )
                 except Exception:
@@ -108,6 +134,7 @@ class OverviewService:
                     "streaming_broker": "OFFLINE",
                     "safety_state": "FAILS_CLOSED",
                     "notice": "Live production banking source is offline. No synthetic data masquerading as live.",
+                    **self._get_replay_fields(),
                 },
             )
 
@@ -159,5 +186,9 @@ class OverviewService:
             latency_p95_ms=p95_lat,
             frozen_config_hash=prov.get("frozen_config_hash", "8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240"),
             split_hash=prov.get("split_hash", "07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd"),
-            status_fields={"results_json": "READY", "policy": "FROZEN"},
+            status_fields={
+                "results_json": "READY",
+                "policy": "FROZEN",
+                **self._get_replay_fields(),
+            },
         )

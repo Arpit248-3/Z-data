@@ -4,7 +4,9 @@ setlocal enabledelayedexpansion
 echo ======================================================================
 echo SIGNALGATE - SAFE VERIFIED DEMO SHUTDOWN (WINDOWS)
 echo ======================================================================
-echo.
+echo [*] Halting any active historical replay workers cleanly to preserve audit integrity...
+python scripts\run_historical_replay.py --stop >nul 2>&1
+
 echo [*] Inspecting processes listening on ports 8000 and 5173 with ownership verification...
 
 powershell -NoProfile -Command ^

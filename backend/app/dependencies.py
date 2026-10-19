@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """SignalGate Dependency Injection Providers
 
 Provides reusable service instances with test substitution support.
@@ -25,10 +27,17 @@ def get_integration_service() -> IntegrationService:
     return IntegrationService()
 
 
+@lru_cache()
+def get_replay_worker() -> HistoricalReplayWorker:
+    from backend.app.services.replay_worker import HistoricalReplayWorker
+    return HistoricalReplayWorker(integration_service=get_integration_service())
+
+
 def get_overview_service(
     artifacts: ArtifactService = Depends(get_artifact_service),
+    worker: HistoricalReplayWorker = Depends(get_replay_worker),
 ) -> OverviewService:
-    return OverviewService(artifacts)
+    return OverviewService(artifacts, replay_worker=worker)
 
 
 def get_policy_service(
@@ -60,3 +69,4 @@ def get_scoring_service(
     integration: IntegrationService = Depends(get_integration_service),
 ) -> ScoringService:
     return ScoringService(artifacts, integration_service=integration)
+

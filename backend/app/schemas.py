@@ -41,6 +41,8 @@ class ReadinessStatusResponse(BaseModel):
     evidence_status: str
     dependencies: Dict[str, Any]
     hashes: Dict[str, Any]
+    readiness: Optional[Dict[str, Any]] = None
+    replay: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -196,6 +198,57 @@ class ReplayRowsResponse(BaseModel):
     scenario_id: str
     status: str
     rows: List[ReplayRowItem]
+
+
+class ReplayStatusResponse(BaseModel):
+    state: Optional[str] = None
+    replay_state: str
+    is_running: bool = False
+    data_provenance: str
+    source_file: str
+    replay_source: Optional[str] = None
+    total_available_rows: Optional[int] = None
+    cursor_row: int
+    cursor_position: Optional[int] = None
+    received_count: int
+    accepted_count: int
+    rejected_count: int
+    duplicate_count: int = 0
+    scored_count: int
+    last_received_event: Optional[Dict[str, Any]] = None
+    last_scored_event: Optional[Dict[str, Any]] = None
+    recent_caserate: float
+    avg_latency_ms: Optional[float] = None
+    last_latency_ms: Optional[float] = 0.0
+    errors: List[str] = Field(default_factory=list)
+    backend_readiness: bool = True
+    model_readiness: bool = True
+    ieee_data_readiness: bool = True
+    live_source_readiness: bool = False
+    live_source_status: str = "DISCONNECTED"
+    external_live_source_status: str = "DISCONNECTED"
+    notice: str
+
+
+class ReplayControlRequest(BaseModel):
+    limit: Optional[int] = Field(500, ge=1, le=50000, description="Max transactions to replay in this run.")
+    delay_ms: Optional[int] = Field(50, ge=0, le=5000, description="Inter-transaction delay in milliseconds.")
+
+
+class ReplayControlResponse(BaseModel):
+    status: str
+    message: str
+    replay_state: str
+    data_provenance: Optional[str] = "HISTORICAL_REPLAY"
+    scored_count: Optional[int] = None
+
+
+class ReplayStepResponse(BaseModel):
+    status: str
+    scored: bool
+    event: Optional[Dict[str, Any]] = None
+    message: Optional[str] = None
+    cursor_row: Optional[int] = None
 
 
 # ---------------------------------------------------------------------------

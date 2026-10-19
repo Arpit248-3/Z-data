@@ -24,6 +24,14 @@ export interface SystemStatusResponse {
   version: string;
   overall_status: 'READY' | 'DEGRADED' | 'NOT_READY' | 'OPERATIONAL_SYNTHETIC' | string;
   evidence_status: string;
+  readiness?: {
+    backend_api?: string;
+    local_model?: string;
+    ieee_cis_data?: string;
+    local_replay?: string;
+    external_live_source?: string;
+    [key: string]: string | undefined;
+  };
   dependencies: {
     dataset: DependencyStatus;
     model_artifacts: DependencyStatus;
@@ -35,6 +43,15 @@ export interface SystemStatusResponse {
     audit_log?: DependencyStatus;
     explanations: DependencyStatus;
     [key: string]: DependencyStatus | undefined;
+  };
+  replay?: {
+    state?: string;
+    data_provenance?: string;
+    replay_source?: string;
+    scored_count?: number;
+    recent_caserate?: number;
+    last_latency_ms?: number;
+    [key: string]: unknown;
   };
   timestamp: string;
 }
@@ -366,4 +383,73 @@ export interface AuditVerifyResponse {
   signing_status: 'SIGNED_HMAC_SHA256' | 'UNSIGNED' | string;
   errors: string[];
   chain_head_hash: string | null;
+}
+
+export interface ReplayLastEvent {
+  event_id: string;
+  sequence_id?: number;
+  transaction_id: string;
+  action: string;
+  reason_code: string;
+  routing_rule?: string;
+  score: number;
+  p?: number;
+  disagreement: number;
+  u?: number | null;
+  u2?: number | null;
+  latency_ms: number;
+  timestamp?: string;
+  scored_at?: string;
+  audit_seq?: number;
+  cfg_hash?: string;
+  model_version?: string;
+  data_provenance: string;
+  [key: string]: unknown;
+}
+
+export interface ReplayStatusResponse {
+  state: 'IDLE' | 'STOPPED' | 'RUNNING' | 'PAUSED' | 'COMPLETED' | 'ERROR' | string;
+  replay_state?: string;
+  data_provenance: string;
+  replay_source: string;
+  source_file?: string;
+  total_available_rows?: number | null;
+  cursor_position?: number;
+  cursor_row?: number;
+  received_count: number;
+  accepted_count: number;
+  rejected_count: number;
+  scored_count: number;
+  duplicate_count: number;
+  recent_caserate: number;
+  avg_latency_ms: number;
+  last_latency_ms: number;
+  is_running: boolean;
+  error_message?: string | null;
+  last_received_event_id?: string | null;
+  last_received_event?: unknown;
+  last_scored_event: ReplayLastEvent | null;
+  model_readiness?: Record<string, unknown>;
+  external_live_source_status: string;
+  [key: string]: unknown;
+}
+
+export interface ReplayControlResponse {
+  status: string;
+  message: string;
+  state?: string;
+  replay_state?: string;
+  is_running?: boolean;
+  scored_count?: number;
+  [key: string]: unknown;
+}
+
+export interface ReplayStepResponse {
+  status: string;
+  scored: boolean;
+  event?: ReplayLastEvent | null;
+  error?: string | null;
+  message?: string;
+  cursor_row?: number;
+  [key: string]: unknown;
 }

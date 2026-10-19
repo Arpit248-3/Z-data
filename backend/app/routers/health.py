@@ -7,7 +7,8 @@ from backend.app.config import settings
 from backend.app.schemas import HealthResponse, ModeReadinessResponse, ReadinessStatusResponse
 from backend.app.services.artifacts import ArtifactService
 from backend.app.services.integration import IntegrationService
-from backend.app.dependencies import get_artifact_service, get_integration_service
+from backend.app.services.replay_worker import HistoricalReplayWorker
+from backend.app.dependencies import get_artifact_service, get_integration_service, get_replay_worker
 
 router = APIRouter(tags=["Health & Status"])
 
@@ -40,13 +41,65 @@ def get_status(
     mode: Optional[str] = Query(None, description="Operating mode filter (e.g. IEEE_CIS_OFFLINE_BENCHMARK)"),
     artifacts: ArtifactService = Depends(get_artifact_service),
     integration_service: IntegrationService = Depends(get_integration_service),
+    worker: HistoricalReplayWorker = Depends(get_replay_worker),
 ) -> ReadinessStatusResponse:
     """Provide an exhaustive, honest dependency readiness report across all subsystems."""
     readiness = artifacts.get_readiness_status()
+    worker_st = worker.get_status()
+    is_model_ready, model_err = integration_service.check_bundle_health()
+
+    # Core 5-dimension distinguished readiness (Stage A § 3)
+    readiness["dependencies"]["backend_api"] = {
+        "ready": True,
+        "status": "READY",
+        "service": settings.project_name,
+        "version": settings.version,
+    }
+    readiness["dependencies"]["local_model"] = {
+        "ready": is_model_ready,
+        "status": "READY" if is_model_ready else "NOT_AVAILABLE",
+        "model_id": "ieee_cis_v1",
+        "error": model_err,
+    }
+    readiness["dependencies"]["ieee_cis_data"] = {
+        "ready": worker_st["ieee_data_readiness"],
+        "status": "READY" if worker_st["ieee_data_readiness"] else "NOT_AVAILABLE",
+        "path": "data/raw/test_transaction.csv",
+        "unlabeled_sample_available": True,
+    }
+    readiness["dependencies"]["local_replay_state"] = {
+        "state": worker_st["replay_state"],
+        "data_provenance": "HISTORICAL_REPLAY",
+        "scored_count": worker_st["scored_count"],
+        "recent_caserate": worker_st["recent_caserate"],
+        "avg_latency_ms": worker_st["avg_latency_ms"],
+    }
+    readiness["dependencies"]["external_live_source"] = {
+        "ready": False,
+        "status": "DISCONNECTED",
+        "notice": "External live banking stream is disconnected. Replay operates on offline IEEE-CIS records only.",
+    }
+    readiness["dependencies"]["ingestion"] = {
+        "status": "HISTORICAL_REPLAY_ACTIVE" if worker_st["replay_state"] == "RUNNING" else ("HISTORICAL_REPLAY_IDLE" if worker_st["scored_count"] > 0 else "IDLE"),
+        "provenance": "HISTORICAL_REPLAY",
+        "scored_count": worker_st["scored_count"],
+        "recent_caserate": worker_st["recent_caserate"],
+        "avg_latency_ms": worker_st["avg_latency_ms"],
+        "live_edge_status": "DISCONNECTED",
+    }
+
+    readiness["readiness"] = {
+        "backend_api": "READY",
+        "local_model": "READY" if is_model_ready else "NOT_AVAILABLE",
+        "ieee_cis_data": "READY" if worker_st["ieee_data_readiness"] else "NOT_AVAILABLE",
+        "local_replay": worker_st["replay_state"],
+        "external_live_source": "DISCONNECTED",
+    }
+    readiness["replay"] = worker_st
+
     if mode and mode.upper() in ("IEEE_CIS_OFFLINE_BENCHMARK", "REAL"):
-        is_ready, err = integration_service.check_bundle_health()
         readiness["evidence_status"] = "IEEE_CIS_OFFLINE_BENCHMARK"
-        readiness["overall_status"] = "OPERATIONAL_OFFLINE_BENCHMARK" if is_ready else "DEGRADED"
+        readiness["overall_status"] = "OPERATIONAL_OFFLINE_BENCHMARK" if is_model_ready else "DEGRADED"
         readiness["dependencies"]["dataset"] = {
             "ready": True,
             "status": "IEEE_CIS_OFFLINE_BENCHMARK",
@@ -55,9 +108,9 @@ def get_status(
             "records": 118108,
         }
         readiness["dependencies"]["ieee_cis_bundle"] = {
-            "ready": is_ready,
-            "status": "READY" if is_ready else "NOT_AVAILABLE",
-            "error": err,
+            "ready": is_model_ready,
+            "status": "READY" if is_model_ready else "NOT_AVAILABLE",
+            "error": model_err,
         }
     elif mode and mode.upper() in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
         readiness["evidence_status"] = "LIVE_SOURCE_NOT_CONNECTED"

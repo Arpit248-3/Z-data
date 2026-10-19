@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Lock,
@@ -9,6 +9,17 @@ import {
   Filter,
   Crosshair,
   BarChart3,
+  Play,
+  Square,
+  StepForward,
+  RotateCcw,
+  CheckCircle2,
+  AlertTriangle,
+  Cpu,
+  Activity,
+  Database,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { MetricCard } from '../../components/MetricCard';
 import { TiltGlassCardDetail } from '../../components/TiltGlassCard';
@@ -16,6 +27,8 @@ import { useApiStatus, useOverview } from '../../lib/api/hooks';
 import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
+import { api } from '../../lib/api/client';
+import { ReplayStatusResponse } from '../../lib/api/types';
 
 const SignalCoreScene = React.lazy(() =>
   import('../../components/SignalCoreScene').then((m) => ({ default: m.SignalCoreScene }))
@@ -27,9 +40,97 @@ export const OverviewPage: React.FC = () => {
   const { status, isBackendConnected, loading: statusLoading, error: statusError, refetch: refetchStatus } = useApiStatus(mode);
   const { overview, refetch: refetchOverview } = useOverview(mode);
 
+  const [replayStatus, setReplayStatus] = useState<ReplayStatusResponse | null>(null);
+  const [replayLoading, setReplayLoading] = useState(false);
+  const [replayError, setReplayError] = useState<string | null>(null);
+  const [stepSuccessMsg, setStepSuccessMsg] = useState<string | null>(null);
+
+  const fetchReplayStatus = useCallback(async () => {
+    try {
+      const res = await api.getReplayStatus();
+      setReplayStatus(res);
+      setReplayError(null);
+    } catch {
+      // Replay worker may be offline or starting
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReplayStatus();
+    const intervalMs = replayStatus?.is_running ? 1000 : 3500;
+    const interval = setInterval(fetchReplayStatus, intervalMs);
+    return () => clearInterval(interval);
+  }, [fetchReplayStatus, replayStatus?.is_running]);
+
+  const handleStartReplay = async () => {
+    setReplayLoading(true);
+    setReplayError(null);
+    try {
+      await api.startReplay(500, 100);
+      await fetchReplayStatus();
+      refetchOverview();
+    } catch (err: unknown) {
+      const e = err as Error;
+      setReplayError(e?.message || 'Failed to start historical replay');
+    } finally {
+      setReplayLoading(false);
+    }
+  };
+
+  const handleStopReplay = async () => {
+    setReplayLoading(true);
+    setReplayError(null);
+    try {
+      await api.stopReplay();
+      await fetchReplayStatus();
+      refetchOverview();
+    } catch (err: unknown) {
+      const e = err as Error;
+      setReplayError(e?.message || 'Failed to stop historical replay');
+    } finally {
+      setReplayLoading(false);
+    }
+  };
+
+  const handleStepReplay = async () => {
+    setReplayLoading(true);
+    setReplayError(null);
+    setStepSuccessMsg(null);
+    try {
+      const res = await api.stepReplay();
+      await fetchReplayStatus();
+      if (res.event) {
+        setStepSuccessMsg(`Scored Txn ${res.event.transaction_id}: ${res.event.action} (${res.event.reason_code}) p=${(res.event.score ?? res.event.p ?? 0).toFixed(4)}`);
+        setTimeout(() => setStepSuccessMsg(null), 4000);
+      }
+      refetchOverview();
+    } catch (err: unknown) {
+      const e = err as Error;
+      setReplayError(e?.message || 'Failed to step replay');
+    } finally {
+      setReplayLoading(false);
+    }
+  };
+
+  const handleResetReplay = async () => {
+    setReplayLoading(true);
+    setReplayError(null);
+    try {
+      await api.resetReplay();
+      await fetchReplayStatus();
+      refetchOverview();
+    } catch (err: unknown) {
+      const e = err as Error;
+      setReplayError(e?.message || 'Failed to reset replay');
+    } finally {
+      setReplayLoading(false);
+    }
+  };
+
   const handleRetryAll = () => {
     refetchStatus();
     refetchOverview();
+    fetchReplayStatus();
   };
 
   const scrollToSection = (id: string) => {
@@ -112,24 +213,37 @@ export const OverviewPage: React.FC = () => {
       {(() => {
         const incomingCaserateDetail: TiltGlassCardDetail = {
           title: 'Incoming Caserate & Ingestion Bus',
-          subtitle: 'Edge Gateway Telemetry vs. Canonical Fixture',
+          subtitle: isLiveDisconnected
+            ? 'Live Edge Message Brokers Offline'
+            : replayStatus?.is_running
+            ? 'Streaming IEEE-CIS Historical Replay'
+            : (replayStatus?.scored_count ?? 0) > 0
+            ? 'Historical Replay Standby (Telemetry Retained)'
+            : 'Deterministic Replay Worker Ready',
           category: 'STREAMING INGESTION BUS',
           icon: <Radio size={18} />,
           accentColor: 'var(--accent-primary)',
-          shortDesc: 'Tracks instantaneous event velocity across edge gateways. In this deterministic test harness, live streaming message brokers (Kafka) remain disconnected, evaluating against verified synthetic replay partitions.',
-          formula: 'λ(t) = dN(t)/dt [Production Streaming Event Rate]',
+          shortDesc: isLiveDisconnected
+            ? 'Live edge banking message brokers (Kafka) remain disconnected under fail-closed safety constraints. No synthetic live data is fabricated.'
+            : replayStatus?.is_running
+            ? `Active sequential replay streaming directly from ${replayStatus.replay_source}. Records undergo feature alignment, model scoring, and cryptographic audit hashing.`
+            : `Controllable sequential replay worker configured for ${replayStatus?.replay_source || 'data/raw/test_transaction.csv'}. Real-time scoring invokes EraBaggedHeterogeneousEnsemble.`,
+          formula: 'λ(t) = dN(t)/dt [5-second Rolling Window Decay]',
           parameters: [
-            { label: 'Ingestion Status', value: 'Offline (Synthetic Replay Fixture)' },
-            { label: 'Evaluation Slice', value: '2,000 cases / canonical partition' },
-            { label: 'Ingestion Pipeline', value: 'Lossless JSONL Sequential Cursor' },
-            { label: 'Clock Guarantee', value: 'Strict Monotonic Timestamp Preservation' },
+            { label: 'Replay State', value: `${replayStatus?.state || 'IDLE'} (${replayStatus?.data_provenance || 'HISTORICAL_REPLAY'})` },
+            { label: 'Current Caserate', value: `${replayStatus?.recent_caserate.toFixed(1) || '0.0'} evt/s` },
+            { label: 'Total Scored', value: `${replayStatus?.scored_count.toLocaleString() || '0'} events` },
+            { label: 'Mean Latency', value: `${replayStatus?.avg_latency_ms.toFixed(1) || '0.0'} ms` },
+            { label: 'Live Banking Stream', value: 'DISCONNECTED (Fail-Closed)' },
           ],
           telemetryNotes: [
-            'Streaming bus disconnected intentionally during offline validation harness.',
-            'Zero synthetic clock skew across all 2,000 canonical test transactions.',
-            'Production edge deploys connect directly to high-throughput Kafka topics.',
+            'Sliding window event rate decays to 0.0 evt/s when replay stops or pauses.',
+            'Idempotency hash ring rejects duplicate event submissions automatically.',
+            'Cryptographic audit entries appended immutably to audit_chain.jsonl.',
           ],
-          partitionInfo: 'Evaluation Partition: test_canonical_2000',
+          partitionInfo: isLiveDisconnected
+            ? 'Live Ingestion: Disconnected'
+            : `Replay Source: ${replayStatus?.replay_source || 'data/raw/test_transaction.csv'}`,
         };
 
         const reviewCapacityDetail: TiltGlassCardDetail = {
@@ -227,18 +341,46 @@ export const OverviewPage: React.FC = () => {
 
         return (
           <section aria-label="Key Operational Benchmarks" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-4)' }}>
-            {/* Card 1: Incoming Caserate (Honest Offline Unavailable Indicator) */}
+            {/* Card 1: Incoming Caserate (Real Backend Response & Rolling Decay) */}
             <MetricCard
               label="INCOMING CASERATE"
-              value={null}
-              isAvailable={false}
+              value={
+                isLiveDisconnected
+                  ? null
+                  : (replayStatus?.is_running || (replayStatus?.scored_count ?? 0) > 0)
+                  ? `${(replayStatus?.recent_caserate ?? 0).toFixed(1)}`
+                  : isRealDataMode
+                  ? '0.0'
+                  : null
+              }
+              unit={(!isLiveDisconnected && ((replayStatus?.scored_count ?? 0) > 0 || isRealDataMode)) ? 'evt/s' : undefined}
+              isAvailable={!isLiveDisconnected}
               unavailableText="Unavailable (Offline)"
-              subtext="Live stream unattached • Synthetic fixture"
+              subtext={
+                isLiveDisconnected
+                  ? 'Live edge disconnected • External broker unattached'
+                  : replayStatus?.is_running
+                  ? `Historical replay active • ${replayStatus.scored_count.toLocaleString()} scored (${replayStatus.last_latency_ms.toFixed(1)}ms)`
+                  : (replayStatus?.scored_count ?? 0) > 0
+                  ? `Replay ${replayStatus?.state.toLowerCase()} • ${replayStatus?.scored_count.toLocaleString()} scored (Rate decayed to 0.0)`
+                  : isRealDataMode
+                  ? 'Replay worker ready • test_transaction.csv'
+                  : 'Offline synthetic fixture • Replay ready'
+              }
               icon={<Radio size={16} />}
-              variant="default"
+              variant={replayStatus?.is_running ? 'cyan' : 'default'}
               clickable={true}
+              onClick={() => scrollToSection('ingestion-bus-section')}
               detail={incomingCaserateDetail}
-              badgeText="3D DETAIL"
+              badgeText={
+                isLiveDisconnected
+                  ? 'OFFLINE'
+                  : replayStatus?.is_running
+                  ? 'STREAMING'
+                  : (replayStatus?.scored_count ?? 0) > 0
+                  ? `REPLAY ${replayStatus?.state}`
+                  : 'READY'
+              }
             />
 
             {/* Card 2: Review Capacity */}
@@ -441,6 +583,238 @@ export const OverviewPage: React.FC = () => {
         );
       })()}
 
+      {/* 3.5. Historical Replay Ingestion Bus & Streaming Scorer (Stage A) */}
+      <section id="ingestion-bus-section" aria-label="Historical Replay Ingestion Bus" className="sg-card" style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '16px', borderLeft: '4px solid var(--accent-primary)' }}>
+        {/* Header Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Radio size={19} style={{ color: 'var(--accent-primary)' }} />
+              <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>
+                HISTORICAL REPLAY INGESTION BUS &amp; DETERMINISTIC SCORING ENGINE
+              </h2>
+              <span className={`badge ${replayStatus?.is_running ? 'badge-ready' : 'badge-synthetic'}`}>
+                <span className="badge-dot" />
+                <span>{replayStatus?.state || 'IDLE'}</span>
+              </span>
+            </div>
+            <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+              Provenance: <strong style={{ color: 'var(--accent-primary-bright)', fontFamily: 'var(--font-mono)' }}>HISTORICAL_REPLAY</strong> &bull; Source: <code style={{ color: 'var(--text-primary)' }}>{replayStatus?.replay_source || 'data/raw/test_transaction.csv'}</code> &bull; External Live Gateway: <span style={{ color: 'var(--color-fraud-alert-bright)', fontWeight: 600 }}>DISCONNECTED (Fail-Closed)</span>
+            </p>
+          </div>
+
+          {/* Action Control Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              className="sg-btn sg-btn-primary"
+              disabled={replayStatus?.is_running || replayLoading}
+              onClick={handleStartReplay}
+              title="Start continuous historical replay worker"
+              style={{ padding: '7px 16px', gap: '6px' }}
+            >
+              <Play size={14} />
+              <span>Start Replay</span>
+            </button>
+
+            <button
+              type="button"
+              className="sg-btn sg-btn-secondary"
+              disabled={!replayStatus?.is_running || replayLoading}
+              onClick={handleStopReplay}
+              title="Stop continuous replay worker (rate will decay to 0.0)"
+              style={{ padding: '7px 16px', gap: '6px' }}
+            >
+              <Square size={14} />
+              <span>Stop Replay</span>
+            </button>
+
+            <button
+              type="button"
+              className="sg-btn sg-btn-secondary"
+              disabled={replayStatus?.is_running || replayLoading}
+              onClick={handleStepReplay}
+              title="Read, validate, score, and audit exactly 1 historical record"
+              style={{ padding: '7px 16px', gap: '6px' }}
+            >
+              <StepForward size={14} />
+              <span>Step 1 Txn</span>
+            </button>
+
+            <button
+              type="button"
+              className="sg-btn sg-btn-ghost"
+              disabled={replayStatus?.is_running || replayLoading}
+              onClick={handleResetReplay}
+              title="Reset replay worker cursor and telemetry counters"
+              style={{ padding: '7px 12px' }}
+            >
+              <RotateCcw size={14} />
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Feedback Messages */}
+        {replayError && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: 'var(--radius-xs)', color: 'var(--color-fraud-alert-bright)', fontSize: '13px' }}>
+            <AlertTriangle size={15} style={{ flexShrink: 0 }} />
+            <span>{replayError}</span>
+          </div>
+        )}
+        {stepSuccessMsg && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-xs)', color: 'var(--color-routine-bright)', fontSize: '13px' }}>
+            <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
+            <span>{stepSuccessMsg}</span>
+          </div>
+        )}
+
+        {/* Real-time Telemetry Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          {/* Card 1: Live Caserate */}
+          <div style={{ background: 'var(--bg-surface-raised)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Instantaneous Caserate
+              </span>
+              <Activity size={14} style={{ color: replayStatus?.is_running ? 'var(--accent-primary-bright)' : 'var(--text-disabled)' }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '24px', fontWeight: 800, color: replayStatus?.is_running ? 'var(--accent-primary-bright)' : 'var(--text-primary)', marginTop: '4px' }}>
+              {(replayStatus?.recent_caserate ?? 0).toFixed(1)} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>evt/s</span>
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '3px' }}>
+              5-sec sliding window decay
+            </div>
+          </div>
+
+          {/* Card 2: Scored Events */}
+          <div style={{ background: 'var(--bg-surface-raised)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Model Invocations
+              </span>
+              <Cpu size={14} style={{ color: 'var(--color-routine-bright)' }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '24px', fontWeight: 800, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
+              {(replayStatus?.scored_count ?? 0).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>scored</span>
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '3px' }}>
+              {(replayStatus?.received_count ?? 0).toLocaleString()} read from test_transaction.csv
+            </div>
+          </div>
+
+          {/* Card 3: Ingestion Quality */}
+          <div style={{ background: 'var(--bg-surface-raised)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Ingestion Quality
+              </span>
+              <ShieldCheck size={14} style={{ color: 'var(--accent-primary)' }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+              {(replayStatus?.accepted_count ?? 0).toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>accepted</span>
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '3px' }}>
+              {replayStatus?.rejected_count ?? 0} rejected &bull; {replayStatus?.duplicate_count ?? 0} dupes idempotent
+            </div>
+          </div>
+
+          {/* Card 4: Inference Latency */}
+          <div style={{ background: 'var(--bg-surface-raised)', padding: '14px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Scoring Latency
+              </span>
+              <Zap size={14} style={{ color: 'var(--color-epistemic-defer-bright)' }} />
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
+              {(replayStatus?.last_latency_ms ?? 0).toFixed(1)} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>ms (last)</span>
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '3px' }}>
+              {(replayStatus?.avg_latency_ms ?? 0).toFixed(1)} ms rolling mean
+            </div>
+          </div>
+        </div>
+
+        {/* Last Scored Transaction Inspector Panel */}
+        <div style={{ background: 'var(--bg-surface-subdued)', padding: '14px 18px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Database size={15} style={{ color: 'var(--accent-primary)' }} />
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                Last Scored Historical Event Inspector
+              </span>
+            </div>
+            {replayStatus?.last_scored_event && (
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11.5px', color: 'var(--text-tertiary)' }}>
+                Audit Chain Entry: <strong style={{ color: 'var(--color-routine-bright)' }}>SEALED (HMAC-SHA256)</strong>
+              </span>
+            )}
+          </div>
+
+          {replayStatus?.last_scored_event ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', alignItems: 'center', background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-default)' }}>
+              <div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Event ID / Sequence</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--accent-primary-bright)', marginTop: '2px', wordBreak: 'break-all' }}>
+                  {replayStatus.last_scored_event.event_id}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Txn ID / Provenance</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>
+                  {replayStatus.last_scored_event.transaction_id} <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>({replayStatus.last_scored_event.data_provenance})</span>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Model Prob (p) / Disagreement (u₂)</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>
+                  p = {replayStatus.last_scored_event.score.toFixed(4)} &bull; u₂ = {replayStatus.last_scored_event.disagreement.toFixed(4)}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Routing Decision</div>
+                <div style={{ marginTop: '2px' }}>
+                  <span
+                    className="badge"
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      backgroundColor:
+                        replayStatus.last_scored_event.action === 'FRAUD_ALERT'
+                          ? 'var(--color-fraud-alert)'
+                          : replayStatus.last_scored_event.action === 'MANUAL_REVIEW'
+                          ? 'var(--color-manual-review)'
+                          : replayStatus.last_scored_event.action === 'ROUTINE'
+                          ? 'var(--color-routine)'
+                          : 'var(--color-epistemic-defer-bright)',
+                      color: '#000',
+                    }}
+                  >
+                    {replayStatus.last_scored_event.action}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '10.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Reason Code / Rule</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '2px' }}>
+                  {replayStatus.last_scored_event.reason_code}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize: '12.5px', color: 'var(--text-tertiary)', padding: '8px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={14} style={{ color: 'var(--accent-primary)' }} />
+              <span>Replay worker ready to stream from <code>data/raw/test_transaction.csv</code>. Click <strong>Step 1 Txn</strong> or <strong>Start Replay</strong> to observe real model scoring and audit registration.</span>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* 4. Primary Analytical Visual: Compact Signal Core Routing Topology (350px Height) */}
       <section id="topology-section" aria-label="Signal Core Routing Topology">
         <Suspense
@@ -596,32 +970,39 @@ export const OverviewPage: React.FC = () => {
               onRetry={handleRetryAll}
             />
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dataset Fixture</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: 'var(--color-epistemic-defer-bright)', marginTop: '4px' }}>
-                  {status?.dependencies?.dataset?.status || (isRealDataMode ? 'IEEE_CIS_OFFLINE_BENCHMARK' : isLiveDisconnected ? 'DISCONNECTED' : 'SYNTHETIC_SMOKE_ONLY')}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>1. Backend / API</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 700, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
+                  {status?.readiness?.backend_api || (isBackendConnected ? 'READY' : 'OFFLINE')}
                 </div>
               </div>
 
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Model Pipeline</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
-                  {status?.dependencies.model_artifacts.status || 'READY'}
+              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>2. Model Bundle</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 700, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
+                  {status?.readiness?.local_model || status?.dependencies?.model_artifacts?.status || 'READY'}
                 </div>
               </div>
 
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Frozen Policy</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
-                  {status?.dependencies.frozen_policy.status || 'READY'}
+              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>3. IEEE-CIS Data</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 700, color: 'var(--color-epistemic-defer-bright)', marginTop: '4px' }}>
+                  {status?.readiness?.ieee_cis_data || (isRealDataMode ? 'READY' : 'FIXTURE')}
                 </div>
               </div>
 
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '11.5px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Evaluation Results</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 700, color: 'var(--color-routine-bright)', marginTop: '4px' }}>
-                  {status?.dependencies.consolidated_results.status || 'READY'}
+              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>4. Replay Worker</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 700, color: replayStatus?.is_running ? 'var(--accent-primary-bright)' : 'var(--text-primary)', marginTop: '4px' }}>
+                  {replayStatus?.state || 'IDLE'}
+                </div>
+              </div>
+
+              <div style={{ background: 'var(--bg-surface-raised)', padding: '10px 12px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>5. Live Broker</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '13.5px', fontWeight: 700, color: 'var(--color-fraud-alert-bright)', marginTop: '4px' }}>
+                  DISCONNECTED
                 </div>
               </div>
             </div>

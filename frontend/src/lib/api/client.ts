@@ -14,7 +14,10 @@ import {
   OperatingMode,
   OverviewResponse,
   PolicyCompareResponse,
+  ReplayControlResponse,
   ReplayRowsResponse,
+  ReplayStatusResponse,
+  ReplayStepResponse,
   ResultsResponse,
   SandboxScoreResponse,
   ScenariosResponse,
@@ -205,4 +208,13 @@ export const api = {
         mode: mode || 'SYNTHETIC_SMOKE_ONLY',
       }),
     }),
+  getReplayStatus: () => request<ReplayStatusResponse>('/api/replay/status'),
+  startReplay: (limit = 500, delayMs = 100) =>
+    request<ReplayControlResponse>('/api/replay/start', {
+      method: 'POST',
+      body: JSON.stringify({ limit, delay_ms: delayMs }),
+    }),
+  stopReplay: () => request<ReplayControlResponse>('/api/replay/stop', { method: 'POST' }),
+  stepReplay: () => request<ReplayStepResponse>('/api/replay/step', { method: 'POST' }),
+  resetReplay: () => request<ReplayControlResponse>('/api/replay/reset', { method: 'POST' }),
 };
