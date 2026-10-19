@@ -5,6 +5,12 @@ from backend.app.schemas import ErrorResponse, SandboxScoreRequest, SandboxScore
 from backend.app.services.scoring import ScoringService
 from backend.app.dependencies import get_scoring_service
 
+from integrations.ibm_architecture.exceptions import (
+    ArtifactNotFoundError,
+    IncompatibleArtifactError,
+    LeakageViolationError,
+)
+
 router = APIRouter(tags=["Scoring Sandbox"])
 
 
@@ -12,7 +18,8 @@ router = APIRouter(tags=["Scoring Sandbox"])
     "/score-sandbox",
     response_model=SandboxScoreResponse,
     responses={
-        400: {"model": ErrorResponse, "description": "Invalid feature payload or forbidden field detected."},
+        400: {"model": ErrorResponse, "description": "Invalid feature payload or parameter."},
+        422: {"model": ErrorResponse, "description": "Leakage violation or validation error."},
         503: {"model": ErrorResponse, "description": "Model or policy artifacts are unavailable."},
     },
 )
@@ -27,7 +34,16 @@ def score_sandbox(
     """
     try:
         return scoring_service.score_sandbox_transaction(request)
-    except FileNotFoundError as e:
+    except LeakageViolationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "code": "LEAKAGE_VIOLATION",
+                "message": str(e),
+                "details": {"violated_fields": list(e.violated_fields)},
+            },
+        )
+    except (FileNotFoundError, ArtifactNotFoundError, IncompatibleArtifactError) as e:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail={

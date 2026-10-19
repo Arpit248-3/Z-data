@@ -12,11 +12,17 @@ from backend.app.services.cases import CaseService
 from backend.app.services.replay import ReplayService
 from backend.app.services.audit import AuditService
 from backend.app.services.scoring import ScoringService
+from backend.app.services.integration import IntegrationService
 
 
 @lru_cache()
 def get_artifact_service() -> ArtifactService:
     return ArtifactService()
+
+
+@lru_cache()
+def get_integration_service() -> IntegrationService:
+    return IntegrationService()
 
 
 def get_overview_service(
@@ -51,5 +57,6 @@ def get_audit_service(
 
 def get_scoring_service(
     artifacts: ArtifactService = Depends(get_artifact_service),
+    integration: IntegrationService = Depends(get_integration_service),
 ) -> ScoringService:
-    return ScoringService(artifacts)
+    return ScoringService(artifacts, integration_service=integration)

@@ -18,10 +18,12 @@ import {
 } from 'recharts';
 import { api } from '../../lib/api/client';
 import { PolicyCompareResponse, PolicyComparisonItem } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
 export const PolicyComparisonPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [budgetMultiple, setBudgetMultiple] = useState<string>('1.5x');
   const [data, setData] = useState<PolicyCompareResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -85,13 +87,13 @@ export const PolicyComparisonPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>{data?.status || 'SYNTHETIC_SMOKE_ONLY'}</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
               <span>CONTROLLED BENCHMARK HARNESS</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
               <span style={{ color: 'var(--text-secondary)' }}>
-                Test Partition: 2,000 txns &bull; 111 Total Fraud
+                {isRealDataMode ? 'Chronological Test Partition (Budget Comparison)' : 'Test Partition: 2,000 txns • 111 Total Fraud'}
               </span>
             </div>
             <h1 className="page-header-title">

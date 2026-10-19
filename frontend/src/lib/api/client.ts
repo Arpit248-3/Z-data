@@ -2,15 +2,18 @@ import {
   ApiClientError,
   ApiErrorResponse,
   AuditListResponse,
+  AuditVerifyResponse,
   CaseDetailResponse,
   CasesResponse,
   DriftReportResponse,
+  GovernanceDecisionResponse,
+  GovernanceProposalResponse,
   HealthResponse,
-  ModesOverviewResponse,
-  ModeSelectResponse,
+  ModelCardResponse,
+  ModeReadinessResponse,
+  OperatingMode,
   OverviewResponse,
   PolicyCompareResponse,
-  ReplayProposalRecord,
   ReplayRowsResponse,
   ResultsResponse,
   SandboxScoreResponse,
@@ -79,7 +82,46 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
 
 export const api = {
   getHealth: () => request<HealthResponse>('/api/health'),
-  getStatus: () => request<SystemStatusResponse>('/api/status'),
+  getMode: () => request<ModeReadinessResponse>('/api/mode'),
+  getStatus: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<SystemStatusResponse>(`/api/status${query}`);
+  },
+  getModelCard: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<ModelCardResponse>(`/api/model/card${query}`);
+  },
+  getDriftReport: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<DriftReportResponse>(`/api/drift/report${query}`);
+  },
+  getProposals: () => request<GovernanceProposalResponse[]>('/api/governance/proposals'),
+  getProposal: (id: string) =>
+    request<GovernanceProposalResponse>(`/api/governance/proposals/${encodeURIComponent(id)}`),
+  replayProposal: (id: string, scenario?: string) => {
+    const query = scenario ? `?scenario=${encodeURIComponent(scenario)}` : '';
+    return request<GovernanceProposalResponse>(
+      `/api/governance/proposals/${encodeURIComponent(id)}/replay${query}`,
+      { method: 'POST' }
+    );
+  },
+  approveProposal: (id: string, approver: string, rationale: string) =>
+    request<GovernanceDecisionResponse>(
+      `/api/governance/proposals/${encodeURIComponent(id)}/approve`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ approver, rationale }),
+      }
+    ),
+  rejectProposal: (id: string, reviewer: string, reason: string) =>
+    request<GovernanceDecisionResponse>(
+      `/api/governance/proposals/${encodeURIComponent(id)}/reject`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reviewer, reason }),
+      }
+    ),
+  verifyAuditChain: () => request<AuditVerifyResponse>('/api/audit/verify'),
   getOverview: () => request<OverviewResponse>('/api/overview'),
   getPoliciesCompare: (budgetMultiple?: string) => {
     const query = budgetMultiple ? `?budget_multiple=${encodeURIComponent(budgetMultiple)}` : '';
@@ -101,6 +143,7 @@ export const api = {
     search?: string;
     offset?: number;
     limit?: number;
+    mode?: OperatingMode | string;
   }) => {
     const searchParams = new URLSearchParams();
     if (params?.scenario) searchParams.set('scenario', params.scenario);
@@ -109,6 +152,7 @@ export const api = {
     if (params?.search) searchParams.set('search', params.search);
     if (params?.offset !== undefined) searchParams.set('offset', String(params.offset));
     if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params?.mode) searchParams.set('mode', params.mode);
     const qs = searchParams.toString();
     return request<CasesResponse>(`/api/cases${qs ? `?${qs}` : ''}`);
   },
@@ -121,29 +165,12 @@ export const api = {
     return request<AuditListResponse>(`/api/audit${qs ? `?${qs}` : ''}`);
   },
   getResults: () => request<ResultsResponse>('/api/results'),
-  scoreSandbox: (features: Record<string, unknown>) =>
+  scoreSandbox: (features: Record<string, unknown>, mode?: OperatingMode | string) =>
     request<SandboxScoreResponse>('/api/score-sandbox', {
       method: 'POST',
-      body: JSON.stringify({ features }),
+      body: JSON.stringify({
+        features,
+        mode: mode || 'SYNTHETIC_SMOKE_ONLY',
+      }),
     }),
-  getModes: () => request<ModesOverviewResponse>('/api/modes'),
-  selectMode: (mode: string) =>
-    request<ModeSelectResponse>('/api/modes/select', {
-      method: 'POST',
-      body: JSON.stringify({ mode }),
-    }),
-  getDrift: (scenario?: string) =>
-    request<DriftReportResponse>(`/api/governance/drift${scenario ? `?scenario=${encodeURIComponent(scenario)}` : ''}`),
-  getProposals: () => request<ReplayProposalRecord[]>('/api/governance/proposals'),
-  validateProposal: (proposal: { proposal_id: string; base_cfg_hash: string; changes: Record<string, unknown>; rationale: string }) =>
-    request<ReplayProposalRecord>('/api/governance/proposals/validate', {
-      method: 'POST',
-      body: JSON.stringify(proposal),
-    }),
-  approveProposal: (proposalId: string, approver: string) =>
-    request<ReplayProposalRecord>('/api/governance/proposals/approve', {
-      method: 'POST',
-      body: JSON.stringify({ proposal_id: proposalId, approver }),
-    }),
-  verifyAuditChain: () => request<{ verified: boolean; chain_length: number; genesis_hash: string; head_hash: string; tamper_detected: boolean; details: string }>('/api/governance/audit-chain/verify'),
 };

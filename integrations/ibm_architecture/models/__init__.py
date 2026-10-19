@@ -1,24 +1,18 @@
-"""SignalGate IBM Architecture Integration — Models Package.
+"""SignalGate IBM Architecture Integration — Models, Ensembles & Calibration Package.
 
-Exports:
-- FeaturePipeline, SyntheticFeaturePipeline
-- BaselineB2, SyntheticModelAdapter
-- EraBaggedHeterogeneousEnsemble, MemberPredictions, compute_training_eras, get_era_omitted_indices
-- PlattCalibrator, IsotonicCalibrator, calibration_ece, validate_calibration_partition
-- DisagreementSignals, DisagreementSignalExtractor, RobustDisagreementSignalExtractor, compute_signals
-- ModelBundle, ModelBundleManifest, save_bundle, load_bundle, load_synthetic_bundle, get_model_bundle
-- check_memory_preflight, load_bounded_dev_cohort, split_dev_cohort, train_local_dev_pipeline
+Provides reproducible model training, 5-member era-bagged heterogeneous ensemble,
+Platt scaling calibration, epistemic disagreement signals, and artifact bundles.
+
+Governing Specification: docs/ibm_architecture_integration_master_spec.md § C, § H
 """
-
-from __future__ import annotations
 
 from integrations.ibm_architecture.models.baseline import BaselineB2
 from integrations.ibm_architecture.models.bundle import (
+    DEFAULT_ARTIFACT_DIR,
     ModelBundle,
     ModelBundleManifest,
-    get_model_bundle,
+    compute_file_sha256,
     load_bundle,
-    load_synthetic_bundle,
     save_bundle,
 )
 from integrations.ibm_architecture.models.calibration import (
@@ -39,45 +33,46 @@ from integrations.ibm_architecture.models.signals import (
     DisagreementSignals,
     RobustDisagreementSignalExtractor,
     compute_signals,
-)
-from integrations.ibm_architecture.models.synthetic_adapter import (
-    SyntheticFeaturePipeline,
-    SyntheticModelAdapter,
+    compute_single_signals,
 )
 from integrations.ibm_architecture.models.trainer import (
-    check_memory_preflight,
-    load_bounded_dev_cohort,
-    split_dev_cohort,
-    train_local_dev_pipeline,
+    check_available_ram,
+    get_available_ram_gb,
     train_mock_pipeline_for_testing,
+    train_pipeline,
 )
 
 __all__ = [
+    # Feature pipeline
     "FeaturePipeline",
-    "SyntheticFeaturePipeline",
+    # Baseline
     "BaselineB2",
-    "SyntheticModelAdapter",
+    # Ensemble
     "EraBaggedHeterogeneousEnsemble",
     "MemberPredictions",
     "compute_training_eras",
     "get_era_omitted_indices",
+    # Calibration
     "PlattCalibrator",
     "IsotonicCalibrator",
     "calibration_ece",
     "validate_calibration_partition",
+    # Signals
     "DisagreementSignals",
     "DisagreementSignalExtractor",
     "RobustDisagreementSignalExtractor",
     "compute_signals",
+    "compute_single_signals",
+    # Bundle serialization
     "ModelBundle",
     "ModelBundleManifest",
     "save_bundle",
     "load_bundle",
-    "load_synthetic_bundle",
-    "get_model_bundle",
-    "check_memory_preflight",
-    "load_bounded_dev_cohort",
-    "split_dev_cohort",
-    "train_local_dev_pipeline",
+    "compute_file_sha256",
+    "DEFAULT_ARTIFACT_DIR",
+    # Training orchestration
+    "train_pipeline",
     "train_mock_pipeline_for_testing",
+    "check_available_ram",
+    "get_available_ram_gb",
 ]

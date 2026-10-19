@@ -1,6 +1,6 @@
 # SignalGate — Shift-Aware Fraud Triage Platform
 
-> **Status:** `SYNTHETIC_SMOKE_ONLY`  
+> **Status:** `SYNTHETIC_SMOKE_ONLY`
 > **Notice:** All metrics, models, datasets, and replay logs in this repository represent synthetic development fixtures. They are designed exclusively for offline architectural verification and research demonstration. They must never be cited or interpreted as real-world financial fraud benchmarks or commercial production clearance guarantees.
 
 ---
@@ -26,9 +26,91 @@ Standard fraud detection systems often assume unlimited human review capacity or
 
 ---
 
+## Installation & Environment Setup
+
+### 1. Prerequisites
+- **Python:** 3.10+ (Python 3.11 recommended)
+- **Node.js:** v18+ with `npm`
+
+### 2. Backend Dependencies
+```powershell
+# Create and activate Python virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Install exact pinned dependencies from lockfile
+pip install -r backend/requirements.lock
+```
+
+### 3. Frontend Dependencies
+```powershell
+cd frontend
+npm install
+cd ..
+```
+
+### 4. Environment Variables Configuration
+Copy the template `.env.example` to `.env`:
+```powershell
+# Windows PowerShell
+Copy-Item .env.example .env
+
+# Linux / macOS
+cp .env.example .env
+```
+The `.env.example` file contains safe placeholders:
+- `SIGNALGATE_AUDIT_KEY`: Optional secret key for HMAC-SHA256 signing of the cryptographic audit ledger. If left unset or blank, the audit chain operates in standard hash-chained mode.
+- `VITE_API_BASE_URL`: Base URL for the FastAPI backend (defaults to `http://127.0.0.1:8000`).
+
+---
+
+## Operating Modes & Evidence Scope
+
+SignalGate operates with strict boundaries across three mutually isolated operational modes:
+
+| Operating Mode | Primary Purpose | Data & Artifact Requirements |
+| :--- | :--- | :--- |
+| `SYNTHETIC_SMOKE_ONLY` | **Default clone mode.** 100% offline development, interactive UI demo, and unit testing. | Uses repository-included `data/synthetic_smoke_fixture.csv` (10,000 synthetic transactions) and pre-fitted synthetic model fixtures. No external downloads required. |
+| `IEEE_CIS_OFFLINE_BENCHMARK` | Offline research benchmark against the IEEE-CIS Fraud Detection dataset. | Requires local raw competition CSV files in `data/raw/` and locally fitted model artifacts in `models/artifacts/ieee_cis_v1/`. |
+| `LIVE_SOURCE_NOT_CONNECTED` | Transparent boundary disclosure. | Signals that live banking feeds, payment settlement gateways, and TEE enclaves are not connected. |
+
+### IEEE-CIS Benchmark Dataset & Model Reproduction
+
+> **Note on Fresh Clones:** A fresh GitHub clone runs out-of-the-box in `SYNTHETIC_SMOKE_ONLY` mode. Real-data inference requires independently providing the competition dataset and generating the local model bundle as described below.
+
+1. **Obtaining the Raw Dataset:**
+   - Download the raw IEEE-CIS Fraud Detection competition files independently from Kaggle:
+     ```bash
+     kaggle competitions download -c ieee-fraud-detection
+     ```
+   - Extract the CSV files directly into `data/raw/`:
+     - `data/raw/train_transaction.csv`
+     - `data/raw/train_identity.csv`
+     - `data/raw/test_transaction.csv`
+     - `data/raw/test_identity.csv`
+     - `data/raw/sample_submission.csv`
+   - *Security Note:* The `data/raw/` directory is excluded from version control via `.gitignore` to adhere to dataset licensing and size limits.
+
+2. **Generating Model Artifacts Locally:**
+   - Fit the 391-feature pipeline, 3-member heterogeneous ensemble, and Platt calibrator locally:
+     ```powershell
+     python -m integrations.ibm_architecture.models.trainer
+     ```
+   - This writes serialized `.joblib` model artifacts to `models/artifacts/ieee_cis_v1/` and evaluates resource constraints.
+   - *Distribution Note:* The trained model bundle contains large binary weights (~115 MB `ensemble.joblib`) and is excluded from git version control.
+
+3. **Executing the Offline Benchmark:**
+   - Run the pre-registered benchmark runner and paired bootstrap evaluation:
+     ```powershell
+     python scripts/run_ieee_benchmark.py
+     ```
+   - All results, metrics, and audit chains are written to `results/ieee_cis_v1/`.
+
+---
+
 ## Offline Demo Quickstart (Windows)
 
-The SignalGate demonstration runs **100% locally and offline**. It requires no external database, no API keys, no cloud credentials, and no external dataset downloads.
+The SignalGate demonstration runs **100% locally and offline**. In `SYNTHETIC_SMOKE_ONLY` mode, it requires no external database, no API keys, no cloud credentials, and no external dataset downloads.
 
 ### Option A: One-Click Windows Launcher
 
@@ -42,7 +124,7 @@ This launcher checks prerequisites, executes the deterministic artifact validato
 
 #### Terminal 1 — FastAPI Backend API
 ```powershell
-# In project root (C:\Users\arpit\Desktop\project)
+# In project root
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 - Health Check: `http://127.0.0.1:8000/api/health`
@@ -51,7 +133,7 @@ python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 
 #### Terminal 2 — Vite React Frontend
 ```powershell
-# In frontend directory (C:\Users\arpit\Desktop\project\frontend)
+# In frontend directory
 cd frontend
 npm run dev -- --host 127.0.0.1 --port 5173
 ```

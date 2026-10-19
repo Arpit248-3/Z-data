@@ -10,12 +10,14 @@ import {
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { CaseDetailResponse, CaseListItem } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
 const PAGE_SIZE = 25;
 
 export const CaseExplorerPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [cases, setCases] = useState<CaseListItem[]>([]);
   const [totalCases, setTotalCases] = useState<number>(0);
   const [offset, setOffset] = useState<number>(0);
@@ -44,6 +46,7 @@ export const CaseExplorerPage: React.FC = () => {
         reason_code: reasonFilter !== 'ALL' ? reasonFilter : undefined,
         offset,
         limit: PAGE_SIZE,
+        mode,
       });
       setCases(res.cases || []);
       setTotalCases(res.total_cases || 0);
@@ -52,7 +55,7 @@ export const CaseExplorerPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, actionFilter, reasonFilter, offset]);
+  }, [searchQuery, actionFilter, reasonFilter, offset, mode]);
 
   useEffect(() => {
     fetchCases();
@@ -115,8 +118,8 @@ export const CaseExplorerPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>SYNTHETIC_SMOKE_ONLY</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
               <span>AUDITED TRANSACTION REPOSITORY</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>

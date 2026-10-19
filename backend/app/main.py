@@ -16,9 +16,8 @@ from backend.app.schemas import ErrorDetail, ErrorResponse
 from backend.app.routers import (
     audit,
     cases,
-    governance,
     health,
-    modes,
+    integration,
     overview,
     policies,
     replay,
@@ -28,13 +27,8 @@ from backend.app.routers import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Lifespan event handler: safely initialize resources and pre-warm model cache without fitting."""
-    # Pre-cache model pipeline in memory so cold-start disk I/O does not degrade initial scoring latency
-    from backend.app.dependencies import get_artifact_service
-    try:
-        get_artifact_service().get_model_pipeline()
-    except Exception:
-        pass
+    """Lifespan event handler: safely initialize resources without model fitting."""
+    # Ensure project paths are resolved and log startup status
     yield
     # Cleanup logic on shutdown if needed
 
@@ -129,8 +123,7 @@ def create_app() -> FastAPI:
     app.include_router(replay.router, prefix=api_prefix)
     app.include_router(audit.router, prefix=api_prefix)
     app.include_router(scoring.router, prefix=api_prefix)
-    app.include_router(modes.router, prefix=api_prefix)
-    app.include_router(governance.router, prefix=api_prefix)
+    app.include_router(integration.router, prefix=api_prefix)
 
     return app
 

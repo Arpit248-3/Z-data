@@ -4,11 +4,13 @@ import { Sidebar } from '../components/Sidebar';
 import { TopBar } from '../components/TopBar';
 import { useApiStatus } from '../lib/api/hooks';
 import { ThemeProvider } from '../context/ThemeContext';
+import { ModeProvider, useMode } from '../context/ModeContext';
 
-export const AppShell: React.FC = () => {
+const AppShellInner: React.FC = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
-  const { status, isBackendConnected } = useApiStatus();
+  const { isBackendConnected } = useApiStatus();
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
 
   // Close mobile drawer on Escape key
   useEffect(() => {
@@ -21,11 +23,8 @@ export const AppShell: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileOpen]);
 
-  const evidenceStatus = status?.evidence_status || 'SYNTHETIC_SMOKE_ONLY';
-
   return (
-    <ThemeProvider>
-      <div className="app-shell">
+    <div className="app-shell">
         {/* Accessible Keyboard Navigation Skip Link */}
         <a href="#main-content" className="skip-to-content">
           Skip to main cockpit content
@@ -65,8 +64,17 @@ export const AppShell: React.FC = () => {
       <footer className="provenance-footer" aria-label="System Provenance & Evidence Verification">
         <div className="footer-left">
           <span className="footer-label">DATASET EVIDENCE:</span>
-          <span className="badge badge-synthetic" title="Development environment operates strictly on synthetic smoke fixtures">
-            {evidenceStatus}
+          <span
+            className={`badge ${
+              isRealDataMode
+                ? 'badge-ready'
+                : isLiveDisconnected
+                ? 'badge-alert'
+                : 'badge-synthetic'
+            }`}
+            title={`Active Operational Mode: ${mode}`}
+          >
+            {mode}
           </span>
         </div>
 
@@ -99,6 +107,15 @@ export const AppShell: React.FC = () => {
         </div>
       </footer>
     </div>
+  );
+};
+
+export const AppShell: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <ModeProvider>
+        <AppShellInner />
+      </ModeProvider>
     </ThemeProvider>
   );
 };

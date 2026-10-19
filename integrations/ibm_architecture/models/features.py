@@ -1,116 +1,127 @@
 """SignalGate IBM Architecture Integration — Feature Preprocessing Pipeline.
 
-Fitted strictly on the training partition in compliance with Master Spec § C2 and § H:
-- 14 categorical columns encoded via OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1, encoded_missing_value=-1).
-- 377 numerical columns imputed via SimpleImputer(strategy='median').
-- Strict quarantine barrier: raises LeakageViolationError if `isFraud`, `TransactionID`,
-  or `TransactionDT` (or case-insensitive variants) enter the pipeline.
-- Output: Contiguous np.float32 matrix of shape (N, 391) matching CANONICAL_FEATURE_MANIFEST.
+Implements feature transformation for the 391-feature IEEE-CIS fraud detection schema:
+- 14 categorical features: OrdinalEncoder (handles unknown and missing values with -1)
+- 377 numerical features: SimpleImputer (median imputation)
+- Enforces strict ground-truth quarantine: raises LeakageViolationError on forbidden fields
+- Training-only fitting: learners fit strictly on training partition, transform to float32
 """
 
 from __future__ import annotations
 
+from typing import Any, Dict, List, Optional, Sequence, Union
 import numpy as np
 import pandas as pd
-from typing import List, Optional, Tuple, Union
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OrdinalEncoder
 
+from integrations.ibm_architecture.exceptions import LeakageViolationError
 from integrations.ibm_architecture.data.manifest import (
     CANONICAL_FEATURE_MANIFEST,
-    QUARANTINED_COLUMNS,
     FeatureManifest,
+    QUARANTINED_COLUMNS,
 )
-from integrations.ibm_architecture.exceptions import LeakageViolationError
 
 
 class FeaturePipeline:
-    """Deterministic, leakage-quarantined feature preprocessor for IEEE-CIS data.
-
-    Must be fitted strictly on the training partition.
-    """
+    """Preprocesses IEEE-CIS tabular features to float32 model input matrices."""
 
     def __init__(self, manifest: Optional[FeatureManifest] = None) -> None:
-        self.manifest: FeatureManifest = manifest or CANONICAL_FEATURE_MANIFEST
-        self.numerical_cols: List[str] = list(self.manifest.numerical_columns)
-        self.categorical_cols: List[str] = list(self.manifest.categorical_columns)
-        self.expected_features: List[str] = self.numerical_cols + self.categorical_cols
+        self.manifest = manifest or CANONICAL_FEATURE_MANIFEST
+        self.categorical_columns: List[str] = list(self.manifest.categorical_columns)
+        self.numerical_columns: List[str] = list(self.manifest.numerical_columns)
+        self.expected_feature_names: List[str] = (
+            self.manifest.numerical_columns + self.manifest.categorical_columns
+        )
 
-        self._num_imputer = SimpleImputer(strategy="median")
-        self._cat_encoder = OrdinalEncoder(
+        self.ordinal_encoder = OrdinalEncoder(
             handle_unknown="use_encoded_value",
             unknown_value=-1,
             encoded_missing_value=-1,
+            dtype=np.float32,
         )
+        self.medians_: np.ndarray = np.zeros(len(self.numerical_columns), dtype=np.float32)
         self.is_fitted: bool = False
 
-    def _validate_quarantine(self, df: pd.DataFrame, context: str = "FeaturePipeline") -> None:
-        """Enforce strict quarantine barrier against target labels and transaction identifiers."""
-        detected = [
-            c for c in df.columns
-            if c in QUARANTINED_COLUMNS or c.lower() in {q.lower() for q in QUARANTINED_COLUMNS}
-        ]
-        if detected:
+    def _check_quarantine(self, df: pd.DataFrame) -> None:
+        """Reject quarantined ground-truth target or raw identifiers."""
+        cols_lower = {str(c).lower(): c for c in df.columns}
+        violations = set()
+        for q in QUARANTINED_COLUMNS:
+            if q.lower() in cols_lower:
+                violations.add(cols_lower[q.lower()])
+        if violations:
+            sorted_v = sorted(violations)
             raise LeakageViolationError(
-                f"Quarantine barrier breached in {context}: columns {detected} "
-                f"are strictly prohibited from entering feature preprocessing.",
-                violated_fields=detected,
-                context=context,
+                f"Quarantined fields detected in feature inputs: {sorted_v}",
+                violated_fields=sorted_v,
+                context="FeaturePipeline.validate_features",
             )
 
-    def fit(self, df: pd.DataFrame) -> "FeaturePipeline":
-        """Fit median imputers and ordinal encoders strictly on the training partition."""
-        self._validate_quarantine(df, context="FeaturePipeline.fit")
+    def fit(self, df: pd.DataFrame) -> FeaturePipeline:
+        """Fit encoders and compute medians strictly on training partition data."""
+        self._check_quarantine(df)
 
-        # Check required columns are present
-        missing = [c for c in self.expected_features if c not in df.columns]
-        if missing:
-            raise ValueError(
-                f"Training DataFrame is missing {len(missing)} required features from manifest. "
-                f"First missing: {missing[:5]}"
-            )
+        # 1. Compute median for numerical columns
+        medians = []
+        for col in self.numerical_columns:
+            if col in df.columns:
+                series = pd.to_numeric(df[col], errors="coerce")
+                val = series.median()
+                medians.append(float(val) if pd.notna(val) else 0.0)
+            else:
+                medians.append(0.0)
+        self.medians_ = np.array(medians, dtype=np.float32)
 
-        # Fit numerical imputer
-        num_data = df[self.numerical_cols]
-        self._num_imputer.fit(num_data)
-
-        # Fit categorical encoder
-        cat_data = df[self.categorical_cols].astype(str)
-        self._cat_encoder.fit(cat_data)
+        # 2. Fit categorical encoder
+        cat_dict = {}
+        for col in self.categorical_columns:
+            if col in df.columns:
+                cat_dict[col] = df[col].astype(str)
+            else:
+                cat_dict[col] = pd.Series(["__missing__"] * len(df), dtype=str)
+        cat_df = pd.DataFrame(cat_dict, index=df.index)
+        self.ordinal_encoder.fit(cat_df)
 
         self.is_fitted = True
         return self
 
     def transform(self, df: pd.DataFrame) -> np.ndarray:
-        """Transform a feature DataFrame into contiguous float32 array of shape (N, 391)."""
+        """Transform input DataFrame into a contiguous float32 array of shape (N, 391)."""
         if not self.is_fitted:
-            raise RuntimeError("FeaturePipeline must be fitted on training data before calling transform().")
+            raise RuntimeError("FeaturePipeline must be fitted before calling transform().")
 
-        self._validate_quarantine(df, context="FeaturePipeline.transform")
+        self._check_quarantine(df)
+        n_rows = len(df)
 
-        missing = [c for c in self.expected_features if c not in df.columns]
-        if missing:
-            raise ValueError(
-                f"DataFrame is missing {len(missing)} required features from manifest. "
-                f"First missing: {missing[:5]}"
-            )
+        # 1. Numerical matrix extraction and imputation
+        num_matrix = np.empty((n_rows, len(self.numerical_columns)), dtype=np.float32)
+        for i, col in enumerate(self.numerical_columns):
+            if col in df.columns:
+                s = pd.to_numeric(df[col], errors="coerce").to_numpy(dtype=np.float32)
+                nan_mask = np.isnan(s)
+                if nan_mask.any():
+                    num_matrix[:, i] = np.where(nan_mask, self.medians_[i], s)
+                else:
+                    num_matrix[:, i] = s
+            else:
+                num_matrix[:, i] = self.medians_[i]
 
-        # Impute numerical features (produce float32)
-        num_data = df[self.numerical_cols]
-        num_arr = self._num_imputer.transform(num_data).astype(np.float32)
+        # 2. Categorical encoding
+        cat_dict = {}
+        for col in self.categorical_columns:
+            if col in df.columns:
+                cat_dict[col] = df[col].astype(str)
+            else:
+                cat_dict[col] = pd.Series(["__missing__"] * n_rows, dtype=str)
+        cat_df = pd.DataFrame(cat_dict, index=df.index)
+        cat_encoded = self.ordinal_encoder.transform(cat_df).astype(np.float32)
 
-        # Encode categorical features (produce float32)
-        cat_data = df[self.categorical_cols].astype(str)
-        cat_arr = self._cat_encoder.transform(cat_data).astype(np.float32)
-
-        # Stack into contiguous float32 array: (N, 377 + 14) = (N, 391)
-        X = np.ascontiguousarray(np.hstack([num_arr, cat_arr]), dtype=np.float32)
-        return X
+        # Concatenate in deterministic order (numericals then categoricals)
+        X_out = np.hstack([num_matrix, cat_encoded]).astype(np.float32)
+        assert X_out.shape == (n_rows, len(self.expected_feature_names))
+        return X_out
 
     def fit_transform(self, df: pd.DataFrame) -> np.ndarray:
-        """Fit on training data and return transformed float32 matrix."""
+        """Convenience method to fit on training data and return transformed matrix."""
         return self.fit(df).transform(df)
-
-    @property
-    def feature_count(self) -> int:
-        return len(self.expected_features)

@@ -1,287 +1,431 @@
-"""Unit and integration tests for Phase 7: Drift Monitoring and Controlled Scenario Replay.
+"""Unit and Integration Tests for SignalGate Drift Monitoring and Replay Gate.
 
 Verifies:
-1. DistributionDriftCalculator calculates PSI and KS without ground-truth labels.
-2. Ground-truth and key quarantine enforcement prevents leakage of isFraud, TransactionID, TransactionDT.
-3. DriftSentinel generates typed proposals for allowlisted keys and fails closed on provider error.
-4. ReplayGate deterministically validates proposals, enforces AWAITING_HUMAN_APPROVAL,
-   and requires explicit human sign-off before operational activation.
+- Population Stability Index (PSI), Kolmogorov-Smirnov (KS), and Wasserstein distance.
+- Separation of feature drift, prediction score drift, and epistemic uncertainty.
+- Handling of missing, NaN, Inf, and non-finite inputs.
+- Ground-truth quarantine enforcement across drift inputs (rejection of isFraud, TransactionID).
+- Advisory Drift Sentinel allowlisting, parameter bounds, ordering, and proposal generation.
+- Replay Gate deterministic validation replay, churn calculation, and test set quarantine.
+- Prevention of automatic policy activation (proposals remain in AWAITING_HUMAN_APPROVAL).
+- Explicit human approval and rejection protocols with cryptographic AuditChain provenance.
+- End-to-end lifecycle from drift detection to approved policy adaptation.
+
+Governing Specification: docs/ibm_architecture_integration_master_spec.md § C, § K
 """
 
-from datetime import datetime, timezone
-import hashlib
 import numpy as np
 import pandas as pd
 import pytest
 
-from integrations.ibm_architecture.contracts import Proposal
-from integrations.ibm_architecture.exceptions import GroundTruthQuarantineError
-from integrations.ibm_architecture.monitoring import (
-    ALLOWLISTED_CONFIG_KEYS,
-    DistributionDriftCalculator,
+from integrations.ibm_architecture.contracts import Action, Proposal
+from integrations.ibm_architecture.exceptions import GroundTruthQuarantineError, LeakageViolationError, SignalGateIntegrationError
+from integrations.ibm_architecture.governance.audit_chain import AuditChain
+from integrations.ibm_architecture.governance.drift_monitor import DriftMonitor, DriftReport, FeatureDriftResult
+from integrations.ibm_architecture.governance.drift_sentinel import (
+    ALLOWLISTED_POLICY_KEYS,
     DriftSentinel,
-    ReplayEvaluationRecord,
-    ReplayGate,
-    calculate_feature_drift,
-    calculate_psi,
+    SentinelConfig,
 )
+from integrations.ibm_architecture.governance.replay_gate import (
+    ProposalStatus,
+    ReplayGate,
+    ReplayValidationResult,
+)
+from integrations.ibm_architecture.policy.frozen_policy import IEEEPolicyConfig, get_frozen_ieee_policy_config
 
-FROZEN_BASE_CFG_HASH = hashlib.sha256(b'{"budget":{"primary_multiple":1.5}}').hexdigest()
+
+# ==============================================================================
+# Fixtures
+# ==============================================================================
+
+@pytest.fixture
+def rng():
+    return np.random.default_rng(42)
 
 
 @pytest.fixture
-def baseline_sample() -> pd.DataFrame:
-    """Deterministic baseline feature sample (1,000 cases)."""
-    np.random.seed(42)
-    return pd.DataFrame({
-        "TransactionAmt": np.random.exponential(scale=100.0, size=1000),
-        "card1": np.random.uniform(1000, 20000, size=1000),
-        "dist1": np.random.gamma(shape=2.0, scale=10.0, size=1000),
-        "C1": np.random.poisson(lam=2.0, size=1000),
-    })
+def monitor():
+    return DriftMonitor(epsilon=1e-4, bins=10)
 
 
 @pytest.fixture
-def shifted_sample() -> pd.DataFrame:
-    """Deterministic shifted feature sample with covariate drift on TransactionAmt and C1."""
-    np.random.seed(99)
-    return pd.DataFrame({
-        "TransactionAmt": np.random.exponential(scale=350.0, size=1000),  # Heavy shift
-        "card1": np.random.uniform(1000, 20000, size=1000),               # Stable
-        "dist1": np.random.gamma(shape=2.0, scale=10.0, size=1000),       # Stable
-        "C1": np.random.poisson(lam=8.0, size=1000),                       # Moderate shift
-    })
+def sentinel():
+    return DriftSentinel()
 
 
-def test_psi_calculation_stable_and_drift() -> None:
-    """Verify PSI calculation for stable vs shifted distributions."""
-    np.random.seed(123)
-    ref = np.random.normal(loc=0.0, scale=1.0, size=2000)
-    identical = np.random.normal(loc=0.0, scale=1.0, size=2000)
-    shifted = np.random.normal(loc=1.5, scale=1.5, size=2000)
-
-    # Identical distribution should be stable (PSI < 0.10)
-    res_stable = calculate_psi(ref, identical)
-    assert res_stable["psi"] is not None
-    assert res_stable["psi"] < 0.10
-    assert res_stable["category"] == "stable"
-
-    # Shifted distribution should be significant drift (PSI > 0.20)
-    res_shifted = calculate_psi(ref, shifted)
-    assert res_shifted["psi"] is not None
-    assert res_shifted["psi"] > 0.20
-    assert res_shifted["category"] == "significant_drift"
+@pytest.fixture
+def replay_gate():
+    return ReplayGate()
 
 
-def test_feature_drift_ks_and_psi(baseline_sample: pd.DataFrame, shifted_sample: pd.DataFrame) -> None:
-    """Verify combined PSI and two-sample KS test on a shifted feature."""
-    res = calculate_feature_drift(
-        reference=baseline_sample["TransactionAmt"],
-        actual=shifted_sample["TransactionAmt"],
-        feature_name="TransactionAmt",
-    )
-    assert res["feature"] == "TransactionAmt"
+@pytest.fixture
+def base_policy():
+    return get_frozen_ieee_policy_config()
+
+
+# ==============================================================================
+# 1. Multi-Metric Drift Monitoring Tests (DRFT-01)
+# ==============================================================================
+
+def test_psi_stable_distribution(monitor, rng):
+    """Identical or near-identical distributions yield PSI < 0.10 and category 'stable'."""
+    ref = rng.normal(0.0, 1.0, size=1000)
+    act = rng.normal(0.0, 1.0, size=1000)
+
+    res = monitor.calculate_psi(ref, act)
     assert res["psi"] is not None
-    assert res["ks_statistic"] is not None
-    assert res["ks_pvalue"] is not None
-    assert res["ks_pvalue"] < 1e-4  # Highly significant KS shift
-    assert res["drift_category"] in ("moderate_drift", "significant_drift")
+    assert res["psi"] < 0.10
+    assert res["category"] == "stable"
 
 
-def test_drift_calculator_quarantine_enforcement(baseline_sample: pd.DataFrame) -> None:
-    """Verify drift calculator rejects isFraud, TransactionID, or TransactionDT."""
-    calc = DistributionDriftCalculator()
+def test_psi_significant_drift(monitor, rng):
+    """Severely shifted distributions yield PSI > 0.20 and category 'significant_drift'."""
+    ref = rng.normal(0.0, 1.0, size=1000)
+    act = rng.normal(2.5, 1.0, size=1000)  # substantial covariate shift
 
-    # Attempting to monitor isFraud must raise GroundTruthQuarantineError
-    with pytest.raises(GroundTruthQuarantineError):
-        calc.compute_drift(
-            reference_df=baseline_sample,
-            comparison_df=baseline_sample,
-            features=["TransactionAmt", "isFraud"],
+    res = monitor.calculate_psi(ref, act)
+    assert res["psi"] is not None
+    assert res["psi"] > 0.20
+    assert res["category"] == "significant_drift"
+
+
+def test_ks_statistic_computation(monitor, rng):
+    """Two-sample KS test computes statistic and p-value correctly via scipy.stats.ks_2samp."""
+    ref = rng.normal(0.0, 1.0, size=500)
+    act = rng.normal(0.0, 1.0, size=500)
+
+    ks_stat, ks_pval = monitor.calculate_ks(ref, act)
+    assert ks_stat is not None
+    assert ks_pval is not None
+    assert ks_stat >= 0.0
+    assert 0.0 <= ks_pval <= 1.0
+    # For identical distributions, p-value should typically be high (> 0.05)
+    assert ks_pval > 0.05
+
+
+def test_wasserstein_distance_computation(monitor, rng):
+    """1D Earth Mover's Distance computed accurately between distributions."""
+    ref = rng.normal(0.0, 1.0, size=500)
+    act_identical = rng.normal(0.0, 1.0, size=500)
+    act_shifted = rng.normal(3.0, 1.0, size=500)
+
+    w_identical = monitor.calculate_wasserstein(ref, act_identical)
+    w_shifted = monitor.calculate_wasserstein(ref, act_shifted)
+
+    assert w_identical is not None
+    assert w_shifted is not None
+    assert w_shifted > w_identical
+    assert abs(w_shifted - 3.0) < 0.5  # Mean shift of 3.0 units
+
+
+def test_prediction_score_drift_computation(monitor, rng):
+    """Calibrated posterior probability p distribution drift is computed and categorized."""
+    ref_p = rng.beta(0.5, 10.0, size=1000)  # typical low fraud risk distribution
+    act_p = rng.beta(2.0, 5.0, size=1000)   # elevated risk distribution shift
+
+    res = monitor.compute_score_drift(ref_p, act_p)
+    assert res.feature == "calibrated_posterior_p"
+    assert res.psi is not None
+    assert res.psi > 0.10
+    assert res.wasserstein_distance is not None
+    assert res.wasserstein_distance > 0.0
+
+
+def test_missing_and_nonfinite_inputs(monitor, rng):
+    """Handles missing, NaN, Inf, and zero-variance inputs safely without crashing."""
+    ref = np.array([np.nan, np.inf, -np.inf, 1.0, 2.0, 3.0, np.nan])
+    act = np.array([1.0, 2.0, 3.0, 4.0, np.nan, np.nan])
+
+    res = monitor.compute_feature_drift(ref, act, feature_name="test_nonfinite")
+    assert res.feature == "test_nonfinite"
+    assert res.ref_sample_count == 3
+    assert res.act_sample_count == 4
+    assert res.ref_missing_rate > 0.0
+    assert res.act_missing_rate > 0.0
+
+    # Constant distribution fallback
+    const_ref = np.ones(100)
+    const_act = np.ones(100)
+    res_const = monitor.compute_feature_drift(const_ref, const_act, feature_name="constant_feat")
+    assert res_const.psi is not None
+    assert res_const.drift_category == "stable"
+
+
+def test_drift_monitor_ground_truth_quarantine(monitor, rng):
+    """Attempting to include isFraud, target, or TransactionID in monitored features raises LeakageViolationError."""
+    df_ref = pd.DataFrame({
+        "TransactionAmt": rng.uniform(10, 100, size=100),
+        "isFraud": [0] * 100,
+        "TransactionID": list(range(100)),
+    })
+    df_act = df_ref.copy()
+
+    with pytest.raises(LeakageViolationError) as exc_info:
+        monitor.compute_drift_report(
+            df_ref, df_act, features=["TransactionAmt", "isFraud"]
         )
+    assert "isFraud" in str(exc_info.value)
 
-    # Attempting to monitor TransactionID must raise GroundTruthQuarantineError
-    with pytest.raises(GroundTruthQuarantineError):
-        calc.compute_drift(
-            reference_df=baseline_sample,
-            comparison_df=baseline_sample,
-            features=["TransactionID"],
-        )
-
-    # Attempting to monitor TransactionDT must raise GroundTruthQuarantineError
-    with pytest.raises(GroundTruthQuarantineError):
-        calc.compute_drift(
-            reference_df=baseline_sample,
-            comparison_df=baseline_sample,
-            features=["TransactionDT"],
-        )
+    with pytest.raises(LeakageViolationError) as exc_info2:
+        monitor.compute_feature_drift(df_ref["isFraud"], df_act["isFraud"], feature_name="isFraud")
+    assert "isFraud" in str(exc_info2.value)
 
 
-def test_drift_calculator_synthetic_mode_telemetry(
-    baseline_sample: pd.DataFrame, shifted_sample: pd.DataFrame
-) -> None:
-    """Verify drift summary reports explicit SYNTHETIC_SMOKE_ONLY status and deferred benchmark."""
-    calc = DistributionDriftCalculator()
-    summary = calc.compute_drift(
-        reference_df=baseline_sample,
-        comparison_df=shifted_sample,
-        features=["TransactionAmt", "card1", "dist1", "C1"],
-        scenario_id="S1_COVARIATE_SHIFT",
-        mode="SYNTHETIC_SMOKE_ONLY",
+def test_drift_report_provenance_and_notice(monitor, rng):
+    """Drift report contains valid SHA-256 provenance hash and non-negotiable discipline notice."""
+    df_ref = pd.DataFrame({"V1": rng.normal(0, 1, size=100), "V2": rng.normal(0, 1, size=100)})
+    df_act = pd.DataFrame({"V1": rng.normal(0, 1, size=100), "V2": rng.normal(0, 1, size=100)})
+
+    report = monitor.compute_drift_report(
+        df_ref, df_act, features=["V1", "V2"],
+        reference_window_id="train_baseline",
+        comparison_window_id="val_window",
     )
 
-    assert summary["status"] == "SYNTHETIC_SMOKE_ONLY"
-    assert summary["scenario_id"] == "S1_COVARIATE_SHIFT"
-    assert summary["real_data_benchmark_status"] == "DEFERRED"
-    assert summary["overall_drift_detected"] is True
-    assert "TransactionAmt" in summary["significant_shift_features"]
-    assert len(summary["feature_drift_reports"]) == 4
+    assert len(report.provenance_hash) == 64
+    assert report.features_monitored == 2
+    assert "not constitute proof of fraud" in report.notice
 
 
-def test_drift_sentinel_offline_proposal_generation(
-    baseline_sample: pd.DataFrame, shifted_sample: pd.DataFrame
-) -> None:
-    """Verify DriftSentinel produces an advisory Proposal when drift is detected."""
-    calc = DistributionDriftCalculator()
-    summary = calc.compute_drift(
-        reference_df=baseline_sample,
-        comparison_df=shifted_sample,
-        features=["TransactionAmt", "card1"],
-        scenario_id="S1_COVARIATE_SHIFT",
-    )
+# ==============================================================================
+# 2. Advisory Drift Sentinel Tests (DRFT-02)
+# ==============================================================================
 
-    sentinel = DriftSentinel()
-    proposal = sentinel.evaluate_and_propose(summary, base_cfg_hash=FROZEN_BASE_CFG_HASH)
+def test_sentinel_no_drift_no_proposal(sentinel, monitor, base_policy, rng):
+    """Stable distributions trigger no adaptation proposal from Sentinel."""
+    df_ref = pd.DataFrame({"V1": rng.normal(0, 1, size=200)})
+    df_act = pd.DataFrame({"V1": rng.normal(0, 1, size=200)})
+
+    report = monitor.compute_drift_report(df_ref, df_act, features=["V1"])
+    proposal = sentinel.evaluate_drift(report, current_policy=base_policy)
+    assert proposal is None
+
+
+def test_sentinel_generates_advisory_proposal_on_drift(sentinel, monitor, base_policy, rng):
+    """Significant drift triggers valid advisory proposal with base_cfg_hash matching active policy."""
+    df_ref = pd.DataFrame({"V1": rng.normal(0, 1, size=500)})
+    df_act = pd.DataFrame({"V1": rng.normal(3.0, 1.0, size=500)})  # severe drift
+
+    report = monitor.compute_drift_report(df_ref, df_act, features=["V1"])
+    proposal = sentinel.evaluate_drift(report, current_policy=base_policy)
 
     assert proposal is not None
     assert isinstance(proposal, Proposal)
-    assert proposal.base_cfg_hash == FROZEN_BASE_CFG_HASH
-    assert "budget.primary_multiple" in proposal.changes
-    assert proposal.changes["budget.primary_multiple"] == 2.0
-    for k in proposal.changes.keys():
-        assert k in ALLOWLISTED_CONFIG_KEYS
+    assert proposal.base_cfg_hash == base_policy.compute_cfg_hash()
+    assert len(proposal.changes) > 0
+    # All proposed keys must belong to allowlisted set
+    for k in proposal.changes:
+        assert k in ALLOWLISTED_POLICY_KEYS
+    assert "Advisory adaptation proposed" in proposal.rationale
 
 
-def test_drift_sentinel_returns_none_when_no_drift(baseline_sample: pd.DataFrame) -> None:
-    """Verify DriftSentinel emits no proposal when distribution is stable."""
-    calc = DistributionDriftCalculator()
-    # Baseline vs self has zero drift
-    summary = calc.compute_drift(
-        reference_df=baseline_sample,
-        comparison_df=baseline_sample,
-        features=["card1"],
-        scenario_id="S0_BASELINE",
-    )
-
-    sentinel = DriftSentinel()
-    proposal = sentinel.evaluate_and_propose(summary, base_cfg_hash=FROZEN_BASE_CFG_HASH)
-    assert proposal is None
+def test_sentinel_rejects_forbidden_keys(sentinel, base_policy):
+    """Attempting to propose forbidden keys (e.g. model_weights, raw_features) fails validation."""
+    forbidden_changes = {
+        "model_weights": [0.1, 0.2, 0.3],
+        "t_review": 0.05,
+    }
+    is_valid, err = sentinel.validate_proposal_changes(forbidden_changes, current_policy=base_policy)
+    assert not is_valid
+    assert "unapproved/prohibited keys" in err
 
 
-def test_drift_sentinel_fail_closed_on_provider_error(
-    baseline_sample: pd.DataFrame, shifted_sample: pd.DataFrame
-) -> None:
-    """Verify DriftSentinel fails closed if external provider throws an exception."""
-    calc = DistributionDriftCalculator()
-    summary = calc.compute_drift(
-        reference_df=baseline_sample,
-        comparison_df=shifted_sample,
-        features=["TransactionAmt"],
-    )
+def test_sentinel_parameter_bounds_enforcement(sentinel, base_policy):
+    """Proposing out-of-bounds parameters or invalid ordering (t_review >= t_alert) fails validation."""
+    # Out of bounds
+    out_of_bounds = {"t_review": 1.5}
+    is_valid, err = sentinel.validate_proposal_changes(out_of_bounds, current_policy=base_policy)
+    assert not is_valid
+    assert "outside allowed bounds" in err
 
-    def failing_provider(s: dict) -> Proposal:
-        raise ConnectionError("Simulated LLM API timeout")
-
-    sentinel = DriftSentinel(llm_provider=failing_provider)
-    proposal = sentinel.evaluate_and_propose(summary, base_cfg_hash=FROZEN_BASE_CFG_HASH)
-    assert proposal is None
+    # Invalid ordering: t_review >= t_alert (base t_alert is ~0.0847)
+    invalid_ordering = {"t_review": 0.090}
+    is_valid2, err2 = sentinel.validate_proposal_changes(invalid_ordering, current_policy=base_policy)
+    assert not is_valid2
+    assert "t_review" in err2 and "must be < t_alert" in err2
 
 
-def test_replay_gate_validation_and_human_approval_lifecycle() -> None:
-    """Verify ReplayGate workflow from validation to AWAITING_HUMAN_APPROVAL to APPROVED_ACTIVE."""
-    gate = ReplayGate(frozen_cfg_hash=FROZEN_BASE_CFG_HASH)
+# ==============================================================================
+# 3. Deterministic Replay Gate Tests (DRFT-03)
+# ==============================================================================
 
-    proposal = Proposal(
-        proposal_id="prop_001",
-        base_cfg_hash=FROZEN_BASE_CFG_HASH,
-        changes={"budget.primary_multiple": 2.0},
-        rationale="Compensate for covariate drift by raising budget quota",
-        created_at=datetime.now(timezone.utc),
-    )
-
-    # 1. Validation and replay leaves status in AWAITING_HUMAN_APPROVAL
-    record = gate.validate_and_replay(proposal)
-    assert record.status == "AWAITING_HUMAN_APPROVAL"
-    assert record.schema_valid is True
-    assert record.hash_matched is True
-    assert record.keys_valid is True
-    assert record.validation_passed is True
-    assert record.workload_constraint_passed is True
-    assert record.approved_by is None
-    assert record.approval_timestamp is None
-    assert len(record.rejection_reasons) == 0
-
-    # 2. Human approval transitions to APPROVED_ACTIVE
-    approved_record = gate.approve(record, approver="RiskOfficer_Arpit")
-    assert approved_record.status == "APPROVED_ACTIVE"
-    assert approved_record.approved_by == "RiskOfficer_Arpit"
-    assert approved_record.approval_timestamp is not None
-    assert approved_record.record_hash == approved_record.compute_record_hash()
-
-
-def test_replay_gate_rejects_mismatched_base_hash() -> None:
-    """Verify ReplayGate rejects proposals targeting an outdated configuration hash."""
-    gate = ReplayGate(frozen_cfg_hash=FROZEN_BASE_CFG_HASH)
-    wrong_hash = "f" * 64
+def test_replay_gate_validation_replay_success(replay_gate, base_policy, rng):
+    """Valid proposal replays deterministically on validation partition and enters AWAITING_HUMAN_APPROVAL."""
+    # Construct small synthetic validation cases
+    val_cases = [
+        {"p": 0.02, "u": 0.10},
+        {"p": 0.075, "u": 0.15},  # borderline between old t_review (0.071) and alert (0.084)
+        {"p": 0.09, "u": 0.20},   # alert
+        {"p": 0.01, "u": 0.60},   # high disagreement
+    ]
 
     proposal = Proposal(
-        proposal_id="prop_stale",
-        base_cfg_hash=wrong_hash,
-        changes={"budget.primary_multiple": 2.0},
-        rationale="Stale proposal against obsolete hash",
-        created_at=datetime.now(timezone.utc),
+        proposal_id="prop_test_001",
+        base_cfg_hash=base_policy.compute_cfg_hash(),
+        changes={"t_review": 0.065},  # lower review threshold
+        rationale="Lower review threshold to evaluate borderline cases",
     )
 
-    record = gate.validate_and_replay(proposal)
-    assert record.status == "REJECTED"
-    assert record.hash_matched is False
-    assert record.validation_passed is False
-    assert any("hash mismatch" in r.lower() for r in record.rejection_reasons)
+    result, status = replay_gate.validate_and_replay(
+        proposal=proposal,
+        current_policy=base_policy,
+        validation_data=val_cases,
+        scenario_id="val_slice",
+    )
+
+    assert result.is_valid
+    assert result.replay_executed
+    assert result.validation_samples == 4
+    # State transition must be AWAITING_HUMAN_APPROVAL (never automatic activation!)
+    assert status == ProposalStatus.AWAITING_HUMAN_APPROVAL
+    assert replay_gate.proposal_states[proposal.proposal_id] == ProposalStatus.AWAITING_HUMAN_APPROVAL
 
 
-def test_replay_gate_rejects_excessive_workload_multiple() -> None:
-    """Verify ReplayGate enforces upper boundary on workload multiple (e.g. max 3.0x)."""
-    gate = ReplayGate(frozen_cfg_hash=FROZEN_BASE_CFG_HASH, max_workload_multiple=3.0)
-
+def test_replay_gate_test_partition_quarantine(replay_gate, base_policy):
+    """Attempting to pass test partition to replay gate raises GroundTruthQuarantineError."""
     proposal = Proposal(
-        proposal_id="prop_greedy",
-        base_cfg_hash=FROZEN_BASE_CFG_HASH,
-        changes={"budget.primary_multiple": 5.0},  # Exceeds max 3.0
-        rationale="Unbounded budget request",
-        created_at=datetime.now(timezone.utc),
+        proposal_id="prop_test_quarantine",
+        base_cfg_hash=base_policy.compute_cfg_hash(),
+        changes={"t_review": 0.065},
+        rationale="Attempted replay on held-out test data",
     )
 
-    record = gate.validate_and_replay(proposal)
-    assert record.status == "REJECTED"
-    assert record.workload_constraint_passed is False
-    assert any("exceeds boundary" in r.lower() for r in record.rejection_reasons)
+    with pytest.raises(GroundTruthQuarantineError) as exc_info:
+        replay_gate.validate_and_replay(
+            proposal=proposal,
+            current_policy=base_policy,
+            validation_data=[{"p": 0.05, "u": 0.1}],
+            scenario_id="test",  # Forbidden!
+        )
+    assert "quarantined" in str(exc_info.value).lower() or "strictly prohibits" in str(exc_info.value).lower()
 
 
-def test_replay_gate_human_rejection() -> None:
-    """Verify ReplayGate human rejection workflow."""
-    gate = ReplayGate(frozen_cfg_hash=FROZEN_BASE_CFG_HASH)
-
+def test_replay_gate_hash_mismatch_rejection(replay_gate, base_policy):
+    """Proposal with mismatched base_cfg_hash fails validation immediately."""
     proposal = Proposal(
-        proposal_id="prop_002",
-        base_cfg_hash=FROZEN_BASE_CFG_HASH,
-        changes={"budget.primary_multiple": 2.5},
-        rationale="Elevate review budget",
-        created_at=datetime.now(timezone.utc),
+        proposal_id="prop_mismatch",
+        base_cfg_hash="a" * 64,  # invalid/stale configuration hash
+        changes={"t_review": 0.065},
+        rationale="Stale proposal based on previous config",
     )
 
-    record = gate.validate_and_replay(proposal)
-    assert record.status == "AWAITING_HUMAN_APPROVAL"
+    result, status = replay_gate.validate_and_replay(
+        proposal=proposal,
+        current_policy=base_policy,
+        validation_data=[{"p": 0.05, "u": 0.1}],
+        scenario_id="validation",
+    )
 
-    rejected_record = gate.reject(record, reviewer="RiskCommittee_Lead", reason="Budget limit frozen for Q4")
-    assert rejected_record.status == "REJECTED"
-    assert any("Budget limit frozen for Q4" in r for r in rejected_record.rejection_reasons)
+    assert not result.is_valid
+    assert not result.base_cfg_hash_matches
+    assert status == ProposalStatus.FAILED_VALIDATION
+    assert "mismatch" in result.rejection_reason.lower()
+
+
+def test_replay_gate_explicit_human_approval(replay_gate, base_policy):
+    """Proposal in AWAITING_HUMAN_APPROVAL transitions to APPROVED only on explicit human call with valid approver ID."""
+    proposal = Proposal(
+        proposal_id="prop_to_approve",
+        base_cfg_hash=base_policy.compute_cfg_hash(),
+        changes={"t_review": 0.068},
+        rationale="Fine-tune review threshold",
+    )
+
+    replay_gate.validate_and_replay(
+        proposal=proposal,
+        current_policy=base_policy,
+        validation_data=[{"p": 0.05, "u": 0.1}],
+    )
+
+    # Empty approver ID must raise error
+    with pytest.raises(ValueError):
+        replay_gate.approve_proposal(
+            proposal_id=proposal.proposal_id,
+            approver="",
+            rationale="Approved without approver id",
+        )
+
+    # Valid human approval
+    audit_chain = AuditChain(secret_key="test_key_for_replay_gate_123456")
+    approval_res = replay_gate.approve_proposal(
+        proposal_id=proposal.proposal_id,
+        approver="lead_risk_officer@signalgate.org",
+        rationale="Validated against Q3 validation holdout; touched rate within 1.1x SLA.",
+        audit_chain=audit_chain,
+    )
+
+    assert approval_res["status"] == "APPROVED"
+    assert approval_res["approver"] == "lead_risk_officer@signalgate.org"
+    assert approval_res["audit_seq"] is not None
+    assert replay_gate.proposal_states[proposal.proposal_id] == ProposalStatus.APPROVED
+
+    # Audit chain must reflect the approval event
+    assert len(audit_chain) == 1
+    assert audit_chain[-1].id == f"gate_approval_{proposal.proposal_id}"
+
+
+def test_replay_gate_rejection_leaves_policy_intact(replay_gate, base_policy):
+    """Rejection transitions proposal to REJECTED, leaving current policy untouched."""
+    proposal = Proposal(
+        proposal_id="prop_to_reject",
+        base_cfg_hash=base_policy.compute_cfg_hash(),
+        changes={"t_review": 0.068},
+        rationale="Aggressive threshold change",
+    )
+
+    replay_gate.validate_and_replay(
+        proposal=proposal,
+        current_policy=base_policy,
+        validation_data=[{"p": 0.05, "u": 0.1}],
+    )
+
+    reject_res = replay_gate.reject_proposal(
+        proposal_id=proposal.proposal_id,
+        reviewer="risk_committee@signalgate.org",
+        reason="Exceeds churn tolerance on borderline cohort.",
+    )
+
+    assert reject_res["status"] == "REJECTED"
+    assert replay_gate.proposal_states[proposal.proposal_id] == ProposalStatus.REJECTED
+
+
+def test_end_to_end_drift_to_replay_lifecycle(monitor, sentinel, replay_gate, base_policy, rng):
+    """End-to-end flow from feature drift detection -> sentinel proposal -> replay gate validation -> human approval -> audit record."""
+    # 1. Simulate severe feature drift in comparison dataset
+    ref_df = pd.DataFrame({"V1": rng.normal(0, 1, size=400), "V2": rng.normal(0, 1, size=400)})
+    act_df = pd.DataFrame({"V1": rng.normal(2.5, 1, size=400), "V2": rng.normal(2.5, 1, size=400)})
+
+    report = monitor.compute_drift_report(
+        ref_df, act_df, features=["V1", "V2"],
+        reference_window_id="ref_train", comparison_window_id="act_val"
+    )
+    assert report.significant_drift_features >= 1
+
+    # 2. Sentinel observes drift and emits advisory Proposal
+    proposal = sentinel.evaluate_drift(report, current_policy=base_policy)
+    assert proposal is not None
+
+    # 3. Replay Gate deterministically replays on validation cases
+    val_data = [{"p": 0.07, "u": 0.1}, {"p": 0.08, "u": 0.2}, {"p": 0.02, "u": 0.05}]
+    result, status = replay_gate.validate_and_replay(
+        proposal=proposal,
+        current_policy=base_policy,
+        validation_data=val_data,
+        scenario_id="val_e2e",
+    )
+    assert result.is_valid
+    assert status == ProposalStatus.AWAITING_HUMAN_APPROVAL
+
+    # 4. Human risk officer reviews replay metrics and authorizes adaptation
+    audit_chain = AuditChain(secret_key="e2e_secret_key_signalgate_123456")
+    approval = replay_gate.approve_proposal(
+        proposal_id=proposal.proposal_id,
+        approver="compliance_lead@signalgate.org",
+        rationale="Approved after verifying replay touched rate stability on validation cohort.",
+        audit_chain=audit_chain,
+    )
+    assert approval["status"] == "APPROVED"
+    assert replay_gate.proposal_states[proposal.proposal_id] == ProposalStatus.APPROVED
+    assert len(audit_chain) == 1
+    assert audit_chain[-1].id == f"gate_approval_{proposal.proposal_id}"

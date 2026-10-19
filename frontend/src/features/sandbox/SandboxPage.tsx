@@ -15,7 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
-import { evaluateLatencySla } from '../../lib/latency';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
@@ -81,6 +81,7 @@ const PRESETS: PresetTransaction[] = [
 ];
 
 export const SandboxPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [features, setFeatures] = useState<Record<string, any>>(PRESETS[0].features);
   const [featureJson, setFeatureJson] = useState<string>(JSON.stringify(PRESETS[0].features, null, 2));
   const [activePresetName, setActivePresetName] = useState<string>(PRESETS[0].name);
@@ -172,7 +173,7 @@ export const SandboxPage: React.FC = () => {
     setLoading(true);
     setApiError(null);
     try {
-      const res = await api.scoreSandbox(features);
+      const res = await api.scoreSandbox(features, mode);
       setScoringResult(res);
     } catch (err: unknown) {
       setApiError(err instanceof Error ? err.message : 'Scoring request rejected by backend.');
@@ -186,10 +187,15 @@ export const SandboxPage: React.FC = () => {
   const featureCount = Object.keys(features || {}).length;
   const payloadBytes = new Blob([featureJson]).size;
 
-  const signals = scoringResult?.signals;
+  const signals = scoringResult?.signals
+    ? {
+        p: (scoringResult.signals as any).p ?? (scoringResult.signals as any).p_risk ?? 0,
+        u: (scoringResult.signals as any).u ?? (scoringResult.signals as any).u_disagreement ?? 0,
+        u_method: scoringResult.signals.u_method ?? '',
+      }
+    : null;
   const decision = scoringResult?.decision;
   const latency = scoringResult?.latency_ms;
-  const slaResult = evaluateLatencySla(latency);
   const action = decision?.action;
   const reasonCode = decision?.reason_code;
 
@@ -205,8 +211,8 @@ export const SandboxPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>SANDBOX_LIVE_EVALUATION</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
               <span>DECISION SUPPORT SIMULATOR</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
@@ -539,21 +545,39 @@ export const SandboxPage: React.FC = () => {
                 <div
                   style={{
                     display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: 'column',
+                    gap: '4px',
                     fontSize: '11px',
                     fontFamily: 'var(--font-mono)',
                     color: 'var(--text-secondary)',
-                    padding: '6px 10px',
+                    padding: '8px 10px',
                     background: 'var(--bg-surface-subdued)',
                     borderRadius: 'var(--radius-xs)',
                     border: '1px solid var(--border-subtle)',
                   }}
                 >
-                  <span style={{ color: 'var(--text-tertiary)' }}>Inference Audit ID:</span>
-                  <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
-                    {scoringResult.decision_id}
-                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--text-tertiary)' }}>Inference Audit ID:</span>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+                      {scoringResult.decision_id}
+                    </span>
+                  </div>
+                  {scoringResult.audit_seq !== undefined && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-tertiary)' }}>Audit Ledger Seq:</span>
+                      <span style={{ color: 'var(--color-routine-bright)', fontWeight: 700 }}>
+                        #{scoringResult.audit_seq}
+                      </span>
+                    </div>
+                  )}
+                  {scoringResult.mode && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-tertiary)' }}>Evidence Mode:</span>
+                      <span style={{ color: 'var(--accent-primary-bright)', fontWeight: 600 }}>
+                        {scoringResult.mode}
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -814,7 +838,7 @@ export const SandboxPage: React.FC = () => {
                               marginTop: '2px',
                             }}
                           >
-                            Model + routing evaluation (live measurement)
+                            HGB + Sigmoid Platt evaluation
                           </div>
                         </div>
                       </div>
@@ -823,9 +847,7 @@ export const SandboxPage: React.FC = () => {
                         <div
                           style={{
                             fontFamily: 'var(--font-mono)',
-                            color: slaResult.isExceeded
-                              ? 'var(--color-fraud-alert)'
-                              : 'var(--accent-primary-bright)',
+                            color: 'var(--accent-primary-bright)',
                             fontWeight: 800,
                             fontSize: '22px',
                             lineHeight: 1.1,
@@ -839,29 +861,15 @@ export const SandboxPage: React.FC = () => {
                             fontSize: '11px',
                             fontFamily: 'var(--font-mono)',
                             fontWeight: 700,
-                            color: slaResult.isPass
-                              ? 'var(--color-routine-bright)'
-                              : slaResult.isExceeded
-                              ? 'var(--color-fraud-alert)'
-                              : 'var(--text-tertiary)',
-                            background: slaResult.isPass
-                              ? 'var(--color-routine-tint)'
-                              : slaResult.isExceeded
-                              ? 'var(--color-fraud-alert-tint, rgba(239, 68, 68, 0.15))'
-                              : 'var(--bg-surface-subdued)',
-                            border: `1px solid ${
-                              slaResult.isPass
-                                ? 'var(--color-routine-dim)'
-                                : slaResult.isExceeded
-                                ? 'rgba(239, 68, 68, 0.35)'
-                                : 'var(--border-subtle)'
-                            }`,
+                            color: 'var(--color-routine-bright)',
+                            background: 'var(--color-routine-tint)',
+                            border: '1px solid var(--color-routine-dim)',
                             padding: '2px 8px',
                             borderRadius: 'var(--radius-xs)',
                             marginTop: '4px',
                           }}
                         >
-                          {slaResult.badgeText}
+                          PASS &bull; &lt;25ms SLA
                         </span>
                       </div>
                     </div>

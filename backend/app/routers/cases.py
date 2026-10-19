@@ -23,6 +23,7 @@ def list_cases(
     risk_min: Optional[float] = Query(None, ge=0.0, le=1.0, description="Minimum risk probability p."),
     risk_max: Optional[float] = Query(None, ge=0.0, le=1.0, description="Maximum risk probability p."),
     search: Optional[str] = Query(None, description="Substring search on case identifier."),
+    mode: Optional[str] = Query(None, description="Operating mode (e.g. IEEE_CIS_OFFLINE_BENCHMARK)."),
     case_service: CaseService = Depends(get_case_service),
 ) -> CasesResponse:
     """Return paginated cases from actual saved prediction records."""
@@ -47,6 +48,7 @@ def list_cases(
 )
 def get_case(
     case_id: str,
+    mode: Optional[str] = Query(None, description="Operating mode filter."),
     case_service: CaseService = Depends(get_case_service),
 ) -> CaseDetailResponse:
     """Retrieve full signals, decision rationale, and feature metadata for a specific case."""

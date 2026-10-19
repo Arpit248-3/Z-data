@@ -1,7 +1,7 @@
 ================================================================================
 SIGNALGATE ENVIRONMENT AUDIT & PHASE 1 PREFLIGHT REPORT
 ================================================================================
-Timestamp: 2026-10-18T13:36:33Z
+Timestamp: 2026-10-17T04:11:05Z
 Status: SYNTHETIC_SMOKE_ONLY
 
 1. SYSTEM & PLATFORM
@@ -53,14 +53,14 @@ Status: SYNTHETIC_SMOKE_ONLY
   Train Rows / Test Rows  : 6000 / 4000
   Feature Count Evaluated : 81
   Forbidden Leakage Check : PASSED (Excluded: TransactionID, TransactionDT, isFraud, true_label, split, partition)
-  Smoke Fit Latency (ms)  : 3305.6
+  Smoke Fit Latency (ms)  : 2914.85
   Raw Test Brier Score    : 0.052222
   Raw Test ROC-AUC        : 0.544818
   Calibration API Status  : VERIFIED_SUPPORTED
   Calibration Path        : sklearn.frozen.FrozenEstimator + CalibratedClassifierCV(method='sigmoid')
   Calibrated Brier Score  : 0.050795
   SHAP Probe Status       : VERIFIED_COMPATIBLE
-  SHAP Latency (10 rows)  : 98.72 ms
+  SHAP Latency (10 rows)  : 49.18 ms
 
 5. MISSING-ARTIFACT READINESS MATRIX
   - Real IEEE-CIS Dataset  : null [STATUS: PENDING_USER_SUPPLY]

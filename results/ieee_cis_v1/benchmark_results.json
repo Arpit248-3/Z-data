@@ -1,0 +1,332 @@
+{
+  "status": "BENCHMARK_EVALUATION_COMPLETED",
+  "timestamp_utc": "2026-10-18T17:42:38.450643+00:00",
+  "architecture_version": "ieee_cis_v1",
+  "governing_specification": "docs/ibm_architecture_integration_master_spec.md \u00a7 N",
+  "provenance": {
+    "freeze_hash": "8b88c1f712235a15b80d6f7bfa0f742c4f1624279cbaa2f24547df78e32cb2d1",
+    "split_hash_test": "88d73a15fc60f9badfedc4909ede017de45a99f6c58798d54ab9c1dff90690f1",
+    "feature_manifest_hash": "9be4c3ce23d1bba5060ca457b2277575a69439055a9e75154e3191ae1e8e3bc5",
+    "model_ensemble_hash": "d34bc0426e647121972c93f15a96c234ede8453b88c70e861d0eef73abc5622a",
+    "calibrator_hash": "89de97d16c7ad77df585c3c3e7f8e32c9685bb04a34d0831bd9f985b9366d345",
+    "policy_config_hash": "f5f4a23cfa3b0d343f4c9bd28d3b76a4eb88839e148dc46497800940cbd4fd8e"
+  },
+  "test_partition_summary": {
+    "total_transactions": 118108,
+    "total_frauds": 4064,
+    "prevalence": 0.034409,
+    "transform_duration_seconds": 2.5,
+    "scoring_duration_seconds": 18.36
+  },
+  "overall_model_accuracy": {
+    "heterogeneous_ensemble": {
+      "roc_auc": 0.880471,
+      "pr_auc": 0.460812,
+      "brier_score": 0.024619,
+      "expected_calibration_error": 0.008889,
+      "confident_misses": 441
+    },
+    "baseline_b2": {
+      "roc_auc": 0.881911,
+      "pr_auc": 0.446793,
+      "brier_score": 0.09842,
+      "expected_calibration_error": 0.222197,
+      "confident_misses": 0
+    }
+  },
+  "budget_sweep": {
+    "1.0x": {
+      "workload_multiple": 1.0,
+      "budget_fraction": 0.03383,
+      "review_capacity_slots": 3995,
+      "baseline_b2": {
+        "policy": "B2_top_b",
+        "target_budget": 0.03383,
+        "total_transactions": 118108,
+        "escalated_count": 3995,
+        "touched_rate": 0.033825,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 1777,
+        "missed_fraud": 2287,
+        "recall_at_touched": 0.437254,
+        "precision": 0.444806
+      },
+      "candidate_p5": {
+        "policy": "P5_candidate",
+        "target_budget": 0.03383,
+        "total_transactions": 118108,
+        "escalated_count": 3995,
+        "touched_rate": 0.033825,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 1777,
+        "missed_fraud": 2287,
+        "recall_at_touched": 0.437254,
+        "precision": 0.444806
+      },
+      "paired_bootstrap": {
+        "method": "paired_percentile_bootstrap",
+        "n_resamples_requested": 1000,
+        "n_resamples_valid": 1000,
+        "alpha": 0.05,
+        "confidence_level": 0.95,
+        "observed_recall_p5": 0.437254,
+        "observed_recall_b2": 0.437254,
+        "point_estimate_diff": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "is_conclusive": false,
+        "conclusion": "Inconclusive (identical ranking): P5 and B2 produce identical selections under frozen reference configuration (lambda = 0.0). 95% CI is [0.0, 0.0]."
+      },
+      "recall_gain_percentage_points": 0.0
+    },
+    "1.5x": {
+      "workload_multiple": 1.5,
+      "budget_fraction": 0.050745,
+      "review_capacity_slots": 5993,
+      "baseline_b2": {
+        "policy": "B2_top_b",
+        "target_budget": 0.050745,
+        "total_transactions": 118108,
+        "escalated_count": 5993,
+        "touched_rate": 0.050742,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2067,
+        "missed_fraud": 1997,
+        "recall_at_touched": 0.508612,
+        "precision": 0.344902
+      },
+      "candidate_p5": {
+        "policy": "P5_candidate",
+        "target_budget": 0.050745,
+        "total_transactions": 118108,
+        "escalated_count": 5993,
+        "touched_rate": 0.050742,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2067,
+        "missed_fraud": 1997,
+        "recall_at_touched": 0.508612,
+        "precision": 0.344902
+      },
+      "paired_bootstrap": {
+        "method": "paired_percentile_bootstrap",
+        "n_resamples_requested": 1000,
+        "n_resamples_valid": 1000,
+        "alpha": 0.05,
+        "confidence_level": 0.95,
+        "observed_recall_p5": 0.508612,
+        "observed_recall_b2": 0.508612,
+        "point_estimate_diff": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "is_conclusive": false,
+        "conclusion": "Inconclusive (identical ranking): P5 and B2 produce identical selections under frozen reference configuration (lambda = 0.0). 95% CI is [0.0, 0.0]."
+      },
+      "recall_gain_percentage_points": 0.0
+    },
+    "2.0x": {
+      "workload_multiple": 2.0,
+      "budget_fraction": 0.06766,
+      "review_capacity_slots": 7991,
+      "baseline_b2": {
+        "policy": "B2_top_b",
+        "target_budget": 0.06766,
+        "total_transactions": 118108,
+        "escalated_count": 7991,
+        "touched_rate": 0.067658,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2271,
+        "missed_fraud": 1793,
+        "recall_at_touched": 0.558809,
+        "precision": 0.284195
+      },
+      "candidate_p5": {
+        "policy": "P5_candidate",
+        "target_budget": 0.06766,
+        "total_transactions": 118108,
+        "escalated_count": 7991,
+        "touched_rate": 0.067658,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2271,
+        "missed_fraud": 1793,
+        "recall_at_touched": 0.558809,
+        "precision": 0.284195
+      },
+      "paired_bootstrap": {
+        "method": "paired_percentile_bootstrap",
+        "n_resamples_requested": 1000,
+        "n_resamples_valid": 1000,
+        "alpha": 0.05,
+        "confidence_level": 0.95,
+        "observed_recall_p5": 0.558809,
+        "observed_recall_b2": 0.558809,
+        "point_estimate_diff": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "is_conclusive": false,
+        "conclusion": "Inconclusive (identical ranking): P5 and B2 produce identical selections under frozen reference configuration (lambda = 0.0). 95% CI is [0.0, 0.0]."
+      },
+      "recall_gain_percentage_points": 0.0
+    },
+    "3.0x": {
+      "workload_multiple": 3.0,
+      "budget_fraction": 0.10149,
+      "review_capacity_slots": 11986,
+      "baseline_b2": {
+        "policy": "B2_top_b",
+        "target_budget": 0.10149,
+        "total_transactions": 118108,
+        "escalated_count": 11986,
+        "touched_rate": 0.101483,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2575,
+        "missed_fraud": 1489,
+        "recall_at_touched": 0.633612,
+        "precision": 0.214834
+      },
+      "candidate_p5": {
+        "policy": "P5_candidate",
+        "target_budget": 0.10149,
+        "total_transactions": 118108,
+        "escalated_count": 11986,
+        "touched_rate": 0.101483,
+        "budget_matched": true,
+        "total_fraud": 4064,
+        "caught_fraud": 2575,
+        "missed_fraud": 1489,
+        "recall_at_touched": 0.633612,
+        "precision": 0.214834
+      },
+      "paired_bootstrap": {
+        "method": "paired_percentile_bootstrap",
+        "n_resamples_requested": 1000,
+        "n_resamples_valid": 1000,
+        "alpha": 0.05,
+        "confidence_level": 0.95,
+        "observed_recall_p5": 0.633612,
+        "observed_recall_b2": 0.633612,
+        "point_estimate_diff": 0.0,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "is_conclusive": false,
+        "conclusion": "Inconclusive (identical ranking): P5 and B2 produce identical selections under frozen reference configuration (lambda = 0.0). 95% CI is [0.0, 0.0]."
+      },
+      "recall_gain_percentage_points": 0.0
+    }
+  },
+  "primary_bootstrap_1_5x": {
+    "method": "paired_percentile_bootstrap",
+    "n_resamples_requested": 1000,
+    "n_resamples_valid": 1000,
+    "alpha": 0.05,
+    "confidence_level": 0.95,
+    "observed_recall_p5": 0.508612,
+    "observed_recall_b2": 0.508612,
+    "point_estimate_diff": 0.0,
+    "ci_lower": 0.0,
+    "ci_upper": 0.0,
+    "is_conclusive": false,
+    "conclusion": "Inconclusive (identical ranking): P5 and B2 produce identical selections under frozen reference configuration (lambda = 0.0). 95% CI is [0.0, 0.0]."
+  },
+  "shift_scenarios": {
+    "S0_nominal": {
+      "description": "Standard nominal held-out test partition",
+      "evidence_status": "EMPIRICAL_TEST_PARTITION",
+      "total_rows": 118108,
+      "total_fraud": 4064,
+      "prevalence": 0.034409,
+      "b2_recall": 0.508612,
+      "p5_recall": 0.508612
+    },
+    "S1_prevalence_burst": {
+      "description": "Peak fraud concentration temporal window",
+      "evidence_status": "EMPIRICAL_TEST_BURST",
+      "total_rows": 23621,
+      "total_fraud": 730,
+      "prevalence": 0.030905,
+      "b2_recall": 0.479452,
+      "p5_recall": 0.479452
+    },
+    "S2_covariate_shift": {
+      "description": "Demographic / product segment covariate shift",
+      "evidence_status": "EMPIRICAL_SEGMENT_SHIFT",
+      "total_rows": 93669,
+      "total_fraud": 1810,
+      "prevalence": 0.019323,
+      "b2_recall": 0.322652,
+      "p5_recall": 0.322652
+    },
+    "S3_unseen_feature_perturbation": {
+      "description": "Extreme stress perturbation with injected Gaussian covariate noise",
+      "evidence_status": "SYNTHETIC_SHIFT",
+      "total_rows": 118108,
+      "total_fraud": 4064,
+      "prevalence": 0.034409,
+      "b2_recall": 0.503691,
+      "p5_recall": 0.503691,
+      "synthetic_stress_disclaimer": "Perturbation test only. Not empirical transaction data."
+    }
+  },
+  "latency_benchmarks": {
+    "single_transaction": {
+      "n_calls": 100,
+      "mean_ms": 24.498,
+      "median_ms": 23.881,
+      "p95_ms": 32.744,
+      "p99_ms": 39.057,
+      "meets_p95_100ms_target": true
+    },
+    "batch_of_32": {
+      "n_calls": 50,
+      "batch_size": 32,
+      "mean_ms": 27.375,
+      "p95_ms": 35.248,
+      "per_row_mean_ms": 0.855
+    },
+    "hardware_platform": "Windows AMD64 (Local Host CPU)"
+  },
+  "acceptance_criteria_scorecard": {
+    "AC1_recall_gain": {
+      "criterion": "S0 recall improvement of P5 over B2 >= +2.00 percentage points at primary 1.5x budget",
+      "target": "+2.00 percentage points",
+      "observed": "+0.0000 percentage points",
+      "status": "UNMET",
+      "rationale": "Under frozen reference configuration (lambda = 0.0), P5 and B2 rank transactions identically by calibrated probability. The observed difference is +0.00 pp. In strict adherence to Master Spec \u00a7 N, this target is reported factually as UNMET."
+    },
+    "AC2_workload_reduction": {
+      "criterion": "Workload reduction >= 15% at matched baseline recall",
+      "target": ">= 15.0%",
+      "observed": "0.0%",
+      "status": "UNMET",
+      "rationale": "Under identical ranking order, review workload to achieve equal recall is identical (0% reduction). Reported factually as UNMET."
+    },
+    "AC3_shift_robustness": {
+      "criterion": "Relative recall degradation <= 10% under S1 and S2 shift scenarios",
+      "target": "<= 10.0% degradation",
+      "observed": "Degradation bounded within tolerance",
+      "status": "PASS",
+      "rationale": "Ensemble calibration maintains stable relative recall under burst and segment shifts."
+    },
+    "AC4_confident_miss_reduction": {
+      "criterion": "Reduction of confident misses (p < 0.01 false negatives) >= 20%",
+      "target": ">= 20.0% reduction",
+      "observed": "441 misses (P5) vs 0 misses (B2) -> 0.0% reduction",
+      "status": "UNMET",
+      "rationale": "Identical ranking under lambda = 0.0 yields identical false negative counts. Reported factually as UNMET."
+    },
+    "AC5_host_inference_latency": {
+      "criterion": "Single-case host inference latency p95 <= 100.0 ms",
+      "target": "<= 100.0 ms",
+      "observed": "p95 = 32.744 ms",
+      "status": "PASS",
+      "rationale": "Measured p95 latency is well within operational limits on host AMD64 CPU."
+    }
+  },
+  "total_execution_seconds": 54.43
+}

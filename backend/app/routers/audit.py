@@ -2,11 +2,21 @@
 
 from typing import Optional
 from fastapi import APIRouter, Depends, Query, Response
-from backend.app.schemas import AuditListResponse
+from backend.app.schemas import AuditListResponse, AuditVerifyResponse
 from backend.app.services.audit import AuditService
-from backend.app.dependencies import get_audit_service
+from backend.app.services.integration import IntegrationService
+from backend.app.dependencies import get_audit_service, get_integration_service
 
 router = APIRouter(prefix="/audit", tags=["Audit Trail"])
+
+
+@router.get("/verify", response_model=AuditVerifyResponse)
+def verify_audit_chain(
+    integration_service: IntegrationService = Depends(get_integration_service),
+) -> AuditVerifyResponse:
+    """Verify sequential continuity and cryptographic integrity of the decision audit ledger."""
+    return integration_service.verify_audit_chain()
+
 
 
 @router.get("", response_model=AuditListResponse)

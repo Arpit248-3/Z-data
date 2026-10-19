@@ -14,6 +14,7 @@ htmlcov/
 # Environments & Credentials
 .env
 .env.*
+!.env.example
 .venv/
 env/
 venv/
@@ -35,6 +36,10 @@ data/raw/
 data/interim/
 data/processed/
 *.zip
+
+# Trained Model Artifacts (IEEE-CIS v1 Bundle & Large Binary Checkpoints)
+models/artifacts/ieee_cis_v1/
+logs/*.runtime.jsonl
 
 # Third-Party Reference Archive (Clean-room integration lives in integrations/ibm_architecture/)
 reference/

@@ -2,6 +2,10 @@
  * SignalGate API TypeScript Definitions
  * Strictly mirrors backend/app/schemas.py and docs/api_contract.md
  */
+export type OperatingMode =
+  | 'SYNTHETIC_SMOKE_ONLY'
+  | 'IEEE_CIS_OFFLINE_BENCHMARK'
+  | 'LIVE_SOURCE_NOT_CONNECTED';
 
 export interface HealthResponse {
   service_name: string;
@@ -228,6 +232,10 @@ export interface SandboxScoreResponse {
   provenance: Record<string, unknown>;
   audit_logged: boolean;
   notice: string;
+  model_id?: string;
+  cfg_hash?: string;
+  audit_seq?: number;
+  mode?: string;
 }
 
 export interface ResultsResponse {
@@ -267,67 +275,88 @@ export class ApiClientError extends Error {
   }
 }
 
-export interface ModeDetail {
-  mode: string;
-  available: boolean;
-  status: string;
-  active: boolean;
-  description: string;
-  missing_prerequisites: string[];
-  diagnostics: Record<string, unknown>;
+export interface ModeDetailItem {
+  status: 'READY' | 'SYNTHETIC_SMOKE_ONLY' | 'NOT_CONNECTED' | 'DEGRADED' | string;
+  details: string;
+  [key: string]: unknown;
 }
 
-export interface ModesOverviewResponse {
-  active_mode: string;
-  supported_modes: ModeDetail[];
+export interface ModeReadinessResponse {
+  active_mode: OperatingMode | string;
+  available_modes: (OperatingMode | string)[];
+  modes_detail: Record<string, ModeDetailItem>;
   notice: string;
 }
 
-export interface ModeSelectResponse {
-  active_mode: string;
-  message: string;
-  status: string;
-  diagnostics: Record<string, unknown>;
+export interface ModelCardResponse {
+  mode: string;
+  model_id: string;
+  architecture_version: string;
+  architecture_type: string;
+  sub_models: string[];
+  calibrator_type: string;
+  feature_count: number;
+  features_sample: string[];
+  manifest_hash: string;
+  artifact_hashes: Record<string, string>;
+  split_provenance: Record<string, unknown>;
+  notice: string;
+}
+
+export interface FeatureDriftReport {
+  feature: string;
+  psi: number;
+  status: 'STABLE' | 'MODERATE' | 'SIGNIFICANT' | string;
+  ks_statistic?: number;
+  ks_p_value?: number;
+  wasserstein_distance?: number;
 }
 
 export interface DriftReportResponse {
+  report_id: string;
   status: string;
-  scenario_id: string;
   features_monitored: number;
-  overall_drift_detected: boolean;
-  significant_shift_features: string[];
-  moderate_shift_features: string[];
+  significant_drift_features: string[];
+  moderate_drift_features: string[];
   mean_psi: number;
   max_psi: number;
-  feature_drift_reports: Array<{
-    feature: string;
-    psi: number | null;
-    drift_category: string;
-    ks_statistic: number | null;
-    ks_pvalue: number | null;
-    ref_missing_rate: number;
-    act_missing_rate: number;
-    missing_rate_delta: number;
-  }>;
-  real_data_benchmark_status: string;
+  score_drift: {
+    psi: number;
+    wasserstein_distance: number;
+    mean_baseline?: number;
+    mean_current?: number;
+  };
+  provenance_hash: string;
+  timestamp: string;
   notice: string;
+  feature_reports: FeatureDriftReport[];
 }
 
-export interface ReplayProposalRecord {
+export interface GovernanceProposalResponse {
   proposal_id: string;
+  status: 'PROPOSED' | 'REPLAYED' | 'APPROVED' | 'REJECTED' | string;
   base_cfg_hash: string;
-  target_cfg_hash: string;
-  status: 'REJECTED' | 'AWAITING_HUMAN_APPROVAL' | 'APPROVED_ACTIVE';
-  schema_valid: boolean;
-  hash_matched: boolean;
-  keys_valid: boolean;
-  validation_passed: boolean;
-  workload_constraint_passed: boolean;
-  baseline_metrics: Record<string, unknown>;
-  proposed_metrics: Record<string, unknown>;
-  rejection_reasons: string[];
-  approved_by: string | null;
-  approval_timestamp: string | null;
+  changes: Record<string, unknown>;
+  rationale: string;
   created_at: string;
-  record_hash: string;
+  replay_result: Record<string, unknown> | null;
+  approval_record: Record<string, unknown> | null;
+}
+
+export interface GovernanceDecisionResponse {
+  proposal_id: string;
+  status: string;
+  decision_maker: string;
+  timestamp: string;
+  audit_seq: number;
+  message: string;
+}
+
+export interface AuditVerifyResponse {
+  status: 'VERIFIED' | 'TAMPERED' | string;
+  is_valid: boolean;
+  record_count: number;
+  signing_status: 'SIGNED_HMAC_SHA256' | 'UNSIGNED' | string;
+  errors: string[];
+  chain_head_hash: string | null;
 }

@@ -9,7 +9,6 @@ Validates:
 """
 
 from datetime import datetime, timezone
-from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
@@ -86,28 +85,22 @@ def test_evidence_mode_resolution_ieee_cis_fails_closed_when_data_missing(tmp_pa
     assert len(err.missing_prerequisites) > 0
 
 
-def test_evidence_mode_resolution_ieee_cis_ready_when_data_present(tmp_path: Path):
-    """IEEE_CIS_OFFLINE_BENCHMARK reports missing checkpoints when bundle deferred on 8GB host, and READY when bundle present."""
-    # 1. On current 8GB host, raw files exist but full training is deferred
-    state = mode_registry.resolve_mode(EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK)
+def test_evidence_mode_resolution_ieee_cis_ready_when_data_present(tmp_path):
+    """IEEE_CIS_OFFLINE_BENCHMARK resolves to READY when raw CSVs are verified on disk."""
+    raw_dir = tmp_path / "data" / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    (raw_dir / "train_transaction.csv").write_text("header\n1")
+    (raw_dir / "train_identity.csv").write_text("header\n1")
+    registry = ModeRegistry(project_root=tmp_path)
+    state = registry.resolve_mode(EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK)
     assert state.mode == EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK
-    assert state.available is False
-    assert state.readiness == ModeReadiness.UNAVAILABLE_MISSING_CHECKPOINTS
-    assert state.diagnostics.get("real_data_training_status") == "DEFERRED"
+    assert state.available is True
+    assert state.readiness == ModeReadiness.READY
+    assert state.prerequisites_met is True
+    assert len(state.missing_prerequisites) == 0
+    # Must not raise ModeUnavailableError
+    registry.assert_mode_ready(EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK)
 
-    # 2. When mock bundle checkpoint is present, mode resolves to READY
-    mock_root = tmp_path / "mock_project"
-    (mock_root / "data" / "raw").mkdir(parents=True)
-    (mock_root / "data" / "raw" / "train_transaction.csv").write_text("dummy")
-    (mock_root / "data" / "raw" / "train_identity.csv").write_text("dummy")
-    (mock_root / "models" / "real_artifacts").mkdir(parents=True)
-    (mock_root / "models" / "real_artifacts" / "model_bundle.joblib").write_text("dummy")
-
-    mock_registry = ModeRegistry(project_root=mock_root)
-    ready_state = mock_registry.resolve_mode(EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK)
-    assert ready_state.available is True
-    assert ready_state.readiness == ModeReadiness.READY
-    assert ready_state.prerequisites_met is True
 
 
 def test_evidence_mode_resolution_live_source_disconnected():

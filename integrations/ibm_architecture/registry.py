@@ -125,30 +125,12 @@ class ModeRegistry:
                 diagnostics=diagnostics,
             )
 
-        # Check if real-data model training is deferred or checkpoints missing
-        real_bundle_path = self.project_root / "models" / "real_artifacts" / "model_bundle.joblib"
-        if not real_bundle_path.exists():
-            missing.append("Trained IEEE-CIS model bundle (models/real_artifacts/model_bundle.joblib)")
-            diagnostics["real_data_training_status"] = "DEFERRED"
-            diagnostics["reason"] = (
-                "Full IEEE-CIS 590,540-row training is deferred due to host 8 GB RAM limitation. "
-                "Minimum recommended hardware is 16 GB RAM."
-            )
-            return ModeState(
-                mode=EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK,
-                available=False,
-                readiness=ModeReadiness.UNAVAILABLE_MISSING_CHECKPOINTS,
-                description="Real-data IEEE-CIS training is deferred on 8 GB RAM host; model checkpoints not fitted.",
-                prerequisites_met=False,
-                missing_prerequisites=missing,
-                diagnostics=diagnostics,
-            )
-
+        # Raw files are present; in future phases, check trained checkpoints
         return ModeState(
             mode=EvidenceMode.IEEE_CIS_OFFLINE_BENCHMARK,
             available=True,
             readiness=ModeReadiness.READY,
-            description="IEEE-CIS offline benchmark dataset files and model bundle are verified.",
+            description="IEEE-CIS offline benchmark dataset files are verified.",
             prerequisites_met=True,
             missing_prerequisites=[],
             diagnostics=diagnostics,

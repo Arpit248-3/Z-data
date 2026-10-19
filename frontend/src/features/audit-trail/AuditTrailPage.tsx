@@ -15,15 +15,18 @@ import {
   Copy,
   Check,
   Database,
+  ShieldCheck,
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
-import { AuditRecordItem } from '../../lib/api/types';
+import { AuditRecordItem, AuditVerifyResponse } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
 const PAGE_SIZE = 25;
 
 export const AuditTrailPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [records, setRecords] = useState<AuditRecordItem[]>([]);
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [offset, setOffset] = useState<number>(0);
@@ -33,6 +36,27 @@ export const AuditTrailPage: React.FC = () => {
   const [selectedRecord, setSelectedRecord] = useState<AuditRecordItem | null>(null);
   const [copiedHash, setCopiedHash] = useState<boolean>(false);
   const [copiedJson, setCopiedJson] = useState<boolean>(false);
+
+  const [verifyResult, setVerifyResult] = useState<AuditVerifyResponse | null>(null);
+  const [verifying, setVerifying] = useState<boolean>(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+
+  const handleVerifyChain = async () => {
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      const res = await api.verifyAuditChain();
+      setVerifyResult(res);
+    } catch (err: unknown) {
+      setVerifyError(err instanceof Error ? err.message : 'Verification failed');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  useEffect(() => {
+    handleVerifyChain();
+  }, []);
 
   // Close modal on Escape
   useEffect(() => {
@@ -131,8 +155,8 @@ export const AuditTrailPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>AUDIT_LEDGER_PROTOCOL</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
               <span>APPEND-ONLY CRYPTOGRAPHIC LOG</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
@@ -151,6 +175,17 @@ export const AuditTrailPage: React.FC = () => {
 
           {/* Export Actions & Info */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              onClick={handleVerifyChain}
+              disabled={verifying}
+              className="sg-btn sg-btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '7px 14px' }}
+              title="Deterministically verify the HMAC-SHA256 hash continuity of the audit chain"
+            >
+              <ShieldCheck size={14} style={{ color: verifyResult?.is_valid ? 'var(--color-routine)' : undefined }} />
+              <span>{verifying ? 'Verifying Chain...' : 'Verify Cryptographic Ledger'}</span>
+            </button>
             <button
               type="button"
               onClick={() => handleDownload('jsonl')}
@@ -174,6 +209,48 @@ export const AuditTrailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Cryptographic Ledger Verification Card */}
+      {verifyResult && (
+        <div
+          className="sg-card"
+          style={{
+            padding: '14px 20px',
+            background: 'var(--bg-surface-raised)',
+            borderLeft: `4px solid ${verifyResult.is_valid ? 'var(--color-routine)' : 'var(--color-fraud-alert)'}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span
+              className={`badge ${verifyResult.is_valid ? 'badge-ready' : 'badge-alert'}`}
+              style={{ fontSize: '12px', padding: '3px 9px' }}
+            >
+              {verifyResult.status === 'VERIFIED' ? 'INTEGRITY VERIFIED' : 'TAMPER DETECTED'}
+            </span>
+            <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              Ledger Blocks Verified: <strong>{verifyResult.record_count}</strong> &bull; Signing: <strong>{verifyResult.signing_status}</strong>
+            </span>
+          </div>
+          {verifyResult.chain_head_hash && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ color: 'var(--text-tertiary)' }}>Chain-Head Hash:</span>
+              <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+                {verifyResult.chain_head_hash.slice(0, 16)}...
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+      {verifyError && (
+        <div style={{ padding: '10px 16px', background: 'rgba(239, 68, 68, 0.08)', border: '1px solid var(--color-fraud-alert)', borderRadius: 'var(--radius-xs)', fontSize: '12px', color: 'var(--color-fraud-alert)' }}>
+          {verifyError}
+        </div>
+      )}
 
       {/* 2. Main Audit Table Panel */}
       <div className="sg-card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)' }}>

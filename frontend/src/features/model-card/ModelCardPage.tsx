@@ -12,7 +12,8 @@ import {
   X,
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
-import { SystemStatusResponse, OverviewResponse } from '../../lib/api/types';
+import { OverviewResponse, ModelCardResponse } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { TiltGlassCard, TiltGlassCardDetail } from '../../components/TiltGlassCard';
@@ -183,8 +184,9 @@ const FROZEN_RULES: FrozenRuleDef[] = [
 ];
 
 export const ModelCardPage: React.FC = () => {
-  const [status, setStatus] = useState<SystemStatusResponse | null>(null);
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [overview, setOverview] = useState<OverviewResponse | null>(null);
+  const [modelCard, setModelCard] = useState<ModelCardResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
@@ -203,11 +205,11 @@ export const ModelCardPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([api.getStatus(), api.getOverview()])
-      .then(([s, o]) => {
+    Promise.all([api.getOverview(), api.getModelCard(mode)])
+      .then(([o, mc]) => {
         if (isMounted) {
-          setStatus(s);
           setOverview(o);
+          setModelCard(mc);
         }
       })
       .catch((err) => {
@@ -218,7 +220,7 @@ export const ModelCardPage: React.FC = () => {
       });
 
     return () => { isMounted = false; };
-  }, []);
+  }, [mode]);
 
   return (
     <div className="model-card-page animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -227,13 +229,13 @@ export const ModelCardPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>{status?.evidence_status || 'SYNTHETIC_SMOKE_ONLY'}</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
               <span>FROZEN POLICY REGISTRATION PROTOCOL</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
               <span style={{ color: 'var(--text-secondary)' }}>
-                Version: v2.1-FINAL
+                {isRealDataMode ? 'Architecture: EraBaggedHeterogeneousEnsemble' : 'Version: v2.1-FINAL'}
               </span>
             </div>
             <h1 className="page-header-title">
@@ -764,28 +766,52 @@ export const ModelCardPage: React.FC = () => {
               </span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '8px' }}>
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>FROZEN CONFIG HASH (SHA-256)</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent-primary-bright)', wordBreak: 'break-all', marginTop: '2px' }}>
-                  {overview?.frozen_config_hash || '8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240'}
+            {isRealDataMode && modelCard ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '8px' }}>
+                <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>ARCHITECTURE &amp; SUB-MODELS</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent-primary-bright)', marginTop: '2px' }}>
+                    {modelCard.architecture_type} ({modelCard.sub_models.join(' + ')})
+                  </div>
                 </div>
-              </div>
 
-              <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>SPLIT HASH (TRAIN 6K / VAL 2K / TEST 2K)</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-routine-bright)', wordBreak: 'break-all', marginTop: '2px' }}>
-                  {overview?.split_hash || '07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd'}
+                <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>TABULAR FEATURES &amp; CALIBRATOR</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-routine-bright)', marginTop: '2px' }}>
+                    {modelCard.feature_count} features &bull; {modelCard.calibrator_type}
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>BUNDLE MANIFEST SHA-256</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-epistemic-defer-bright)', wordBreak: 'break-all', marginTop: '2px' }}>
+                    {modelCard.manifest_hash}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '8px' }}>
+                <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>FROZEN CONFIG HASH (SHA-256)</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--accent-primary-bright)', wordBreak: 'break-all', marginTop: '2px' }}>
+                    {overview?.frozen_config_hash || '8d3f02ca492ca94bab45f3ceac8d39432c2f29f40d54e7990b4aa78cbbff6240'}
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--bg-surface-raised)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>SPLIT HASH (TRAIN 6K / VAL 2K / TEST 2K)</div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--color-routine-bright)', wordBreak: 'break-all', marginTop: '2px' }}>
+                    {overview?.split_hash || '07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd'}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Explanation Disclaimer */}
             <div style={{ background: 'var(--bg-surface-subdued)', padding: '8px 10px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
               <Info size={14} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
               <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-                <strong>Explainability Notice:</strong> SHAP and TreeExplainer local feature attributions are explicitly disabled in this development smoke protocol.
-                No simulated or reconstructed attribution values are presented.
+                <strong>Explainability Notice:</strong> {isRealDataMode && modelCard?.notice ? modelCard.notice : 'SHAP and TreeExplainer local feature attributions are explicitly disabled in this development smoke protocol. No simulated or reconstructed attribution values are presented.'}
               </span>
             </div>
           </div>

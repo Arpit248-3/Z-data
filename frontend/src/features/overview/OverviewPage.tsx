@@ -13,6 +13,7 @@ import {
 import { MetricCard } from '../../components/MetricCard';
 import { TiltGlassCardDetail } from '../../components/TiltGlassCard';
 import { useApiStatus, useOverview } from '../../lib/api/hooks';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
@@ -24,6 +25,7 @@ export const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
   const { status, isBackendConnected, loading: statusLoading, error: statusError, refetch: refetchStatus } = useApiStatus();
   const { overview, refetch: refetchOverview } = useOverview();
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
 
   const handleRetryAll = () => {
     refetchStatus();
@@ -46,13 +48,19 @@ export const OverviewPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>{status?.evidence_status || 'SYNTHETIC_SMOKE_ONLY'}</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
-              <span>OFFLINE EVALUATION FIXTURE PROTOCOL</span>
+              <span>
+                {isRealDataMode
+                  ? 'IEEE-CIS 391-FEATURE ENSEMBLE BENCHMARK'
+                  : isLiveDisconnected
+                  ? 'LIVE INGESTION DISCONNECTED'
+                  : 'OFFLINE EVALUATION FIXTURE PROTOCOL'}
+              </span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
               <span style={{ color: 'var(--text-secondary)' }}>
-                Test Partition: 2,000 txns
+                {isRealDataMode ? 'Chronological Test Partition' : 'Test Partition: 2,000 txns'}
               </span>
             </div>
             <h1 className="page-header-title">
@@ -78,7 +86,29 @@ export const OverviewPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Interactive 4-Card KPI Telemetry Band with 3D Tilt & Meaningful Actions */}
+      {isLiveDisconnected && (
+        <div
+          className="card"
+          style={{
+            borderLeft: '4px solid var(--color-fraud-alert, #ef4444)',
+            backgroundColor: 'rgba(239, 68, 68, 0.08)',
+            padding: '14px 18px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="badge badge-alert">DISCONNECTED</span>
+            <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--color-fraud-alert-bright)' }}>
+              LIVE EDGE BANKING BROKERS OFFLINE
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+            Live production event ingestion is not connected. Under strict SignalGate non-negotiable safety boundaries, the system fails closed rather than fabricating synthetic live data. Select <strong>IEEE-CIS BENCHMARK</strong> to test against real competition records, or <strong>SYNTHETIC FIXTURE</strong> for smoke validation.
+          </p>
+        </div>
+      )}
       {(() => {
         const incomingCaserateDetail: TiltGlassCardDetail = {
           title: 'Incoming Caserate & Ingestion Bus',

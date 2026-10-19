@@ -1,9 +1,9 @@
 # Phase 4: Reproducible Model Training, Calibration and Artifacts — Research & Technical Specifications
 
-**Phase:** `04-reproducible-model-training-calibration-and-artifacts`  
-**Date:** 2026-10-18  
-**Governing Specification:** `docs/ibm_architecture_integration_master_spec.md` § C, § H  
-**Requirements Covered:** `MODL-01`, `MODL-02`, `MODL-03`  
+**Phase:** `04-reproducible-model-training-calibration-and-artifacts`
+**Date:** 2026-10-18
+**Governing Specification:** `docs/ibm_architecture_integration_master_spec.md` § C, § H
+**Requirements Covered:** `MODL-01`, `MODL-02`, `MODL-03`
 
 ---
 
@@ -32,10 +32,12 @@ In strict compliance with the governing specification:
    - Under no circumstances will synthetic records be substituted, nor will false claims of full 590k-sample training or benchmark success be made.
    - Orchestration scripts for full dataset training fail closed with `ArtifactNotFoundError` when raw CSVs are missing.
    - Small, explicitly labeled mock fixtures are used exclusively for unit testing pipeline transformations, model convergence, calibration curves, and signal calculations.
-6. **Memory Governance (Windows 11 AMD64, 8 GB RAM):**
-   - Preprocessing transforms features to `float32` arrays.
-   - Ensemble members use bounded tree depths/iterations (`max_iter=60` for `HistGradientBoostingClassifier`, `n_estimators=100` for `ExtraTreesClassifier`).
-   - Intermediate arrays and memory are aggressively cleaned via `gc.collect()`.
+6. **Sequential Memory Governance (Peak RAM ~2.8–3.5 GB):**
+   - Preprocessing transforms features to contiguous `float32` arrays (~528.5 MB for 354k rows).
+   - Estimators and ensemble members are fitted strictly sequentially in series, never in parallel.
+   - Intermediate arrays and memory are aggressively cleaned via `gc.collect()` between each member fit.
+   - ExtraTreesClassifier uses single-threaded execution (`n_jobs=1`) to prevent multi-worker memory duplication.
+   - Dynamic pre-stage physical RAM gate enforces a minimum available RAM floor (≥ 4.5 GB) before each expensive stage.
 
 ---
 
@@ -54,7 +56,7 @@ To enhance shift robustness without data leakage, the ensemble divides the train
 |---|---|:---:|:---:|---|
 | `era0_omit_hgbc_s11` | `HistGradientBoostingClassifier` | Era 0 ($[0\%, 20\%]$) | 11 | `max_iter=60, class_weight='balanced', early_stopping=False` |
 | `era1_omit_hgbc_s22` | `HistGradientBoostingClassifier` | Era 1 ($[20\%, 40\%]$) | 22 | `max_iter=60, class_weight='balanced', early_stopping=False` |
-| `era2_omit_et_s11` | `ExtraTreesClassifier` | Era 2 ($[40\%, 60\%]$) | 11 | `n_estimators=100, class_weight='balanced', n_jobs=-1` |
+| `era2_omit_et_s11` | `ExtraTreesClassifier` | Era 2 ($[40\%, 60\%]$) | 11 | `n_estimators=100, class_weight='balanced', n_jobs=1` |
 | `era3_omit_lr_s11` | `Pipeline[SimpleImputer, StandardScaler, LogisticRegression]` | Era 3 ($[60\%, 80\%]$) | 11 | `solver='lbfgs', max_iter=2000, C=0.1, class_weight='balanced'` |
 | `era4_omit_hgbc_s33` | `HistGradientBoostingClassifier` | Era 4 ($[80\%, 100\%]$) | 33 | `max_iter=60, class_weight='balanced', early_stopping=False` |
 

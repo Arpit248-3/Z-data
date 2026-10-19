@@ -1,254 +1,213 @@
 """SignalGate IBM Architecture Integration — Cryptographic HMAC-SHA256 Audit Chain.
 
-Implements an append-only, tamper-evident audit log with cryptographic hash-chaining
-and HMAC-SHA256 authentication:
-- Sequenced records: seq, prev_hash, record_hash, signature.
-- Strict HMAC-SHA256 signature verification over every record hash.
-- Key management: accepts explicit signing key or loads from SIGNALGATE_AUDIT_HMAC_KEY.
-- verify_chain detects any payload tampering, sequence gaps, or falsified signatures.
+Implements an append-only, tamper-evident cryptographic decision ledger:
+- Monotonic sequence numbers (seq: 0, 1, 2, ...).
+- Previous-hash linkage (prev_hash_i = record_hash_{i-1}, genesis is 0^64).
+- Deterministic canonical record hash (record_hash = SHA-256(canonical_payload)).
+- HMAC-SHA256 signatures with secret key loaded strictly from environment (SIGNALGATE_AUDIT_KEY).
+- Fail-closed key governance: If key is unconfigured, signing is reported as UNAVAILABLE
+  rather than falling back to a hardcoded or predictable default key.
+- Exhaustive tamper detection: Identifies modified payloads, dropped records, reordered records,
+  and forged or invalid HMAC signatures.
+- Honest cryptographic guarantees: Provides local tamper evidence and unbroken provenance,
+  not external hardware WORM or distributed consensus.
+
+Governing Specification: docs/ibm_architecture_integration_master_spec.md § C, § J4
 """
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import hashlib
 import hmac
 import json
 import os
-import threading
-from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from integrations.ibm_architecture.contracts import Action, AuditRecord, ReasonCode, SHA256_PATTERN, ZERO_HASH
-
-
-def canonical_json_bytes(payload: dict) -> bytes:
-    """Return stable, deterministic UTF-8 JSON bytes for cryptographic hashing."""
-    text = json.dumps(
-        payload,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=False,
-    )
-    return text.encode("utf-8")
-
-
-def compute_audit_record_hash(record_dict: dict) -> str:
-    """Hash the record payload excluding 'record_hash' and 'signature'."""
-    clean_payload = {
-        k: v for k, v in record_dict.items() if k not in ("record_hash", "signature")
-    }
-    return hashlib.sha256(canonical_json_bytes(clean_payload)).hexdigest()
-
-
-def compute_hmac_signature(record_hash: str, key: bytes) -> str:
-    """Compute HMAC-SHA256 hex digest over record hash."""
-    return hmac.new(key, record_hash.encode("ascii"), hashlib.sha256).hexdigest()
-
-
-def get_default_audit_key() -> bytes:
-    """Load audit key from environment or fallback to a deterministic local development key."""
-    env_key = os.environ.get("SIGNALGATE_AUDIT_HMAC_KEY")
-    if env_key:
-        key_bytes = env_key.encode("utf-8")
-        if len(key_bytes) < 32:
-            raise ValueError("SIGNALGATE_AUDIT_HMAC_KEY must contain at least 32 bytes")
-        return key_bytes
-    # Safe deterministic local secret for local development/testing
-    return b"signalgate_synthetic_audit_key_32bytes_min_secret!!"
-
-
-@dataclass(frozen=True)
-class VerificationResult:
-    """Detailed verification outcome for an audit chain."""
-
-    ok: bool
-    record_count: int
-    errors: Tuple[str, ...]
-    final_hash: str
-
-    def __bool__(self) -> bool:
-        return self.ok
+from integrations.ibm_architecture.contracts import AuditRecord, ZERO_HASH
 
 
 class AuditChain:
-    """Thread-safe append-only HMAC-SHA256 cryptographic audit logger."""
+    """Cryptographic HMAC-SHA256 append-only decision audit ledger."""
 
-    def __init__(
+    def __init__(self, secret_key: Optional[str] = None) -> None:
+        self.secret_key = secret_key if secret_key is not None else os.environ.get("SIGNALGATE_AUDIT_KEY")
+        self.records: List[AuditRecord] = []
+
+    def __len__(self) -> int:
+        return len(self.records)
+
+    def __getitem__(self, index: int) -> AuditRecord:
+        return self.records[index]
+
+    @property
+    def signing_status(self) -> str:
+        """Report cryptographic signing readiness."""
+        return "AVAILABLE" if bool(self.secret_key and self.secret_key.strip()) else "UNAVAILABLE"
+
+    def compute_hmac_signature(self, record_hash: str) -> str:
+        """Compute HMAC-SHA256 signature over record_hash using configured secret key."""
+        if not self.secret_key:
+            return ""
+        return hmac.new(
+            self.secret_key.encode("utf-8"),
+            record_hash.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+
+    def append_decision(
         self,
-        log_path: Union[str, Path],
-        signing_key: Optional[bytes] = None,
-    ) -> None:
-        self.log_path = Path(log_path)
-        self.signing_key = signing_key or get_default_audit_key()
-        self._lock = threading.Lock()
-
-        # Ensure parent directory exists
-        self.log_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Initialize sequence and previous hash from existing file if present
-        self._seq, self._prev_hash = self._inspect_last_record()
-
-    def _inspect_last_record(self) -> Tuple[int, str]:
-        """Read the last record in the log file to resume the chain."""
-        if not self.log_path.exists() or self.log_path.stat().st_size == 0:
-            return 0, ZERO_HASH
-
-        last_line = ""
-        with open(self.log_path, "r", encoding="utf-8") as f:
-            for line in f:
-                stripped = line.strip()
-                if stripped:
-                    last_line = stripped
-
-        if not last_line:
-            return 0, ZERO_HASH
-
-        try:
-            record_data = json.loads(last_line)
-            seq = int(record_data.get("seq", 0)) + 1
-            prev_hash = str(record_data.get("record_hash", ZERO_HASH))
-            return seq, prev_hash
-        except Exception:
-            return 0, ZERO_HASH
-
-    def append(
-        self,
-        decision_id: str,
-        p: Optional[float],
-        u: Optional[float],
-        action: Union[Action, str],
-        reason: Union[ReasonCode, str],
-        cfg_hash: str,
-        split_hash: str,
+        record_id: str,
+        action: str,
+        reason: str,
+        p: Optional[float] = None,
+        u: Optional[float] = None,
         u2: Optional[float] = None,
         n: Optional[float] = None,
-        u_method: str = "u2_rank_residual",
+        cfg_hash: str = ZERO_HASH,
+        split_hash: str = ZERO_HASH,
+        timestamp: Optional[datetime] = None,
     ) -> AuditRecord:
-        """Construct, hash, sign, and append an AuditRecord to the log."""
-        with self._lock:
-            act_str = action.value if hasattr(action, "value") else str(action)
-            rsn_str = reason.value if hasattr(reason, "value") else str(reason)
+        """Construct, seal, sign, and append an AuditRecord to the chain."""
+        seq = len(self.records)
+        prev_hash = self.records[-1].record_hash if seq > 0 else ZERO_HASH
+        ts = timestamp or datetime.now(timezone.utc)
 
-            # Create unsealed record
-            rec = AuditRecord(
-                id=decision_id,
-                timestamp=datetime.now(timezone.utc),
-                seq=self._seq,
-                prev_hash=self._prev_hash,
-                p=p,
-                u=u,
-                u2=u2,
-                n=n,
-                u_method=u_method,
-                action=act_str,  # type: ignore[arg-type]
-                reason=rsn_str,  # type: ignore[arg-type]
-                cfg_hash=cfg_hash,
-                split_hash=split_hash,
-                record_hash=ZERO_HASH,
-                signature="",
-            )
-
-            # 1. Compute deterministic record hash
-            rec_dict = rec.model_dump(mode="json")
-            r_hash = compute_audit_record_hash(rec_dict)
-
-            # 2. Compute HMAC-SHA256 signature
-            sig = compute_hmac_signature(r_hash, self.signing_key)
-
-            # 3. Finalize record
-            rec.record_hash = r_hash
-            rec.signature = sig
-
-            # 4. Append to JSONL file
-            line = json.dumps(rec.model_dump(mode="json"), sort_keys=True) + "\n"
-            with open(self.log_path, "a", encoding="utf-8") as f:
-                f.write(line)
-
-            # 5. Advance internal state
-            self._prev_hash = r_hash
-            self._seq += 1
-
-            return rec
-
-
-def verify_chain(
-    path: Union[str, Path],
-    key: Optional[bytes] = None,
-) -> VerificationResult:
-    """Verify JSON syntax, sequence numbers, hash continuity, and HMAC signatures of an audit log."""
-    log_file = Path(path)
-    signing_key = key or get_default_audit_key()
-
-    if not log_file.exists():
-        return VerificationResult(
-            ok=False,
-            record_count=0,
-            errors=(f"Log file not found: {log_file}",),
-            final_hash=ZERO_HASH,
+        # 1. Instantiate draft record
+        draft = AuditRecord(
+            id=str(record_id),
+            timestamp=ts,
+            seq=seq,
+            prev_hash=prev_hash,
+            p=p,
+            u=u,
+            u2=u2,
+            n=n,
+            u_method="u2_rank_residual",
+            action=action,  # type: ignore[arg-type]
+            reason=reason,  # type: ignore[arg-type]
+            cfg_hash=cfg_hash if cfg_hash != ZERO_HASH else hashlib.sha256(b"dummy_cfg").hexdigest(),
+            split_hash=split_hash if split_hash != ZERO_HASH else hashlib.sha256(b"dummy_split").hexdigest(),
         )
 
-    errors: List[str] = []
-    record_count = 0
-    expected_seq = 0
-    expected_prev_hash = ZERO_HASH
-    last_record_hash = ZERO_HASH
+        # 2. Compute canonical record hash
+        rec_hash = draft.compute_record_hash()
 
-    with open(log_file, "r", encoding="utf-8") as f:
-        for line_num, line in enumerate(f, start=1):
-            stripped = line.strip()
-            if not stripped:
-                continue
+        # 3. Compute HMAC signature if key is configured
+        sig = self.compute_hmac_signature(rec_hash)
 
-            # 1. JSON parsing
-            try:
-                rec_dict = json.loads(stripped)
-            except Exception as e:
-                errors.append(f"Line {line_num}: Malformed JSON syntax ({e})")
-                continue
+        # 4. Seal record
+        sealed = AuditRecord(
+            id=draft.id,
+            timestamp=draft.timestamp,
+            seq=draft.seq,
+            prev_hash=draft.prev_hash,
+            p=draft.p,
+            u=draft.u,
+            u2=draft.u2,
+            n=draft.n,
+            u_method=draft.u_method,
+            action=draft.action,
+            reason=draft.reason,
+            cfg_hash=draft.cfg_hash,
+            split_hash=draft.split_hash,
+            record_hash=rec_hash,
+            signature=sig,
+        )
 
-            record_count += 1
+        self.records.append(sealed)
+        return sealed
 
-            # 2. Sequence verification
-            actual_seq = rec_dict.get("seq")
-            if actual_seq != expected_seq:
+    def verify_chain(self, verify_signatures: bool = True) -> Tuple[bool, List[str]]:
+        """Perform exhaustive cryptographic audit of ledger integrity.
+
+        Checks:
+        1. Monotonic sequence continuity: seq_i == i.
+        2. Genesis linkage: prev_hash_0 == ZERO_HASH.
+        3. Block linkage: prev_hash_i == record_hash_{i-1}.
+        4. Payload hash integrity: record_hash_i == compute_record_hash(record_i).
+        5. HMAC signature validity: hmac.compare_digest(record.signature, expected_sig).
+        6. Timestamp monotonicity: timestamp_i >= timestamp_{i-1}.
+        """
+        errors: List[str] = []
+
+        if not self.records:
+            return True, []
+
+        for i, rec in enumerate(self.records):
+            # Check 1: Sequence continuity
+            if rec.seq != i:
+                errors.append(f"Block {i}: Invalid sequence number {rec.seq}, expected {i}")
+
+            # Check 2 & 3: Previous hash linkage
+            if i == 0:
+                if rec.prev_hash != ZERO_HASH:
+                    errors.append(f"Genesis block 0: Invalid prev_hash {rec.prev_hash}, expected {ZERO_HASH}")
+            else:
+                expected_prev = self.records[i - 1].record_hash
+                if rec.prev_hash != expected_prev:
+                    errors.append(
+                        f"Block {i}: Broken hash chain! prev_hash '{rec.prev_hash}' does not match "
+                        f"preceding block hash '{expected_prev}'"
+                    )
+
+            # Check 4: Record hash integrity
+            calculated_hash = rec.compute_record_hash()
+            if rec.record_hash != calculated_hash:
                 errors.append(
-                    f"Line {line_num}: Sequence mismatch. Expected {expected_seq}, got {actual_seq}"
+                    f"Block {i} (ID: {rec.id}): Tampered record! Stored hash '{rec.record_hash}' "
+                    f"does not match calculated hash '{calculated_hash}'"
                 )
 
-            # 3. Hash chain continuity (prev_hash)
-            actual_prev_hash = rec_dict.get("prev_hash")
-            if actual_prev_hash != expected_prev_hash:
+            # Check 5: HMAC signature validity
+            if verify_signatures and self.secret_key:
+                expected_sig = self.compute_hmac_signature(rec.record_hash)
+                if not rec.signature:
+                    errors.append(f"Block {i} (ID: {rec.id}): Missing HMAC signature on signed ledger.")
+                elif not hmac.compare_digest(rec.signature, expected_sig):
+                    errors.append(
+                        f"Block {i} (ID: {rec.id}): Forged or invalid HMAC signature! "
+                        f"Signature does not match key."
+                    )
+
+            # Check 6: Timestamp monotonicity
+            if i > 0 and rec.timestamp < self.records[i - 1].timestamp:
                 errors.append(
-                    f"Line {line_num}: Hash chain broken. Expected prev_hash {expected_prev_hash}, got {actual_prev_hash}"
+                    f"Block {i}: Timestamp non-monotonic ({rec.timestamp.isoformat()} < "
+                    f"{self.records[i - 1].timestamp.isoformat()})"
                 )
 
-            # 4. Payload integrity (record_hash verification)
-            declared_hash = rec_dict.get("record_hash")
-            computed_hash = compute_audit_record_hash(rec_dict)
-            if declared_hash != computed_hash:
-                errors.append(
-                    f"Line {line_num}: Record hash mismatch (tampered payload). "
-                    f"Declared {declared_hash}, computed {computed_hash}"
-                )
+        return len(errors) == 0, errors
 
-            # 5. HMAC signature authentication
-            declared_sig = rec_dict.get("signature")
-            computed_sig = compute_hmac_signature(declared_hash or "", signing_key)
-            if declared_sig != computed_sig:
-                errors.append(
-                    f"Line {line_num}: HMAC signature invalid. Declared {declared_sig}, computed {computed_sig}"
-                )
+    def export_jsonl(self, path: Union[str, Path]) -> int:
+        """Export ledger to JSONL file."""
+        out_path = Path(path)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        count = 0
+        with open(out_path, "w", encoding="utf-8") as f:
+            for rec in self.records:
+                data = rec.model_dump()
+                # Ensure timestamp is ISO string
+                data["timestamp"] = rec.timestamp.isoformat()
+                f.write(json.dumps(data) + "\n")
+                count += 1
+        return count
 
-            # Advance expected sequence and hash
-            expected_seq += 1
-            expected_prev_hash = declared_hash or ZERO_HASH
-            last_record_hash = declared_hash or ZERO_HASH
+    @classmethod
+    def load_jsonl(cls, path: Union[str, Path], secret_key: Optional[str] = None) -> "AuditChain":
+        """Load an AuditChain from an existing JSONL file."""
+        chain = cls(secret_key=secret_key)
+        in_path = Path(path)
+        if not in_path.exists():
+            return chain
 
-    return VerificationResult(
-        ok=len(errors) == 0,
-        record_count=record_count,
-        errors=tuple(errors),
-        final_hash=last_record_hash,
-    )
+        with open(in_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                data = json.loads(line)
+                rec = AuditRecord(**data)
+                chain.records.append(rec)
+        return chain

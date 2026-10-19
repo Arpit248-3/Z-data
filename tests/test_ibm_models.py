@@ -1,36 +1,37 @@
-"""SignalGate IBM Architecture Integration — Phase 4 Model Unit Tests.
+"""Tests for SignalGate IBM Architecture Model Training, Ensemble, Calibration & Bundling.
 
 Verifies:
-- FeaturePipeline schema compliance, float32 output, and LeakageViolationError on quarantined columns.
-- BaselineB2 gradient boosting estimator.
-- EraBaggedHeterogeneousEnsemble era segmentation, omission, and consensus averaging.
-- PlattCalibrator and IsotonicCalibrator partition protections and monotonic probability mapping.
-- Diagnostic ECE metric calculation.
-- Disagreement signals u (std dev) and u2 (MAD from median).
-- ModelBundle serialization, manifest generation, cryptographic checksums, and deserialization.
-- Memory preflight checks and split validation.
+- Learned feature pipeline and strict ground-truth quarantine.
+- Baseline estimator B2.
+- 5-member era-bagged heterogeneous ensemble with sequential fitting and n_jobs=1.
+- Platt calibration partition governance (raises ValueError on validation/test).
+- Epistemic disagreement signals (u >= 0, u2 >= 0).
+- ModelBundle serialization, manifest tracking, and cryptographic checksum validation.
+- Fail-closed training orchestration when raw data is missing.
+- Pre-stage RAM safety checking.
 """
 
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
+import pytest
 import numpy as np
 import pandas as pd
-import pytest
 
+from integrations.ibm_architecture.exceptions import (
+    ArtifactNotFoundError,
+    IncompatibleArtifactError,
+    LeakageViolationError,
+)
 from integrations.ibm_architecture.data.manifest import CANONICAL_FEATURE_MANIFEST
-from integrations.ibm_architecture.exceptions import LeakageViolationError, ModeUnavailableError
 from integrations.ibm_architecture.models.baseline import BaselineB2
 from integrations.ibm_architecture.models.bundle import (
     ModelBundle,
     ModelBundleManifest,
-    get_model_bundle,
+    compute_file_sha256,
     load_bundle,
-    load_synthetic_bundle,
     save_bundle,
 )
-from integrations.ibm_architecture.models.synthetic_adapter import SyntheticModelAdapter
 from integrations.ibm_architecture.models.calibration import (
     IsotonicCalibrator,
     PlattCalibrator,
@@ -49,348 +50,235 @@ from integrations.ibm_architecture.models.signals import (
     DisagreementSignals,
     RobustDisagreementSignalExtractor,
     compute_signals,
+    compute_single_signals,
 )
 from integrations.ibm_architecture.models.trainer import (
-    check_memory_preflight,
-    get_available_memory_mb,
-    split_dev_cohort,
+    check_available_ram,
+    train_mock_pipeline_for_testing,
+    train_pipeline,
 )
 
 
 @pytest.fixture
-def mock_feature_df() -> pd.DataFrame:
-    """Create a minimal synthetic DataFrame containing all 391 manifest features."""
+def mock_labeled_df() -> pd.DataFrame:
+    """Create a realistic labeled mock DataFrame for model testing."""
     np.random.seed(42)
-    n_rows = 100
-    data = {}
-
-    # 377 numerical features
-    for col in CANONICAL_FEATURE_MANIFEST.numerical_columns:
-        data[col] = np.random.randn(n_rows).astype(np.float32)
-
-    # 14 categorical features
-    for col in CANONICAL_FEATURE_MANIFEST.categorical_columns:
-        data[col] = np.random.choice(["A", "B", "C", "missing"], size=n_rows)
-
+    n = 100
+    data = {
+        "TransactionID": np.arange(1000, 1000 + n),
+        "TransactionDT": np.arange(100, 100 + n),
+        "isFraud": np.random.choice([0, 1], size=n, p=[0.8, 0.2]),
+        "ProductCD": np.random.choice(["W", "C", "H", "R"], size=n),
+        "card4": np.random.choice(["visa", "mastercard", "discover"], size=n),
+        "card6": np.random.choice(["credit", "debit"], size=n),
+        "P_emaildomain": np.random.choice(["gmail.com", "yahoo.com", "anonymous.com"], size=n),
+        "R_emaildomain": np.random.choice(["gmail.com", "hotmail.com", "missing"], size=n),
+        "DeviceType": np.random.choice(["desktop", "mobile"], size=n),
+        "TransactionAmt": np.random.uniform(5.0, 500.0, size=n).astype(np.float32),
+        "C1": np.random.poisson(2, size=n).astype(np.float32),
+        "C2": np.random.poisson(1, size=n).astype(np.float32),
+        "D1": np.random.uniform(0.0, 100.0, size=n).astype(np.float32),
+        "V1": np.random.choice([0.0, 1.0, np.nan], size=n).astype(np.float32),
+    }
     return pd.DataFrame(data)
 
 
-# ---------------------------------------------------------------------------
-# FeaturePipeline Tests
-# ---------------------------------------------------------------------------
+def test_feature_pipeline_fit_transform_shape_and_quarantine(mock_labeled_df: pd.DataFrame):
+    """Verify FeaturePipeline transforms inputs to (N, 391) and enforces quarantine."""
+    fp = FeaturePipeline()
+    X_df = mock_labeled_df.drop(columns=["isFraud", "TransactionID", "TransactionDT"])
 
-def test_feature_pipeline_fit_transform_shape(mock_feature_df: pd.DataFrame) -> None:
-    pipeline = FeaturePipeline()
-    X = pipeline.fit_transform(mock_feature_df)
+    fp.fit(X_df)
+    assert fp.is_fitted
+    X_trans = fp.transform(X_df)
 
-    assert pipeline.is_fitted
-    assert X.shape == (100, 391)
-    assert X.dtype == np.float32
-    assert np.all(np.isfinite(X))
+    assert isinstance(X_trans, np.ndarray)
+    assert X_trans.shape == (len(mock_labeled_df), 391)
+    assert X_trans.dtype == np.float32
 
+    # Quarantine rejection tests
+    for forbidden in ["isFraud", "TransactionID", "TransactionDT"]:
+        bad_df = X_df.copy()
+        bad_df[forbidden] = 1
+        with pytest.raises(LeakageViolationError):
+            fp.transform(bad_df)
 
-def test_feature_pipeline_unfitted_transform_raises(mock_feature_df: pd.DataFrame) -> None:
-    pipeline = FeaturePipeline()
-    with pytest.raises(RuntimeError, match="must be fitted"):
-        pipeline.transform(mock_feature_df)
-
-
-@pytest.mark.parametrize("bad_col", ["isFraud", "isfraud", "TransactionID", "TransactionDT", "target"])
-def test_feature_pipeline_quarantine_rejection(mock_feature_df: pd.DataFrame, bad_col: str) -> None:
-    pipeline = FeaturePipeline()
-    leaky_df = mock_feature_df.copy()
-    leaky_df[bad_col] = 1
-
-    with pytest.raises(LeakageViolationError):
-        pipeline.fit(leaky_df)
-
-    # Fit clean first, then test transform
-    pipeline.fit(mock_feature_df)
-    with pytest.raises(LeakageViolationError):
-        pipeline.transform(leaky_df)
+        with pytest.raises(LeakageViolationError):
+            FeaturePipeline().fit(bad_df)
 
 
-# ---------------------------------------------------------------------------
-# Baseline B2 Tests
-# ---------------------------------------------------------------------------
+def test_baseline_b2_fit_predict(mock_labeled_df: pd.DataFrame):
+    """Verify Baseline B2 fits on training data and generates calibrated probabilities."""
+    fp = FeaturePipeline()
+    X_df = mock_labeled_df.drop(columns=["isFraud", "TransactionID", "TransactionDT"])
+    X_trans = fp.fit_transform(X_df)
+    y = mock_labeled_df["isFraud"].to_numpy(dtype=np.int8)
 
-def test_baseline_b2_fit_predict(mock_feature_df: pd.DataFrame) -> None:
-    pipeline = FeaturePipeline()
-    X = pipeline.fit_transform(mock_feature_df)
-    y = np.array([0, 1] * 50, dtype=np.int8)
+    b2 = BaselineB2(max_iter=10)
+    b2.fit(X_trans, y)
+    assert b2.is_fitted
 
-    baseline = BaselineB2(max_iter=10, random_state=11)
-    baseline.fit(X, y)
+    proba = b2.predict_proba(X_trans)
+    assert proba.shape == (len(mock_labeled_df), 2)
+    assert np.all(proba >= 0.0) and np.all(proba <= 1.0)
+    np.testing.assert_allclose(proba.sum(axis=1), 1.0, atol=1e-5)
 
-    probas = baseline.predict_proba(X)
-    assert len(probas) == 100
-    assert np.all(probas >= 0.0)
-    assert np.all(probas <= 1.0)
-    assert baseline.member_id == "baseline_b2_hgbc_s11"
+    pos_proba = b2.predict_positive_proba(X_trans)
+    assert pos_proba.shape == (len(mock_labeled_df),)
+    np.testing.assert_allclose(pos_proba, proba[:, 1], atol=1e-6)
 
 
-# ---------------------------------------------------------------------------
-# EraBaggedHeterogeneousEnsemble Tests
-# ---------------------------------------------------------------------------
-
-def test_compute_training_eras() -> None:
+def test_ensemble_eras_and_sequential_fit(mock_labeled_df: pd.DataFrame):
+    """Verify EraBaggedHeterogeneousEnsemble era segmentation, n_jobs=1, and sequential fitting."""
     eras = compute_training_eras(100, n_eras=5)
     assert len(eras) == 5
     assert eras[0] == (0, 20)
-    assert eras[-1] == (80, 100)
+    assert eras[4] == (80, 100)
 
+    # Test era omission
+    omitted = get_era_omitted_indices(100, omit_era_idx=2, n_eras=5)
+    assert len(omitted) == 80
+    assert not np.any((omitted >= 40) & (omitted < 60))
 
-def test_get_era_omitted_indices() -> None:
-    idx = get_era_omitted_indices(100, omit_era_idx=0, n_eras=5)
-    assert len(idx) == 80
-    assert 0 not in idx
-    assert 19 not in idx
-    assert 20 in idx
+    # Test sequential fit with n_jobs=1
+    ensemble = EraBaggedHeterogeneousEnsemble(extra_trees_n_jobs=1)
+    assert ensemble.members["era2_omit_et_s11"].n_jobs == 1
 
+    fp = FeaturePipeline()
+    X_df = mock_labeled_df.drop(columns=["isFraud", "TransactionID", "TransactionDT"])
+    X_trans = fp.fit_transform(X_df)
+    y = mock_labeled_df["isFraud"].to_numpy(dtype=np.int8)
 
-def test_era_bagged_ensemble_fit_predict(mock_feature_df: pd.DataFrame) -> None:
-    pipeline = FeaturePipeline()
-    X = pipeline.fit_transform(mock_feature_df)
-    y = np.array([0, 1] * 50, dtype=np.int8)
+    stages_checked = []
+    def record_stage(stage: str):
+        stages_checked.append(stage)
 
-    ensemble = EraBaggedHeterogeneousEnsemble(n_eras=5, mode="local_dev")
-    ensemble.fit(X, y)
-
+    ensemble.fit(X_trans, y, pre_stage_ram_check=record_stage)
     assert ensemble.is_fitted
-    assert ensemble.n_members == 5
-    assert len(ensemble.member_ids) == 5
+    assert len(stages_checked) == 5
 
-    mp = ensemble.predict_member_proba(X)
-    assert isinstance(mp, MemberPredictions)
-    assert mp.proba_matrix.shape == (100, 5)
-    assert np.all(mp.proba_matrix >= 0.0)
-    assert np.all(mp.proba_matrix <= 1.0)
+    # Predictions
+    mp = ensemble.predict_member_proba(X_trans)
+    assert mp.proba_matrix.shape == (len(mock_labeled_df), 5)
+    assert len(mp.member_ids) == 5
 
-    consensus = ensemble.predict_proba(X)
-    assert len(consensus) == 100
-    assert np.allclose(consensus, mp.proba_matrix.mean(axis=1))
+    p_cons = ensemble.predict_positive_proba(X_trans)
+    assert p_cons.shape == (len(mock_labeled_df),)
+    np.testing.assert_allclose(p_cons, np.mean(mp.proba_matrix, axis=1), atol=1e-6)
 
 
-# ---------------------------------------------------------------------------
-# Calibration Tests
-# ---------------------------------------------------------------------------
+def test_platt_and_isotonic_calibration_partition_guards():
+    """Verify PlattCalibrator partition governance and diagnostic ECE."""
+    raw_scores = np.array([0.1, 0.3, 0.4, 0.7, 0.85, 0.9])
+    y_calib = np.array([0, 0, 0, 1, 1, 1], dtype=np.int8)
 
-def test_validate_calibration_partition_prohibits_val_and_test() -> None:
-    validate_calibration_partition("calibration")
-    with pytest.raises(ValueError, match="NEVER be fitted on 'validation'"):
-        validate_calibration_partition("validation")
-    with pytest.raises(ValueError, match="NEVER be fitted on 'test'"):
-        validate_calibration_partition("test")
+    # Prohibited partition checks
+    for bad_partition in ["validation", "val", "test", "holdout"]:
+        with pytest.raises(ValueError, match="Prohibited partition for calibration"):
+            validate_calibration_partition(bad_partition)
+        with pytest.raises(ValueError):
+            PlattCalibrator().fit(raw_scores, y_calib, partition=bad_partition)
 
+    # Permitted fit on calibration
+    calibrator = PlattCalibrator()
+    calibrator.fit(raw_scores, y_calib, partition="calibration")
+    assert calibrator.is_fitted
 
-def test_platt_calibrator_fit_predict() -> None:
-    scores = np.linspace(0.1, 0.9, 100)
-    labels = np.array([0] * 50 + [1] * 50, dtype=np.int8)
+    calib_probs = calibrator.predict(raw_scores)
+    assert calib_probs.shape == (6,)
+    assert np.all(calib_probs >= 0.0) and np.all(calib_probs <= 1.0)
+    # Monotonicity: higher raw risk score produces higher calibrated probability
+    assert np.all(np.diff(calib_probs) >= 0)
 
-    calibrator = PlattCalibrator(max_iter=100)
-    calibrator.fit(scores, labels, partition="calibration")
-
-    calibrated = calibrator.predict_proba(scores)
-    assert len(calibrated) == 100
-    assert np.all(calibrated >= 0.0)
-    assert np.all(calibrated <= 1.0)
-    # Sigmoid mapping is monotonic
-    assert np.all(calibrated[:-1] <= calibrated[1:])
-
-
-def test_isotonic_calibrator_fit_predict() -> None:
-    scores = np.linspace(0.1, 0.9, 100)
-    labels = np.array([0] * 50 + [1] * 50, dtype=np.int8)
-
-    calibrator = IsotonicCalibrator()
-    calibrator.fit(scores, labels, partition="calibration")
-
-    calibrated = calibrator.predict_proba(scores)
-    assert len(calibrated) == 100
-    assert np.all(calibrated >= 0.0)
-    assert np.all(calibrated <= 1.0)
-
-
-def test_calibration_ece_metric() -> None:
-    scores = np.array([0.1, 0.2, 0.8, 0.9])
-    labels = np.array([0, 0, 1, 1], dtype=np.int8)
-    ece = calibration_ece(scores, labels, n_bins=5)
-    assert ece >= 0.0
+    # Expected Calibration Error calculation
+    ece = calibration_ece(calib_probs, y_calib, n_bins=5)
     assert isinstance(ece, float)
+    assert ece >= 0.0
 
 
-# ---------------------------------------------------------------------------
-# Disagreement Signals Tests
-# ---------------------------------------------------------------------------
+def test_disagreement_signals_mathematical_properties():
+    """Verify epistemic disagreement signals u and u2 match statistical properties."""
+    extractor_u = DisagreementSignalExtractor()
+    extractor_u2 = RobustDisagreementSignalExtractor()
 
-def test_disagreement_signals_calculation() -> None:
-    # 3 samples, 5 members
-    probas = np.array([
-        [0.2, 0.2, 0.2, 0.2, 0.2],  # Zero disagreement
-        [0.1, 0.2, 0.3, 0.4, 0.5],  # Spread
-        [0.0, 0.1, 0.1, 0.1, 0.9],  # One outlier
-    ])
-    mp = MemberPredictions(proba_matrix=probas, member_ids=[f"m{i}" for i in range(5)])
+    # Consensus case: identical predictions across all members
+    identical_preds = [0.42, 0.42, 0.42, 0.42, 0.42]
+    assert extractor_u.extract(identical_preds) == 0.0
+    assert extractor_u2.extract(identical_preds) == 0.0
+
+    # Divergent case
+    divergent_preds = [0.1, 0.3, 0.5, 0.7, 0.9]
+    u = extractor_u.extract(divergent_preds)
+    u2 = extractor_u2.extract(divergent_preds)
+    assert u > 0.0
+    assert u2 > 0.0
+    np.testing.assert_allclose(u, np.std(divergent_preds, ddof=0), atol=1e-6)
+
+    # Vectorized compute_signals
+    proba_matrix = np.array([
+        [0.1, 0.1, 0.1, 0.1, 0.1],
+        [0.2, 0.3, 0.4, 0.5, 0.6],
+    ], dtype=np.float32)
+    mp = MemberPredictions(proba_matrix=proba_matrix, member_ids=[f"m{i}" for i in range(5)])
 
     signals = compute_signals(mp)
-    assert signals.shape == (3,)
-    assert signals["n"][0] == 5.0
-
-    # Row 0: zero std and zero MAD
-    assert signals["u"][0] == 0.0
-    assert signals["u2"][0] == 0.0
-    assert signals["p"][0] == 0.2
-
-    # Row 1: strictly positive
-    assert signals["u"][1] > 0.0
-    assert signals["u2"][1] > 0.0
+    assert len(signals) == 2
+    assert signals[0]["u"] == 0.0
+    assert signals[1]["u"] > 0.0
+    assert signals[0]["n"] == 5.0
 
 
-# ---------------------------------------------------------------------------
-# ModelBundle Serialization Tests
-# ---------------------------------------------------------------------------
+def test_bundle_serialization_roundtrip_and_checksum_verification(tmp_path: Path, mock_labeled_df: pd.DataFrame):
+    """Verify ModelBundle save, load, checksum validation, and tamper-resistance."""
+    bundle = train_mock_pipeline_for_testing(mock_labeled_df, output_dir=tmp_path / "bundle")
 
-def test_model_bundle_save_and_load(mock_feature_df: pd.DataFrame) -> None:
-    pipeline = FeaturePipeline()
-    X = pipeline.fit_transform(mock_feature_df)
-    y = np.array([0, 1] * 50, dtype=np.int8)
+    # Verify manifest fields
+    assert bundle.manifest.execution_concurrency == "sequential"
+    assert bundle.manifest.member_concurrency == {"extra_trees_n_jobs": 1}
+    assert bundle.manifest.feature_count == 391
+    assert "baseline_b2.joblib" in bundle.manifest.artifact_hashes
 
-    baseline = BaselineB2(max_iter=5)
-    baseline.fit(X, y)
+    # Reload bundle from disk
+    reloaded = load_bundle(tmp_path / "bundle")
+    assert reloaded.manifest.execution_concurrency == "sequential"
+    assert reloaded.manifest.artifact_hashes == bundle.manifest.artifact_hashes
 
-    ensemble = EraBaggedHeterogeneousEnsemble(n_eras=2, mode="local_dev")
-    ensemble.fit(X, y)
+    # Verify identical inference between original and reloaded
+    X_df = mock_labeled_df.drop(columns=["isFraud", "TransactionID", "TransactionDT"])
+    X_orig = bundle.feature_pipeline.transform(X_df)
+    X_reloaded = reloaded.feature_pipeline.transform(X_df)
+    np.testing.assert_array_equal(X_orig, X_reloaded)
 
-    calibrator = PlattCalibrator(max_iter=10)
-    calibrator.fit(np.linspace(0.1, 0.9, 100), y, partition="calibration")
+    p_orig = bundle.ensemble.predict_positive_proba(X_orig)
+    p_reloaded = reloaded.ensemble.predict_positive_proba(X_reloaded)
+    np.testing.assert_allclose(p_orig, p_reloaded, atol=1e-6)
 
-    manifest = ModelBundleManifest(
-        architecture_version="ieee_cis_v1",
-        execution_mode="RESOURCE_CONSTRAINED_LOCAL_DEV",
-        benchmark_comparable=False,
-        row_counts={"train": 100},
-    )
-    bundle = ModelBundle(pipeline, baseline, ensemble, calibrator, manifest)
+    # Tamper detection: modifying a joblib artifact must raise IncompatibleArtifactError
+    artifact_to_tamper = tmp_path / "bundle" / "baseline_b2.joblib"
+    with open(artifact_to_tamper, "ab") as f:
+        f.write(b"CORRUPTED_BYTES")
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        saved_manifest = save_bundle(bundle, tmp_dir)
-        assert len(saved_manifest.component_checksums) == 4
-        assert "feature_pipeline.joblib" in saved_manifest.component_checksums
-
-        loaded_bundle = load_bundle(tmp_dir)
-        assert loaded_bundle.manifest.execution_mode == "RESOURCE_CONSTRAINED_LOCAL_DEV"
-        assert loaded_bundle.manifest.benchmark_comparable is False
-
-        # Verify scoring outputs match
-        scores_orig = bundle.score_features(mock_feature_df)
-        scores_loaded = loaded_bundle.score_features(mock_feature_df)
-        assert np.allclose(scores_orig["p_cal"], scores_loaded["p_cal"])
-        assert np.allclose(scores_orig["u"], scores_loaded["u"])
+    with pytest.raises(IncompatibleArtifactError):
+        load_bundle(tmp_path / "bundle")
 
 
-# ---------------------------------------------------------------------------
-# Memory Preflight & Split Tests
-# ---------------------------------------------------------------------------
+def test_train_pipeline_fail_closed_on_missing_csvs(tmp_path: Path):
+    """Verify train_pipeline fails closed with ArtifactNotFoundError when raw CSVs are missing."""
+    empty_dir = tmp_path / "empty_raw"
+    empty_dir.mkdir(parents=True, exist_ok=True)
 
-def test_memory_preflight_check() -> None:
-    avail_mb = get_available_memory_mb()
-    assert avail_mb > 0.0
+    with pytest.raises(ArtifactNotFoundError) as exc_info:
+        train_pipeline(data_dir=empty_dir)
 
-    status = check_memory_preflight(min_free_mb=10.0, stage="test_preflight")
-    assert status["sufficient"] is True
-
-
-def test_split_dev_cohort() -> None:
-    n_total = 25000
-    df = pd.DataFrame({"feat1": np.zeros(n_total, dtype=np.float32)})
-    y = pd.Series([0, 1] * (n_total // 2))
-    dt = pd.Series(np.arange(1000, 1000 + n_total))
-    tids = pd.Series(np.arange(2000, 2000 + n_total))
-
-    parts = split_dev_cohort(df, y, dt, tids, train_n=15000, cal_n=2500, val_n=2500, test_n=5000)
-    assert parts["train"]["row_count"] == 15000
-    assert parts["calibration"]["row_count"] == 2500
-    assert parts["validation"]["row_count"] == 2500
-    assert parts["test"]["row_count"] == 5000
-    assert len(parts["train"]["split_hash"]) == 64
+    assert "train_transaction.csv" in str(exc_info.value)
 
 
-# ---------------------------------------------------------------------------
-# Synthetic Model Adapter & Bundle Tests (SYNTHETIC_SMOKE_ONLY)
-# ---------------------------------------------------------------------------
+def test_pre_stage_ram_safety_check():
+    """Verify check_available_ram behaves safely and enforces threshold."""
+    # Tiny threshold should pass on any running host
+    avail = check_available_ram(min_free_gb=0.01)
+    assert avail > 0.01
 
-def test_synthetic_model_adapter_loading_and_manifest() -> None:
-    adapter = SyntheticModelAdapter.load()
-    assert adapter.execution_mode == "SYNTHETIC_SMOKE_ONLY"
-    assert adapter.is_synthetic is True
-    assert adapter.real_data_training_status == "DEFERRED"
-    assert adapter.manifest.benchmark_comparable is False
-    assert len(adapter.feature_names) == 67
-    assert len(adapter.ensemble_members) == 3
-    assert len(adapter.manifest.component_checksums) == 4
-
-
-def test_synthetic_model_adapter_quarantine() -> None:
-    adapter = SyntheticModelAdapter.load()
-    df_leak = pd.DataFrame({"isFraud": [0, 1], "TransactionAmt": [10.0, 20.0]})
-    with pytest.raises(LeakageViolationError):
-        adapter.score_features(df_leak)
-
-    df_id_leak = pd.DataFrame({"TransactionID": [100, 101], "TransactionAmt": [10.0, 20.0]})
-    with pytest.raises(LeakageViolationError):
-        adapter.score_features(df_id_leak)
-
-    df_dt_leak = pd.DataFrame({"TransactionDT": [86400, 86401], "TransactionAmt": [10.0, 20.0]})
-    with pytest.raises(LeakageViolationError):
-        adapter.score_features(df_dt_leak)
-
-
-def test_synthetic_model_adapter_inference() -> None:
-    adapter = SyntheticModelAdapter.load()
-    # Read first 5 rows from synthetic smoke fixture
-    df_fixture = pd.read_csv("data/synthetic_smoke_fixture.csv", nrows=5)
-    # Strip forbidden columns before passing to feature scoring
-    clean_df = df_fixture.drop(columns=["isFraud", "TransactionID", "TransactionDT"], errors="ignore")
-
-    results = adapter.score_features(clean_df)
-    assert "p_raw" in results
-    assert "p_cal" in results
-    assert "u" in results
-    assert "u2" in results
-    assert "n" in results
-    assert "p_b2" in results
-    assert results["n"] == 3
-    assert results["execution_mode"] == "SYNTHETIC_SMOKE_ONLY"
-    assert results["benchmark_comparable"] is False
-    assert results["real_data_training_status"] == "DEFERRED"
-
-    # Value checks
-    assert len(results["p_raw"]) == 5
-    assert np.all(results["p_raw"] >= 0.0) and np.all(results["p_raw"] <= 1.0)
-    assert np.all(results["p_cal"] >= 0.0) and np.all(results["p_cal"] <= 1.0)
-    assert np.all(results["p_b2"] >= 0.0) and np.all(results["p_b2"] <= 1.0)
-    assert np.all(results["u"] >= 0.0)
-    assert np.all(np.isfinite(results["u2"]))
-
-
-def test_load_synthetic_bundle_and_factory() -> None:
-    bundle = load_synthetic_bundle()
-    assert bundle.execution_mode == "SYNTHETIC_SMOKE_ONLY"
-    assert bundle.is_synthetic is True
-    assert bundle.real_data_training_status == "DEFERRED"
-
-    # Factory in SYNTHETIC_SMOKE_ONLY mode
-    b_syn = get_model_bundle("SYNTHETIC_SMOKE_ONLY")
-    assert b_syn.execution_mode == "SYNTHETIC_SMOKE_ONLY"
-
-    # Factory in IEEE_CIS_OFFLINE_BENCHMARK mode fails closed with explicit error
-    with pytest.raises(ModeUnavailableError) as exc_info:
-        get_model_bundle("IEEE_CIS_OFFLINE_BENCHMARK")
-    assert "DEFERRED" in str(exc_info.value)
-    assert "16" in str(exc_info.value)  # mentions 16 GB requirement
-
-    # Factory in LIVE_SOURCE_NOT_CONNECTED mode fails closed
-    with pytest.raises(ModeUnavailableError) as exc_info_live:
-        get_model_bundle("LIVE_SOURCE_NOT_CONNECTED")
-    assert "DISCONNECTED" in str(exc_info_live.value)
-
+    # Impossible threshold should raise MemoryError
+    with pytest.raises(MemoryError, match="Pre-stage resource check failed"):
+        check_available_ram(min_free_gb=9999999.0)

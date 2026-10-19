@@ -1,18 +1,15 @@
 """SignalGate IBM Architecture Integration — Disagreement Signal Extractors.
 
-Extracts inter-model disagreement signals from MemberPredictions in compliance with
-Master Spec § C, § D, and § H:
-- $u$: Population standard deviation across member probabilities:
-  u = sqrt( (1/M) * sum_{m=1}^M (p_m - bar{p})^2 )
-- $u_2$: Mean absolute deviation from the median member probability:
-  u_2 = (1/M) * sum_{m=1}^M |p_m - median(p)|
-- Signals are computed strictly from unlabelled member probabilities;
-  zero ground-truth labels are accessed or required.
+Computes epistemic disagreement and dispersion signals without accessing ground-truth labels:
+- u: Population standard deviation across active ensemble member predictions.
+- u2: Median absolute deviation (MAD) from median member probability.
+- Vectorized and single-case calculations returning structured DisagreementSignals.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import List, Union
 import numpy as np
 
 from integrations.ibm_architecture.models.ensemble import MemberPredictions
@@ -20,59 +17,78 @@ from integrations.ibm_architecture.models.ensemble import MemberPredictions
 
 @dataclass(frozen=True)
 class DisagreementSignals:
-    """Structured uncertainty representation for a single transaction case."""
+    """Uncertainty and consensus signals extracted from heterogeneous ensemble."""
 
-    p: float   # Consensus mean probability
-    u: float   # Standard deviation across ensemble members
-    u2: float  # Median absolute deviation (MAD) across ensemble members
-    n: float   # Number of active ensemble members
+    p: float   # Ensemble consensus probability (mean)
+    u: float   # Population standard deviation across member probabilities
+    u2: float  # Median absolute deviation (MAD) from median probability
+    n: float   # Active ensemble member count
 
 
 class DisagreementSignalExtractor:
-    """Computes population standard deviation u across member probabilities."""
+    """Computes population standard deviation across ensemble member probabilities."""
 
-    @staticmethod
-    def extract(proba_matrix: np.ndarray) -> np.ndarray:
-        """Compute standard deviation across columns (members), shape (N,)."""
-        P = np.asarray(proba_matrix, dtype=np.float64)
-        return np.std(P, axis=1, ddof=0)
+    def extract(self, probabilities: Union[np.ndarray, List[float]]) -> float:
+        p_arr = np.asarray(probabilities, dtype=np.float64)
+        if len(p_arr) == 0:
+            return 0.0
+        val = float(np.std(p_arr, ddof=0))
+        return val if val > 1e-12 else 0.0
 
 
 class RobustDisagreementSignalExtractor:
-    """Computes median absolute deviation u_2 across member probabilities."""
+    """Computes median absolute deviation from the median member probability."""
 
-    @staticmethod
-    def extract(proba_matrix: np.ndarray) -> np.ndarray:
-        """Compute mean absolute deviation from the median across columns, shape (N,)."""
-        P = np.asarray(proba_matrix, dtype=np.float64)
-        medians = np.median(P, axis=1, keepdims=True)
-        return np.mean(np.abs(P - medians), axis=1)
+    def extract(self, probabilities: Union[np.ndarray, List[float]]) -> float:
+        p_arr = np.asarray(probabilities, dtype=np.float64)
+        if len(p_arr) == 0:
+            return 0.0
+        med = np.median(p_arr)
+        val = float(np.mean(np.abs(p_arr - med)))
+        return val if val > 1e-12 else 0.0
 
 
 def compute_signals(mp: MemberPredictions) -> np.ndarray:
-    """Vectorized calculation of disagreement signals from MemberPredictions.
-
-    Returns a structured numpy array with fields:
-      - 'p': float64 (consensus mean probability)
-      - 'u': float64 (standard deviation)
-      - 'u2': float64 (median absolute deviation)
-      - 'n': float64 (active member count)
-    """
-    P = np.asarray(mp.proba_matrix, dtype=np.float64)
-    if P.ndim == 1:
-        P = P.reshape(1, -1)
-
+    """Compute vectorized structured signals array with fields [p, u, u2, n] across batch."""
+    P = mp.proba_matrix.astype(np.float64)
     n_samples, n_members = P.shape
-    p_mean = np.mean(P, axis=1)
-    u_std = DisagreementSignalExtractor.extract(P)
-    u2_mad = RobustDisagreementSignalExtractor.extract(P)
-    n_arr = np.full(n_samples, float(n_members), dtype=np.float64)
 
-    dtype = [("p", "f8"), ("u", "f8"), ("u2", "f8"), ("n", "f8")]
-    structured = np.empty(n_samples, dtype=dtype)
-    structured["p"] = p_mean
-    structured["u"] = u_std
-    structured["u2"] = u2_mad
-    structured["n"] = n_arr
+    # 1. Consensus mean p
+    p_vec = np.mean(P, axis=1)
 
-    return structured
+    # 2. Population standard deviation u
+    u_vec = np.std(P, axis=1, ddof=0)
+    u_vec = np.where(u_vec > 1e-12, u_vec, 0.0)
+
+    # 3. Median absolute deviation u2
+    med_vec = np.median(P, axis=1, keepdims=True)
+    u2_vec = np.mean(np.abs(P - med_vec), axis=1)
+    u2_vec = np.where(u2_vec > 1e-12, u2_vec, 0.0)
+
+    # 4. Member count n
+    n_vec = np.full(n_samples, fill_value=float(n_members), dtype=np.float64)
+
+    dtype = [("p", np.float64), ("u", np.float64), ("u2", np.float64), ("n", np.float64)]
+    out = np.empty(n_samples, dtype=dtype)
+    out["p"] = p_vec
+    out["u"] = u_vec
+    out["u2"] = u2_vec
+    out["n"] = n_vec
+
+    return out
+
+
+def compute_single_signals(probabilities: Union[np.ndarray, List[float]]) -> DisagreementSignals:
+    """Compute DisagreementSignals for a single transaction vector."""
+    p_arr = np.asarray(probabilities, dtype=np.float64)
+    n_members = len(p_arr)
+    if n_members == 0:
+        return DisagreementSignals(p=0.0, u=0.0, u2=0.0, n=0.0)
+
+    p_val = float(np.mean(p_arr))
+    u_raw = float(np.std(p_arr, ddof=0))
+    u_val = u_raw if u_raw > 1e-12 else 0.0
+    u2_raw = float(np.mean(np.abs(p_arr - np.median(p_arr))))
+    u2_val = u2_raw if u2_raw > 1e-12 else 0.0
+
+    return DisagreementSignals(p=p_val, u=u_val, u2=u2_val, n=float(n_members))

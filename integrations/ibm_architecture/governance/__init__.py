@@ -1,38 +1,56 @@
-"""SignalGate IBM Architecture Integration — Governance, Agents & Cryptographic Audit Package.
+"""SignalGate IBM Architecture Integration — Governance Subpackage.
 
-Exports:
-- ClaimVerifier, VerificationResult, REGISTERED_TEMPLATES, ALLOWED_FIELD_OPERATORS
-- CaseCopilot
-- ClaimLedger
-- AuditChain, verify_chain, get_default_audit_key
+Exports Claim Verifier, Claim Ledger, Cryptographic Audit Chain, Drift Monitor,
+Drift Sentinel, and Replay Gate.
 """
 
-from __future__ import annotations
-
 from integrations.ibm_architecture.governance.claim_verifier import (
-    ALLOWED_FIELD_OPERATORS,
-    REGISTERED_TEMPLATES,
     ClaimVerifier,
-    VerificationResult as ClaimVerificationResult,
+    VerificationResult,
 )
-from integrations.ibm_architecture.governance.copilot import CaseCopilot
-from integrations.ibm_architecture.governance.claim_ledger import ClaimLedger
+from integrations.ibm_architecture.governance.claim_ledger import (
+    ClaimLedger,
+    ClaimLedgerEntry,
+)
 from integrations.ibm_architecture.governance.audit_chain import (
     AuditChain,
-    VerificationResult as AuditVerificationResult,
-    get_default_audit_key,
-    verify_chain,
+)
+from integrations.ibm_architecture.governance.drift_monitor import (
+    DriftMonitor,
+    DriftReport,
+    FeatureDriftResult,
+)
+from integrations.ibm_architecture.governance.drift_sentinel import (
+    DriftSentinel,
+    SentinelConfig,
+    ALLOWLISTED_POLICY_KEYS,
+    PARAMETER_BOUNDS,
+)
+from integrations.ibm_architecture.governance.replay_gate import (
+    ReplayGate,
+    ReplayValidationResult,
+    ProposalStatus,
 )
 
 __all__ = [
+    # Claim Verification
     "ClaimVerifier",
-    "ClaimVerificationResult",
-    "REGISTERED_TEMPLATES",
-    "ALLOWED_FIELD_OPERATORS",
-    "CaseCopilot",
+    "VerificationResult",
     "ClaimLedger",
+    "ClaimLedgerEntry",
+    # Audit Chain
     "AuditChain",
-    "AuditVerificationResult",
-    "get_default_audit_key",
-    "verify_chain",
+    # Drift Monitoring
+    "DriftMonitor",
+    "DriftReport",
+    "FeatureDriftResult",
+    # Drift Sentinel
+    "DriftSentinel",
+    "SentinelConfig",
+    "ALLOWLISTED_POLICY_KEYS",
+    "PARAMETER_BOUNDS",
+    # Replay Gate
+    "ReplayGate",
+    "ReplayValidationResult",
+    "ProposalStatus",
 ]

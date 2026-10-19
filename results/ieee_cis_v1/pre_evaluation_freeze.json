@@ -1,0 +1,110 @@
+{
+  "status": "PRE_EVALUATION_FREEZE_VERIFIED",
+  "timestamp_utc": "2026-10-18T17:34:35.807875+00:00",
+  "architecture_version": "ieee_cis_v1",
+  "governing_specification": "docs/ibm_architecture_integration_master_spec.md § C, § N, § O",
+  "historical_look_acknowledgement": {
+    "historical_test_looks_acknowledged": true,
+    "evaluation_classification": "BENCHMARK_REPRODUCTION_AND_ACCEPTANCE_EVALUATION",
+    "prior_looks": [
+      {
+        "gate": "G3_SYNTHETIC_TEST_LOOK",
+        "dataset": "synthetic_smoke_fixture.csv (2,000 rows)",
+        "record": "results/g3_test_look.json",
+        "preserved_unmodified": true
+      },
+      {
+        "gate": "PHASE_4_IEEE_CIS_TEST_EVALUATION",
+        "dataset": "ieee_cis_test_partition (118,108 rows)",
+        "record": "results/ieee_cis_v1/training_report.json",
+        "preserved_unmodified": true
+      }
+    ],
+    "reproducibility_protocol": "Phase 10 evaluates frozen Candidate P5 vs Baseline B2 across pre-registered workload budgets (1.0x, 1.5x, 2.0x, 3.0x) with 1,000 paired bootstrap resamples. Zero hyperparameters or thresholds have been tuned on test labels."
+  },
+  "dataset": {
+    "raw_dir": "data\\raw",
+    "train_transaction_bytes": 683351067,
+    "train_identity_bytes": 26529680,
+    "total_raw_rows": 590540,
+    "verified": true
+  },
+  "split_manifest": {
+    "train": {
+      "row_count": 354324,
+      "fraud_count": 11988,
+      "prevalence": 0.03383344057980831,
+      "split_hash": "ee8c38fd7e8b2af1b93a7824fd80f59c7811e5ce2ac1651500d51bf6e2e1f53a",
+      "dt_min": 86400,
+      "dt_max": 8745772
+    },
+    "calibration": {
+      "row_count": 59054,
+      "fraud_count": 2550,
+      "prevalence": 0.04318081755681241,
+      "split_hash": "a1880e4f36558c33d77d0a1a2cf6b1dfe607a4983909364afff71ca84401e7bb",
+      "dt_min": 8745798,
+      "dt_max": 10437996
+    },
+    "validation": {
+      "row_count": 59054,
+      "fraud_count": 2061,
+      "prevalence": 0.034900260778270735,
+      "split_hash": "f824d80aea2e20f72e4ed8f06e6d119c7572caf50cf304dfb4224e8d990e7170",
+      "dt_min": 10438003,
+      "dt_max": 12192842
+    },
+    "test": {
+      "row_count": 118108,
+      "fraud_count": 4064,
+      "prevalence": 0.034409184813899145,
+      "split_hash": "88d73a15fc60f9badfedc4909ede017de45a99f6c58798d54ab9c1dff90690f1",
+      "dt_min": 12192900,
+      "dt_max": 15811131
+    }
+  },
+  "model_bundle": {
+    "artifacts_dir": "models\\artifacts\\ieee_cis_v1",
+    "ensemble_members": [
+      "HistGradientBoostingClassifier",
+      "ExtraTreesClassifier",
+      "LogisticRegression"
+    ],
+    "calibrator_type": "PlattSigmoid",
+    "calibration_split": "calibration (59,054 rows)",
+    "artifact_hashes": {
+      "feature_pipeline.joblib": "b9b3176b2273ffbfdde0a01a0175f61a4491b9bed66dc55c82787dbb75ad72d6",
+      "baseline_b2.joblib": "cd20605e5791806e0e9e9a5425b4e3fbf5ed3e6e4062d269b49136ea2142c732",
+      "ensemble.joblib": "d34bc0426e647121972c93f15a96c234ede8453b88c70e861d0eef73abc5622a",
+      "calibrator.joblib": "89de97d16c7ad77df585c3c3e7f8e32c9685bb04a34d0831bd9f985b9366d345"
+    },
+    "verified": true
+  },
+  "feature_manifest": {
+    "total_features": 391,
+    "categorical_features": 14,
+    "numerical_features": 377,
+    "target_excluded": true,
+    "identifiers_excluded": true,
+    "sha256": "9be4c3ce23d1bba5060ca457b2277575a69439055a9e75154e3191ae1e8e3bc5"
+  },
+  "frozen_policy": {
+    "status": "FROZEN_IEEE_CIS_V1",
+    "t_alert": 0.084705,
+    "t_review": 0.071002,
+    "u_threshold": 0.526773,
+    "disagreement_weight_lambda": 0.0,
+    "target_budget": 0.06525,
+    "workload_multiples": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "primary_workload_multiple": 1.5,
+    "reference_prevalence": 0.03383,
+    "config_hash": "f5f4a23cfa3b0d343f4c9bd28d3b76a4eb88839e148dc46497800940cbd4fd8e",
+    "verified": true
+  },
+  "freeze_hash": "8b88c1f712235a15b80d6f7bfa0f742c4f1624279cbaa2f24547df78e32cb2d1"
+}

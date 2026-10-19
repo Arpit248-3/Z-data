@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
   Info,
-  Layers,
+  Activity,
 } from 'lucide-react';
 import {
   BarChart,
@@ -15,6 +15,8 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { api } from '../../lib/api/client';
+import { DriftReportResponse } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 import { TiltGlassCard, TiltGlassCardDetail } from '../../components/TiltGlassCard';
@@ -33,9 +35,14 @@ interface ShiftScenarioData {
 }
 
 export const DriftShiftPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [scenarios, setScenarios] = useState<ShiftScenarioData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [driftReport, setDriftReport] = useState<DriftReportResponse | null>(null);
+  const [driftLoading, setDriftLoading] = useState<boolean>(false);
+  const [driftError, setDriftError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -71,6 +78,24 @@ export const DriftShiftPage: React.FC = () => {
     return () => { isMounted = false; };
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    setDriftLoading(true);
+    setDriftError(null);
+    api.getDriftReport(mode)
+      .then((res) => {
+        if (isMounted) setDriftReport(res);
+      })
+      .catch((err) => {
+        if (isMounted) setDriftError(err instanceof Error ? err.message : 'Failed to load live drift report');
+      })
+      .finally(() => {
+        if (isMounted) setDriftLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [mode]);
+
   return (
     <div className="drift-shift-page animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       {/* 1. Header & Evidence Banner */}
@@ -78,13 +103,13 @@ export const DriftShiftPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>SYNTHETIC_SHIFT_PROTOCOL</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
-              <span>COVARIATE PERTURBATION HARNESS</span>
+              <span>COVARIATE PERTURBATION &amp; DRIFT HARNESS</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
               <span style={{ color: 'var(--text-secondary)' }}>
-                Scenarios S0, S1, S3 Evaluated
+                {isRealDataMode ? 'IEEE-CIS Real Tabular Drift Monitor' : 'Scenarios S0, S1, S3 Evaluated'}
               </span>
             </div>
             <h1 className="page-header-title">
@@ -237,22 +262,108 @@ export const DriftShiftPage: React.FC = () => {
             })}
           </div>
 
-          {/* 5. Honest Unavailable State for Continuous Streaming PSI/KS */}
-          <div className="sg-card" style={{ padding: '20px 24px', background: 'var(--bg-surface-raised)', border: '1px dashed var(--border-active)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <Layers size={18} style={{ color: 'var(--accent-primary)' }} />
-              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Continuous Streaming PSI / KS Feature Drift Heatmap
-              </span>
-              <span className="badge badge-neutral" style={{ fontSize: '12px', padding: '3px 9px' }}>
-                Offline Static Protocol
-              </span>
+          {/* 5. Live Distribution Drift Monitor (GET /api/drift/report) */}
+          <div
+            className="sg-card"
+            style={{
+              padding: '20px 24px',
+              background: 'var(--bg-surface-raised)',
+              border: '1px solid var(--border-default)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Activity size={18} style={{ color: 'var(--accent-primary)' }} />
+                <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  Live Distribution Drift Telemetry (PSI &amp; Wasserstein Distance)
+                </span>
+                <span
+                  className={`badge ${
+                    isLiveDisconnected
+                      ? 'badge-alert'
+                      : driftReport?.status === 'STABLE'
+                      ? 'badge-ready'
+                      : 'badge-caution'
+                  }`}
+                  style={{ fontSize: '11px', padding: '2px 8px' }}
+                >
+                  {isLiveDisconnected ? 'OFFLINE' : driftReport?.status || 'MONITORING'}
+                </span>
+              </div>
+              {driftReport?.timestamp && (
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-tertiary)' }}>
+                  Report Hash: {driftReport.provenance_hash?.slice(0, 8)}... &bull; {driftReport.timestamp}
+                </span>
+              )}
             </div>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.65 }}>
-              Continuous real-time windowed Population Stability Index (PSI) and Kolmogorov-Smirnov (KS) streaming telemetry
-              require live sliding windows. In the offline static evaluation harness, scenario-level perturbation benchmarks
-              (S0, S1, S3 above) serve as the authoritative shift evidence.
-            </p>
+
+            {driftLoading ? (
+              <LoadingState message="Calculating drift telemetry from partition evidence..." />
+            ) : driftError ? (
+              <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.08)', borderRadius: 'var(--radius-xs)', fontSize: '12px', color: 'var(--color-fraud-alert)' }}>
+                {driftError}
+              </div>
+            ) : isLiveDisconnected ? (
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
+                Live edge ingestion is offline. Real-time streaming drift calculation is suspended.
+              </p>
+            ) : driftReport ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {/* Metric Summary Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+                  <div style={{ background: 'var(--bg-surface-subdued)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Monitored Features</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>
+                      {driftReport.features_monitored}
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-surface-subdued)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Mean Feature PSI</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 700, color: driftReport.mean_psi < 0.1 ? 'var(--color-routine-bright)' : 'var(--color-manual-review-bright)', marginTop: '4px' }}>
+                      {driftReport.mean_psi.toFixed(4)}
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-surface-subdued)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Max Feature PSI</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 700, color: driftReport.max_psi < 0.25 ? 'var(--color-routine-bright)' : 'var(--color-fraud-alert-bright)', marginTop: '4px' }}>
+                      {driftReport.max_psi.toFixed(4)}
+                    </div>
+                  </div>
+
+                  <div style={{ background: 'var(--bg-surface-subdued)', padding: '10px 14px', borderRadius: 'var(--radius-xs)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>Score Wasserstein Distance</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 700, color: 'var(--accent-primary-bright)', marginTop: '4px' }}>
+                      {(driftReport.score_drift?.wasserstein_distance ?? 0).toFixed(4)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Statutory Guardrail Callout */}
+                <div
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: 'var(--radius-xs)',
+                    background: 'rgba(99, 102, 241, 0.08)',
+                    border: '1px solid var(--accent-primary-dim)',
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <Info size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
+                  <span>
+                    <strong>Statutory Principle:</strong> {driftReport.notice || 'Distribution drift indicates data shift, not proof of fraud.'}
+                  </span>
+                </div>
+              </div>
+            ) : null}
           </div>
         </>
       )}

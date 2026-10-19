@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, ShieldAlert } from 'lucide-react';
 import { ApiStatusIndicator } from './ApiStatusIndicator';
-import { ModeSwitcher } from './ModeSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { ModeSwitcher } from './ModeSwitcher';
 import { useApiStatus } from '../lib/api/hooks';
 
 interface TopBarProps {
@@ -74,6 +74,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleMobile }) => {
         </NavLink>
 
         <div className="header-divider" aria-hidden="true" />
+
         <ModeSwitcher />
       </div>
 

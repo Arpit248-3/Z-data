@@ -1,0 +1,50 @@
+{
+  "status": "TRAINING_COMPLETED",
+  "timestamp_utc": "2026-10-18T15:15:50Z",
+  "execution_concurrency": "sequential",
+  "duration_seconds": 537.81,
+  "manifest": {
+    "architecture_version": "ieee_cis_v1",
+    "created_at": "2026-10-18T15:15:41.947711+00:00",
+    "execution_concurrency": "sequential",
+    "member_concurrency": {
+      "extra_trees_n_jobs": 1
+    },
+    "feature_count": 391,
+    "feature_manifest_sha256": "",
+    "split_hashes": {
+      "train": "ee8c38fd7e8b2af1b93a7824fd80f59c7811e5ce2ac1651500d51bf6e2e1f53a",
+      "calibration": "a1880e4f36558c33d77d0a1a2cf6b1dfe607a4983909364afff71ca84401e7bb",
+      "validation": "f824d80aea2e20f72e4ed8f06e6d119c7572caf50cf304dfb4224e8d990e7170",
+      "test": "88d73a15fc60f9badfedc4909ede017de45a99f6c58798d54ab9c1dff90690f1"
+    },
+    "row_counts": {
+      "train": 354324,
+      "calibration": 59054,
+      "validation": 59054,
+      "test": 118108
+    },
+    "training_duration_seconds": 537.81,
+    "memory_peak_mb": 1117.52,
+    "metrics": {
+      "validation": {
+        "ensemble_roc_auc": 0.9054257861352994,
+        "baseline_b2_roc_auc": 0.9046355386749446,
+        "ensemble_brier": 0.022220334995182896,
+        "ensemble_ece": 0.003828682420901084
+      },
+      "test": {
+        "ensemble_roc_auc": 0.8804706435225167,
+        "baseline_b2_roc_auc": 0.8819106947981399,
+        "ensemble_brier": 0.02461855293096125,
+        "ensemble_ece": 0.008888948473831077
+      }
+    },
+    "artifact_hashes": {
+      "feature_pipeline.joblib": "b9b3176b2273ffbfdde0a01a0175f61a4491b9bed66dc55c82787dbb75ad72d6",
+      "baseline_b2.joblib": "cd20605e5791806e0e9e9a5425b4e3fbf5ed3e6e4062d269b49136ea2142c732",
+      "ensemble.joblib": "d34bc0426e647121972c93f15a96c234ede8453b88c70e861d0eef73abc5622a",
+      "calibrator.joblib": "89de97d16c7ad77df585c3c3e7f8e32c9685bb04a34d0831bd9f985b9366d345"
+    }
+  }
+}

@@ -246,12 +246,13 @@ def _check_forbidden_recursively(obj: Any) -> None:
 
 class SandboxScoreRequest(BaseModel):
     features: Dict[str, Any]
+    mode: str = "SYNTHETIC_SMOKE_ONLY"
 
     @field_validator("features")
     def reject_forbidden_features(cls, v: Dict[str, Any]) -> Dict[str, Any]:
         if not v:
             raise ValueError("Feature payload cannot be empty.")
-        
+
         # 1. Recursive leakage check
         _check_forbidden_recursively(v)
 
@@ -279,3 +280,95 @@ class SandboxScoreResponse(BaseModel):
     provenance: Dict[str, Any]
     audit_logged: bool
     notice: str
+    model_id: Optional[str] = None
+    cfg_hash: Optional[str] = None
+    audit_seq: Optional[int] = None
+    mode: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Operating Modes & Model Card
+# ---------------------------------------------------------------------------
+class ModeReadinessResponse(BaseModel):
+    active_mode: str
+    available_modes: List[str]
+    modes_detail: Dict[str, Any]
+    notice: str
+
+
+class ModelCardResponse(BaseModel):
+    mode: str
+    model_id: str
+    architecture_version: str
+    architecture_type: str
+    sub_models: List[str]
+    calibrator_type: str
+    feature_count: int
+    features_sample: List[str]
+    manifest_hash: str
+    artifact_hashes: Dict[str, str]
+    split_provenance: Dict[str, Any]
+    notice: str
+
+
+# ---------------------------------------------------------------------------
+# Drift Monitoring
+# ---------------------------------------------------------------------------
+class DriftReportAPIResponse(BaseModel):
+    report_id: str
+    status: str
+    features_monitored: int
+    significant_drift_features: int
+    moderate_drift_features: int
+    mean_psi: float
+    max_psi: float
+    score_drift: Optional[Dict[str, Any]] = None
+    provenance_hash: str
+    timestamp: str
+    notice: str
+    feature_reports: Optional[List[Dict[str, Any]]] = None
+
+
+# ---------------------------------------------------------------------------
+# Governance & Replay Gate
+# ---------------------------------------------------------------------------
+class GovernanceProposalResponse(BaseModel):
+    proposal_id: str
+    status: str
+    base_cfg_hash: str
+    changes: Dict[str, Any]
+    rationale: str
+    created_at: str
+    replay_result: Optional[Dict[str, Any]] = None
+    approval_record: Optional[Dict[str, Any]] = None
+
+
+class ProposalApprovalRequest(BaseModel):
+    approver: str = Field(..., min_length=1, description="Authenticated human approver identifier")
+    rationale: str = Field(..., min_length=1, description="Audit-trailed business and risk justification")
+
+
+class ProposalRejectionRequest(BaseModel):
+    reviewer: str = Field(..., min_length=1, description="Authenticated human reviewer identifier")
+    reason: str = Field(..., min_length=1, description="Audit-trailed rejection rationale")
+
+
+class GovernanceDecisionResponse(BaseModel):
+    proposal_id: str
+    status: str
+    decision_maker: str
+    timestamp: str
+    audit_seq: Optional[int] = None
+    message: str
+
+
+# ---------------------------------------------------------------------------
+# Audit Chain Verification
+# ---------------------------------------------------------------------------
+class AuditVerifyResponse(BaseModel):
+    status: str
+    is_valid: bool
+    record_count: int
+    signing_status: str
+    errors: List[str]
+    chain_head_hash: Optional[str] = None
