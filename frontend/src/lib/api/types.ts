@@ -301,6 +301,13 @@ export interface ModelCardResponse {
   artifact_hashes: Record<string, string>;
   split_provenance: Record<string, unknown>;
   notice: string;
+  thresholds?: Record<string, number>;
+  capacity_budget?: {
+    review_capacity_slots: number;
+    budget_fraction: number;
+    workload_multiple: string;
+    status: string;
+  };
 }
 
 export interface FeatureDriftReport {

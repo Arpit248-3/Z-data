@@ -298,37 +298,112 @@ interface FrozenRuleDef {
   color: string;
 }
 
-export function getFrozenRules(isRealDataMode: boolean, _isLiveDisconnected?: boolean): FrozenRuleDef[] {
-  const quotaLabel = isRealDataMode ? '5,993 slots' : '130 slots';
-  const quotaLimit = isRealDataMode ? '5,993' : '130';
+export function getFrozenRules(
+  isRealDataMode: boolean,
+  isLiveDisconnected?: boolean,
+  modelCard?: ModelCardResponse | null
+): FrozenRuleDef[] {
+  const tAlert = modelCard?.thresholds?.t_alert ?? 0.084705;
+  const tReview = modelCard?.thresholds?.t_review ?? 0.071002;
+  const uThreshold = modelCard?.thresholds?.u_threshold ?? 0.526773;
+
+  const tAlertStr = tAlert.toFixed(4);
+  const tReviewStr = tReview.toFixed(4);
+  const uThreshStr = uThreshold.toFixed(4);
+
+  if (isLiveDisconnected) {
+    return [
+      {
+        id: 'R1',
+        name: 'R1_HIGH_RISK',
+        condition: `p ≥ ${tAlert.toFixed(6)} (t_alert)`,
+        action: 'FRAUD_ALERT',
+        actionClass: 'badge-alert',
+        capacityTreatment: 'Exempt from quota • Live scoring suspended',
+        riskRange: `p ∈ [${tAlertStr}, 1.0000]`,
+        visualWidth: '85%',
+        color: 'var(--color-fraud-alert)',
+      },
+      {
+        id: 'R2',
+        name: 'R2_INTERMEDIATE_RISK',
+        condition: `p ≥ ${tReview.toFixed(6)} (t_review) • Quota: 0 (Offline)`,
+        action: 'MANUAL_REVIEW',
+        actionClass: 'badge-caution',
+        capacityTreatment: 'Review queue suspended (0 active slots)',
+        riskRange: `p ∈ [${tReviewStr}, ${tAlertStr})`,
+        visualWidth: '55%',
+        color: 'var(--color-manual-review)',
+      },
+      {
+        id: 'R3',
+        name: 'R3_MODEL_DISAGREEMENT',
+        condition: `u₂ ≥ ${uThreshold.toFixed(6)} (u_threshold) • Quota: 0 (Offline)`,
+        action: 'MANUAL_REVIEW',
+        actionClass: 'badge-caution',
+        capacityTreatment: 'Review queue suspended (0 active slots)',
+        riskRange: 'Epistemic u₂ Residual Bypass',
+        visualWidth: '70%',
+        color: 'var(--color-epistemic-defer)',
+      },
+      {
+        id: 'R5',
+        name: 'R5_LOW_RISK_RELIABLE',
+        condition: `p < ${tReview.toFixed(6)} AND u₂ < ${uThreshold.toFixed(6)}`,
+        action: 'ROUTINE',
+        actionClass: 'badge-ready',
+        capacityTreatment: 'Clearance suspended while stream is offline',
+        riskRange: `p < ${tReviewStr}, u₂ < ${uThreshStr}`,
+        visualWidth: '25%',
+        color: 'var(--color-routine)',
+      },
+      {
+        id: 'R6',
+        name: 'R6_CAPACITY_DEFERRED',
+        condition: 'Live stream disconnected • Quota = 0',
+        action: 'HELD / DEFERRED',
+        actionClass: 'badge-alert',
+        capacityTreatment: 'Fail-closed hold; zero unauthorized clearance',
+        riskRange: 'Fail-Closed Disconnect Hold',
+        visualWidth: '100%',
+        color: 'var(--color-epistemic-defer-bright)',
+      },
+    ];
+  }
+
+  const quotaSlots = modelCard?.capacity_budget?.review_capacity_slots ?? (isRealDataMode ? 5993 : 130);
+  const quotaLabel = `${quotaSlots.toLocaleString()} slots`;
+  const quotaLimit = quotaSlots.toLocaleString();
+  const deferredCases = isRealDataMode ? '5,020 cases' : '974 cases';
+  const queueHoldRange = `Queue Saturation Hold (B = ${quotaLimit})`;
 
   return [
     {
       id: 'R1',
       name: 'R1_HIGH_RISK',
-      condition: 'p ≥ 0.084705 (t_alert)',
+      condition: `p ≥ ${tAlert.toFixed(6)} (t_alert)`,
       action: 'FRAUD_ALERT',
       actionClass: 'badge-alert',
       capacityTreatment: 'Exempt from analyst review quota',
-      riskRange: 'p ∈ [0.0847, 1.0000]',
+      riskRange: `p ∈ [${tAlertStr}, 1.0000]`,
       visualWidth: '85%',
       color: 'var(--color-fraud-alert)',
     },
     {
       id: 'R2',
       name: 'R2_INTERMEDIATE_RISK',
-      condition: `p ≥ 0.071002 (t_review) • Quota ≤ ${quotaLimit}`,
+      condition: `p ≥ ${tReview.toFixed(6)} (t_review) • Quota ≤ ${quotaLimit}`,
       action: 'MANUAL_REVIEW',
       actionClass: 'badge-caution',
       capacityTreatment: `Consumes analyst review quota B (≤ ${quotaLimit})`,
-      riskRange: 'p ∈ [0.0710, 0.0847)',
+      riskRange: `p ∈ [${tReviewStr}, ${tAlertStr})`,
       visualWidth: '55%',
       color: 'var(--color-manual-review)',
     },
     {
       id: 'R3',
       name: 'R3_MODEL_DISAGREEMENT',
-      condition: `u₂ ≥ 0.526773 (u_threshold) • Quota ≤ ${quotaLimit}`,
+      condition: `u₂ ≥ ${uThreshold.toFixed(6)} (u_threshold) • Quota ≤ ${quotaLimit}`,
       action: 'MANUAL_REVIEW',
       actionClass: 'badge-caution',
       capacityTreatment: `Consumes analyst review quota B (≤ ${quotaLimit})`,
@@ -339,11 +414,11 @@ export function getFrozenRules(isRealDataMode: boolean, _isLiveDisconnected?: bo
     {
       id: 'R5',
       name: 'R5_LOW_RISK_RELIABLE',
-      condition: 'p < 0.071002 AND u₂ < 0.526773',
+      condition: `p < ${tReview.toFixed(6)} AND u₂ < ${uThreshold.toFixed(6)}`,
       action: 'ROUTINE',
       actionClass: 'badge-ready',
-      capacityTreatment: 'Zero-touch automated clearance',
-      riskRange: 'p < 0.0710, u₂ < 0.5268',
+      capacityTreatment: isRealDataMode ? 'Zero-touch clearance (IEEE-CIS partition)' : 'Zero-touch clearance (Synthetic fixture)',
+      riskRange: `p < ${tReviewStr}, u₂ < ${uThreshStr}`,
       visualWidth: '25%',
       color: 'var(--color-routine)',
     },
@@ -353,8 +428,8 @@ export function getFrozenRules(isRealDataMode: boolean, _isLiveDisconnected?: bo
       condition: `Review escalations > B (${quotaLabel})`,
       action: 'HELD / DEFERRED',
       actionClass: 'badge-synthetic',
-      capacityTreatment: 'Held for deferred audit; zero silent leakage',
-      riskRange: 'Queue Saturation Trigger',
+      capacityTreatment: `Held for deferred audit (${deferredCases}); zero silent leakage`,
+      riskRange: queueHoldRange,
       visualWidth: '95%',
       color: 'var(--color-epistemic-defer)',
     },
@@ -368,7 +443,7 @@ export const ModelCardPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const architectureSpecs = useMemo(() => getArchitectureSpecs(isRealDataMode, isLiveDisconnected), [isRealDataMode, isLiveDisconnected]);
-  const frozenRules = useMemo(() => getFrozenRules(isRealDataMode, isLiveDisconnected), [isRealDataMode, isLiveDisconnected]);
+  const frozenRules = useMemo(() => getFrozenRules(isRealDataMode, isLiveDisconnected, modelCard), [isRealDataMode, isLiveDisconnected, modelCard]);
   const [selectedRule, setSelectedRule] = useState<string | null>(null);
   const [inspectRule, setInspectRule] = useState<FrozenRuleDef | null>(null);
 

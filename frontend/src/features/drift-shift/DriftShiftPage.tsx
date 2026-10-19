@@ -175,8 +175,22 @@ export const DriftShiftPage: React.FC = () => {
           <Info size={20} />
         </div>
         <span style={{ fontSize: '14.5px', color: 'var(--text-secondary)', lineHeight: 1.65, flex: 1 }}>
-          <strong style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Operational Distinction:</strong> Statistical drift across feature distributions (e.g. Transaction Amount, V-series) is a measure of covariate shift,
-          not an automatic verdict of fraud. Epistemic disagreement (<span style={{ color: 'var(--color-epistemic-defer-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>u₂</span>) detects this uncertainty and safely diverts cases to review.
+          <strong style={{ color: 'var(--text-primary)', fontWeight: 700 }}>
+            Operational Distinction ({isRealDataMode ? 'IEEE-CIS Real Benchmark' : isLiveDisconnected ? 'Live Stream Disconnected' : 'Synthetic Smoke Protocol'}):
+          </strong>{' '}
+          {isRealDataMode ? (
+            <>
+              Statistical drift across 391 tabular feature distributions (e.g. TransactionAmt, card1–card6, C-series, D-series, V-series) is a measure of covariate shift across chronological partitions, not an automatic verdict of fraud. Epistemic disagreement (<span style={{ color: 'var(--color-epistemic-defer-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>u₂</span>) detects prediction uncertainty under distribution shift and safely diverts ambiguous cases to the review lane.
+            </>
+          ) : isLiveDisconnected ? (
+            <>
+              Streaming Kolmogorov-Smirnov and Wasserstein drift calculations are suspended while the core banking event stream is disconnected. Real-time telemetry fails closed to prevent unverified model degradation.
+            </>
+          ) : (
+            <>
+              Statistical drift across synthetic feature distributions (e.g. Amount, C1–C14, V1–V30) measures controlled covariate shift from adversarial perturbation scenarios (S0, S1, S3). Epistemic disagreement (<span style={{ color: 'var(--color-epistemic-defer-bright)', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>u₂</span>) quantifies model discordance and diverts uncertain transactions to analyst review.
+            </>
+          )}
         </span>
       </div>
 

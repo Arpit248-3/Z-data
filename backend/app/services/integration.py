@@ -250,6 +250,17 @@ class IntegrationService:
                     "Trained on IEEE-CIS benchmark dataset. Chronological final test partition "
                     "is strictly held out from threshold selection and tuning."
                 ),
+                thresholds={
+                    "t_alert": 0.084705,
+                    "t_review": 0.071002,
+                    "u_threshold": 0.526773,
+                },
+                capacity_budget={
+                    "review_capacity_slots": 5993,
+                    "budget_fraction": 0.050745,
+                    "workload_multiple": "1.5x",
+                    "status": "SATURATED",
+                },
             )
         elif mode_upper in ("SYNTHETIC_SMOKE_ONLY", "SYNTHETIC"):
             return ModelCardResponse(
@@ -265,6 +276,17 @@ class IntegrationService:
                 artifact_hashes={"model.joblib": "synthetic_model_hash", "calibrator.joblib": "synthetic_cal_hash"},
                 split_provenance={"split_hash": "07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd"},
                 notice="Synthetic smoke fixture model for fast UI and API functional verification.",
+                thresholds={
+                    "t_alert": 0.084705,
+                    "t_review": 0.071002,
+                    "u_threshold": 0.526773,
+                },
+                capacity_budget={
+                    "review_capacity_slots": 130,
+                    "budget_fraction": 0.06525,
+                    "workload_multiple": "1.5x",
+                    "status": "SATURATED",
+                },
             )
         elif mode_upper in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
             return ModelCardResponse(
@@ -280,6 +302,17 @@ class IntegrationService:
                 artifact_hashes={},
                 split_provenance={},
                 notice="LIVE SOURCE NOT CONNECTED: Live banking/payment ingestion stream is disconnected. Real-time inference pipeline inactive.",
+                thresholds={
+                    "t_alert": 0.084705,
+                    "t_review": 0.071002,
+                    "u_threshold": 0.526773,
+                },
+                capacity_budget={
+                    "review_capacity_slots": 0,
+                    "budget_fraction": 0.0,
+                    "workload_multiple": "OFFLINE",
+                    "status": "DISCONNECTED",
+                },
             )
         else:
             raise ValueError(

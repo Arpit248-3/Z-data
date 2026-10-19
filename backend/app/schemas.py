@@ -309,6 +309,8 @@ class ModelCardResponse(BaseModel):
     artifact_hashes: Dict[str, str]
     split_provenance: Dict[str, Any]
     notice: str
+    thresholds: Optional[Dict[str, float]] = None
+    capacity_budget: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
