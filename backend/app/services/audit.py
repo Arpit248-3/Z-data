@@ -16,8 +16,15 @@ class AuditService:
     def __init__(self, artifact_service: ArtifactService):
         self.artifacts = artifact_service
 
-    def _read_audit_records(self) -> Tuple[List[Dict[str, Any]], int]:
-        audit_path = self.artifacts.project_root / "logs" / "audit.jsonl"
+    def _read_audit_records(self, mode: Optional[str] = None) -> Tuple[List[Dict[str, Any]], int]:
+        mode_upper = (mode or "SYNTHETIC_SMOKE_ONLY").strip().upper()
+        if mode_upper in ("IEEE_CIS_OFFLINE_BENCHMARK", "IEEE_CIS", "REAL"):
+            audit_path = self.artifacts.project_root / "results" / "ieee_cis_v1" / "audit_chain.jsonl"
+        elif mode_upper in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
+            return [], 0
+        else:
+            audit_path = self.artifacts.project_root / "logs" / "audit.jsonl"
+
         if not audit_path.exists():
             return [], 0
 
@@ -44,8 +51,9 @@ class AuditService:
         action: Optional[str] = None,
         reason_code: Optional[str] = None,
         case_id: Optional[str] = None,
+        mode: Optional[str] = None,
     ) -> AuditListResponse:
-        records, skipped = self._read_audit_records()
+        records, skipped = self._read_audit_records(mode=mode)
         filtered = []
 
         for r in records:
@@ -77,8 +85,9 @@ class AuditService:
         action: Optional[str] = None,
         reason_code: Optional[str] = None,
         case_id: Optional[str] = None,
+        mode: Optional[str] = None,
     ) -> str:
-        records, _ = self._read_audit_records()
+        records, _ = self._read_audit_records(mode=mode)
         filtered = []
 
         for r in records:

@@ -473,11 +473,19 @@ export const SandboxPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={Boolean(jsonError) || loading}
+                disabled={Boolean(jsonError) || loading || isLiveDisconnected}
                 className="payload-score-cta"
+                style={isLiveDisconnected ? { opacity: 0.5, cursor: 'not-allowed', background: 'var(--bg-surface-subdued)' } : undefined}
+                title={isLiveDisconnected ? 'Live stream is disconnected. Real-time scoring disabled in this mode.' : undefined}
               >
                 <Play size={15} />
-                <span>{loading ? 'EVALUATING INFERENCE...' : 'SCORE PAYLOAD'}</span>
+                <span>
+                  {loading
+                    ? 'EVALUATING INFERENCE...'
+                    : isLiveDisconnected
+                    ? 'SCORING DISABLED (LIVE DISCONNECTED)'
+                    : 'SCORE PAYLOAD'}
+                </span>
               </button>
             </div>
           </form>

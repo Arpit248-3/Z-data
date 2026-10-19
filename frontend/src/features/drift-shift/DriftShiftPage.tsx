@@ -80,6 +80,20 @@ export const DriftShiftPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+    if (mode === 'LIVE_SOURCE_NOT_CONNECTED') {
+      setDriftReport(null);
+      setDriftError('LIVE SOURCE DISCONNECTED: Live edge ingestion is offline. Real-time streaming drift calculation is suspended.');
+      setDriftLoading(false);
+      return;
+    }
+
+    if (mode === 'SYNTHETIC_SMOKE_ONLY') {
+      setDriftReport(null);
+      setDriftError('SYNTHETIC SMOKE MODE: Feature drift monitoring is configured for the IEEE-CIS offline benchmark partition. Switch to IEEE-CIS BENCHMARK mode to view active drift metrics.');
+      setDriftLoading(false);
+      return;
+    }
+
     setDriftLoading(true);
     setDriftError(null);
     api.getDriftReport(mode)
@@ -87,7 +101,7 @@ export const DriftShiftPage: React.FC = () => {
         if (isMounted) setDriftReport(res);
       })
       .catch((err) => {
-        if (isMounted) setDriftError(err instanceof Error ? err.message : 'Failed to load live drift report');
+        if (isMounted) setDriftError(err instanceof Error ? err.message : 'Failed to load drift report');
       })
       .finally(() => {
         if (isMounted) setDriftLoading(false);

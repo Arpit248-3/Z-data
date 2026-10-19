@@ -70,7 +70,7 @@ export const CaseExplorerPage: React.FC = () => {
     let isMounted = true;
     setDetailLoading(true);
     setDetailError(null);
-    api.getCaseDetail(selectedCaseId)
+    api.getCaseDetail(selectedCaseId, mode)
       .then((detail) => {
         if (isMounted) setCaseDetail(detail);
       })
@@ -82,7 +82,7 @@ export const CaseExplorerPage: React.FC = () => {
       });
 
     return () => { isMounted = false; };
-  }, [selectedCaseId]);
+  }, [selectedCaseId, mode]);
 
   // Close modal on Escape key
   useEffect(() => {
@@ -263,7 +263,9 @@ export const CaseExplorerPage: React.FC = () => {
             </div>
           ) : cases.length === 0 ? (
             <div style={{ padding: '36px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              No transactions match the applied query parameters.
+              {isLiveDisconnected
+                ? 'LIVE SOURCE DISCONNECTED: Real-time event streaming is disconnected. No live cases to display. Switch to IEEE-CIS BENCHMARK or SYNTHETIC FIXTURE to inspect cases.'
+                : 'No transactions match the applied query parameters.'}
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>

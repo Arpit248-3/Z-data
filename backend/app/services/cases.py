@@ -14,8 +14,15 @@ class CaseService:
     def __init__(self, artifact_service: ArtifactService):
         self.artifacts = artifact_service
 
-    def _load_all_cases(self) -> List[Dict[str, Any]]:
-        cases_path = self.artifacts.project_root / "results" / "cases.jsonl"
+    def _load_all_cases(self, mode: Optional[str] = None) -> List[Dict[str, Any]]:
+        mode_upper = (mode or "SYNTHETIC_SMOKE_ONLY").strip().upper()
+        if mode_upper in ("IEEE_CIS_OFFLINE_BENCHMARK", "IEEE_CIS", "REAL"):
+            cases_path = self.artifacts.project_root / "results" / "ieee_cis_v1" / "cases_benchmark.jsonl"
+        elif mode_upper == "LIVE_SOURCE_NOT_CONNECTED":
+            return []
+        else:
+            cases_path = self.artifacts.project_root / "results" / "cases.jsonl"
+
         if not cases_path.exists():
             return []
         cases = []
@@ -39,8 +46,9 @@ class CaseService:
         risk_min: Optional[float] = None,
         risk_max: Optional[float] = None,
         search: Optional[str] = None,
+        mode: Optional[str] = None,
     ) -> CasesResponse:
-        all_cases = self._load_all_cases()
+        all_cases = self._load_all_cases(mode=mode)
         filtered = []
 
         for c in all_cases:
@@ -106,8 +114,11 @@ class CaseService:
             cases=items,
         )
 
-    def get_case_detail(self, case_id: str) -> Optional[CaseDetailResponse]:
-        all_cases = self._load_all_cases()
+    def get_case_detail(self, case_id: str, mode: Optional[str] = None) -> Optional[CaseDetailResponse]:
+        # Try requested mode first, then fallback to other if not found
+        all_cases = self._load_all_cases(mode=mode)
+        if not all_cases and mode:
+            all_cases = self._load_all_cases(mode="IEEE_CIS_OFFLINE_BENCHMARK") + self._load_all_cases(mode="SYNTHETIC_SMOKE_ONLY")
         for c in all_cases:
             if str(c.get("case_id")) == str(case_id):
                 return CaseDetailResponse(

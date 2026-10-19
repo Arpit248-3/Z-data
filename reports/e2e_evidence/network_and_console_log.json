@@ -1,0 +1,3333 @@
+{
+  "network": [
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:11.351Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:11.354Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:11.355Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:11.355Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:11.363Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:11.364Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.512Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.513Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.513Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.513Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.514Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.514Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:11.514Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.525Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.525Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.526Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.526Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.526Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.526Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:11.526Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.640Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.643Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.644Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:11.652Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.785Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.864Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.864Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.864Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:11.865Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.866Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:11.866Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:14.548Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:14.548Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:14.548Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:14.565Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:14.566Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:14.566Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:17.068Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:17.073Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:17.073Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:17.073Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:17.074Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:17.074Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.151Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.151Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.151Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.152Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.152Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.152Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:17.152Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.154Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.154Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.155Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.155Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.155Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.155Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:17.155Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.180Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.199Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.204Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.211Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.218Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.222Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:17.223Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.223Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.223Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.223Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:17.224Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:17.224Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.224Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:17.224Z"
+    },
+    {
+      "type": "request",
+      "method": "POST",
+      "url": "http://127.0.0.1:5173/api/score-sandbox",
+      "time": "2026-10-19T08:50:18.842Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/score-sandbox",
+      "time": "2026-10-19T08:50:18.881Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:22.183Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:22.185Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:22.186Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:22.186Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:22.187Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:22.187Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.229Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.233Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.234Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.234Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.236Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.236Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:22.236Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.237Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.237Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.237Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.237Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.238Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.238Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:22.238Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.252Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:22.261Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.266Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.268Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:22.272Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.284Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.285Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.286Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.291Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.300Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.301Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.306Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.314Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:22.321Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.376Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.376Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.376Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.376Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.377Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.377Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.395Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.396Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:22.397Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.397Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.397Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:22.398Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:24.157Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:24.157Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:24.157Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:24.180Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:24.181Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=SYNTHETIC_SMOKE_ONLY",
+      "time": "2026-10-19T08:50:24.181Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:25.096Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:25.096Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:25.096Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:25.105Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:25.105Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:25.105Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:26.042Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:26.042Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:26.043Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:26.057Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:26.058Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:26.058Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:27.000Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:27.008Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:27.009Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:27.009Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:27.009Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:27.009Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:28.913Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:28.916Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:28.917Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:28.917Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:28.923Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:28.923Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.034Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.034Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.034Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.048Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.050Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:29.050Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.053Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.075Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.075Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:29.075Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.075Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:29.080Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.080Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.080Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.081Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.082Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.083Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.083Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.083Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:29.083Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.151Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.152Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.158Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.166Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.166Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.167Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.170Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:29.170Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.171Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.173Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.173Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:29.173Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:30.796Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:30.800Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:30.800Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:30.800Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:30.804Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:30.807Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.899Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.899Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.899Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.906Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.915Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.917Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:30.917Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.932Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.935Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.935Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.936Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.936Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.936Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:30.936Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.936Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.937Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:30.937Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:30.937Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:30.937Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.937Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.939Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:30.941Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:30.942Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.942Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.962Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.982Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:30.994Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:33.001Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:33.001Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:35.020Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/cases?scenario=S0&offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:35.031Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:35.908Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:35.911Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:35.913Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:35.913Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:35.916Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:35.917Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.984Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.984Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.984Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.984Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.984Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.985Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:35.985Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.988Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.991Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.992Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.992Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:35.992Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:35.992Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:35.992Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.005Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.038Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.038Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:36.039Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.040Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:36.051Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.052Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.052Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.063Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.064Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:36.069Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.074Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.080Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:36.089Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/policies/compare?budget_multiple=1.5x&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:36.165Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/policies/compare?budget_multiple=1.5x&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:36.166Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/policies/compare?budget_multiple=1.5x&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:36.203Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/policies/compare?budget_multiple=1.5x&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:36.203Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:38.215Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:38.215Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:38.217Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:38.217Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:38.217Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:38.217Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.254Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.255Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.255Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.255Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.255Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.256Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:38.256Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.259Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:38.260Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.304Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.304Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.304Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:38.305Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.311Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.311Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:38.311Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.312Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.316Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:38.328Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.329Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit/verify",
+      "time": "2026-10-19T08:50:38.351Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:38.352Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit/verify",
+      "time": "2026-10-19T08:50:38.352Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:38.352Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.355Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.377Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit/verify",
+      "time": "2026-10-19T08:50:38.378Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:38.402Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:38.402Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit/verify",
+      "time": "2026-10-19T08:50:38.402Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:38.403Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:40.446Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=LIVE_SOURCE_NOT_CONNECTED",
+      "time": "2026-10-19T08:50:40.463Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:42.448Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/audit?offset=0&limit=25&mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:42.460Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:43.318Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:43.320Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:43.321Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:43.321Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:43.324Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:43.325Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.383Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.383Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.383Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.384Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.384Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.384Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:43.384Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.403Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:43.404Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.420Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.421Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.421Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:43.422Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.431Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.431Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.436Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/model/card?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.437Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.437Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/model/card?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.437Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.440Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:43.489Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.489Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/model/card?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.489Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.491Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/overview?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.507Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/model/card?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:43.508Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.510Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.528Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:43.528Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:45.430Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:45.436Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:45.437Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:45.437Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:45.445Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:45.445Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.496Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.496Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.498Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.508Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.508Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.508Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:45.510Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:45.517Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.522Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:45.522Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.538Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.538Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.552Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:45.552Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.571Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/results",
+      "time": "2026-10-19T08:50:45.579Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/drift/report?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:45.579Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/results",
+      "time": "2026-10-19T08:50:45.580Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/drift/report?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:45.580Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.581Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.582Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:45.582Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.582Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.583Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.591Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/results",
+      "time": "2026-10-19T08:50:45.634Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:45.640Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/results",
+      "time": "2026-10-19T08:50:45.645Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/drift/report?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:45.651Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/drift/report?mode=IEEE_CIS_OFFLINE_BENCHMARK",
+      "time": "2026-10-19T08:50:45.708Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:47.594Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:47.600Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:47.601Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:47.601Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:47.607Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:47.607Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.667Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.667Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.667Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.667Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.667Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.668Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:47.669Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.681Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/scenarios",
+      "time": "2026-10-19T08:50:47.688Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/replay/rows?scenario=S0&offset=0&limit=200",
+      "time": "2026-10-19T08:50:47.689Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/scenarios",
+      "time": "2026-10-19T08:50:47.689Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/replay/rows?scenario=S0&offset=0&limit=200",
+      "time": "2026-10-19T08:50:47.689Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:47.703Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.712Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.757Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:47.758Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.758Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/scenarios",
+      "time": "2026-10-19T08:50:47.764Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.765Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.765Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.766Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:47.766Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.776Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.782Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.782Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/scenarios",
+      "time": "2026-10-19T08:50:47.782Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:47.794Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/replay/rows?scenario=S0&offset=0&limit=200",
+      "time": "2026-10-19T08:50:47.843Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/replay/rows?scenario=S0&offset=0&limit=200",
+      "time": "2026-10-19T08:50:47.903Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:50.639Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/hooks.ts",
+      "time": "2026-10-19T08:50:50.644Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:50.645Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:50.645Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/client.ts",
+      "time": "2026-10-19T08:50:50.650Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/src/lib/api/types.ts",
+      "time": "2026-10-19T08:50:50.651Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.730Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.731Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.732Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.732Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.732Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.732Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:50.733Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.735Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:50.735Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.813Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.814Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.814Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:50.814Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.814Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.815Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.815Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/mode",
+      "time": "2026-10-19T08:50:50.815Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.816Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.817Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/health",
+      "time": "2026-10-19T08:50:50.817Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.818Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.827Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://127.0.0.1:5173/api/status",
+      "time": "2026-10-19T08:50:50.828Z"
+    },
+    {
+      "type": "request",
+      "method": "POST",
+      "url": "http://127.0.0.1:8000/api/score-sandbox",
+      "time": "2026-10-19T08:50:53.008Z"
+    },
+    {
+      "type": "response",
+      "status": 400,
+      "url": "http://127.0.0.1:8000/api/score-sandbox",
+      "time": "2026-10-19T08:50:53.030Z"
+    }
+  ],
+  "console": [
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:11.346Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:11.349Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:11.420Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:11.523Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.911Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.911Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.913Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.914Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.914Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:11.914Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: Error creating WebGL context.",
+      "time": "2026-10-19T08:50:11.914Z"
+    },
+    {
+      "type": "error",
+      "text": "The above error occurred in the <ForwardRef(Canvas)> component:\n\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at FiberProvider (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17708:21)\n    at CanvasWrapper\n    at Suspense\n    at WebGLErrorBoundary (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:33:5)\n    at div\n    at div\n    at div\n    at SignalCoreScene (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:460:41)\n    at Suspense\n    at section\n    at div\n    at OverviewPage (http://127.0.0.1:5173/src/features/overview/OverviewPage.tsx:41:20)\n    at Suspense\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at main\n    at div\n    at div\n    at div\n    at AppShellInner (http://127.0.0.1:5173/src/app/AppShell.tsx:27:37)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at AppShell\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at RenderErrorBoundary (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=f64d4694:4072:5)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App\n\nReact will try to recreate this component tree from scratch using the error boundary you provided, WebGLErrorBoundary.",
+      "time": "2026-10-19T08:50:11.924Z"
+    },
+    {
+      "type": "warning",
+      "text": "[SignalCoreScene] WebGL error caught by boundary: Error: Error creating WebGL context.\n    at new WebGLRenderer (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-SMQVUEJW.js?v=c96d6932:17269:19)\n    at createRendererInstance (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17049:15)\n    at Object.configure (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17149:18)\n    at http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17820:20\n    at commitHookEffectListMount (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:16915:34)\n    at commitLayoutEffectOnFiber (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17002:23)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17980:17)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17969:15)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19) {componentStack: \n    at commitLayoutMountEffects_complete (http://…chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App}",
+      "time": "2026-10-19T08:50:11.924Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:17.057Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:17.060Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:17.074Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:17.152Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:22.166Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:22.176Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:22.187Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:22.236Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.445Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.445Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.445Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.445Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.446Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:22.446Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: Error creating WebGL context.",
+      "time": "2026-10-19T08:50:22.446Z"
+    },
+    {
+      "type": "error",
+      "text": "The above error occurred in the <ForwardRef(Canvas)> component:\n\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at FiberProvider (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17708:21)\n    at CanvasWrapper\n    at Suspense\n    at WebGLErrorBoundary (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:33:5)\n    at div\n    at div\n    at div\n    at SignalCoreScene (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:460:41)\n    at Suspense\n    at section\n    at div\n    at OverviewPage (http://127.0.0.1:5173/src/features/overview/OverviewPage.tsx:41:20)\n    at Suspense\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at main\n    at div\n    at div\n    at div\n    at AppShellInner (http://127.0.0.1:5173/src/app/AppShell.tsx:27:37)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at AppShell\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at RenderErrorBoundary (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=f64d4694:4072:5)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App\n\nReact will try to recreate this component tree from scratch using the error boundary you provided, WebGLErrorBoundary.",
+      "time": "2026-10-19T08:50:22.451Z"
+    },
+    {
+      "type": "warning",
+      "text": "[SignalCoreScene] WebGL error caught by boundary: Error: Error creating WebGL context.\n    at new WebGLRenderer (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-SMQVUEJW.js?v=c96d6932:17269:19)\n    at createRendererInstance (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17049:15)\n    at Object.configure (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17149:18)\n    at http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17820:20\n    at commitHookEffectListMount (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:16915:34)\n    at commitLayoutEffectOnFiber (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17002:23)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17980:17)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17969:15)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19) {componentStack: \n    at commitLayoutMountEffects_complete (http://…chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App}",
+      "time": "2026-10-19T08:50:22.451Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:28.909Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:28.910Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:28.924Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:29.033Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.189Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.190Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.190Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.190Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.191Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: A WebGL context could not be created. Reason:  disabled by enterprise policy or commandline switch",
+      "time": "2026-10-19T08:50:29.195Z"
+    },
+    {
+      "type": "error",
+      "text": "THREE.WebGLRenderer: Error creating WebGL context.",
+      "time": "2026-10-19T08:50:29.196Z"
+    },
+    {
+      "type": "error",
+      "text": "The above error occurred in the <ForwardRef(Canvas)> component:\n\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at FiberProvider (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17708:21)\n    at CanvasWrapper\n    at Suspense\n    at WebGLErrorBoundary (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:33:5)\n    at div\n    at div\n    at div\n    at SignalCoreScene (http://127.0.0.1:5173/src/components/SignalCoreScene.tsx:460:41)\n    at Suspense\n    at section\n    at div\n    at OverviewPage (http://127.0.0.1:5173/src/features/overview/OverviewPage.tsx:41:20)\n    at Suspense\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at main\n    at div\n    at div\n    at div\n    at AppShellInner (http://127.0.0.1:5173/src/app/AppShell.tsx:27:37)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at AppShell\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at RenderErrorBoundary (http://127.0.0.1:5173/node_modules/.vite/deps/react-router-dom.js?v=f64d4694:4072:5)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App\n\nReact will try to recreate this component tree from scratch using the error boundary you provided, WebGLErrorBoundary.",
+      "time": "2026-10-19T08:50:29.199Z"
+    },
+    {
+      "type": "warning",
+      "text": "[SignalCoreScene] WebGL error caught by boundary: Error: Error creating WebGL context.\n    at new WebGLRenderer (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-SMQVUEJW.js?v=c96d6932:17269:19)\n    at createRendererInstance (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17049:15)\n    at Object.configure (http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17149:18)\n    at http://127.0.0.1:5173/node_modules/.vite/deps/@react-three_fiber.js?v=a80371cf:17820:20\n    at commitHookEffectListMount (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:16915:34)\n    at commitLayoutEffectOnFiber (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17002:23)\n    at commitLayoutMountEffects_complete (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17980:17)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17969:15)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19)\n    at commitLayoutEffects_begin (http://127.0.0.1:5173/node_modules/.vite/deps/chunk-RC3YDMAO.js?v=c96d6932:17950:19) {componentStack: \n    at commitLayoutMountEffects_complete (http://…chunk-RC3YDMAO.js?v=c96d6932:17982:17)\n    at App}",
+      "time": "2026-10-19T08:50:29.199Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:30.791Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:30.791Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:30.809Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:30.917Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:35.900Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:35.903Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:35.920Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:35.985Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:38.214Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:38.214Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:38.217Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:38.256Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:43.314Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:43.317Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:43.329Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:43.386Z"
+    },
+    {
+      "type": "error",
+      "text": "Error: <polygon> attribute points: Expected number, \"34%,7 37%,10 34%,1…\".",
+      "time": "2026-10-19T08:50:43.585Z"
+    },
+    {
+      "type": "error",
+      "text": "Error: <polygon> attribute points: Expected number, \"59%,7 62%,10 59%,1…\".",
+      "time": "2026-10-19T08:50:43.585Z"
+    },
+    {
+      "type": "error",
+      "text": "Error: <polygon> attribute points: Expected number, \"84%,7 87%,10 84%,1…\".",
+      "time": "2026-10-19T08:50:43.585Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:45.407Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:45.419Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:45.447Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:45.510Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:47.588Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:47.592Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:47.611Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:47.666Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-10-19T08:50:50.631Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-10-19T08:50:50.636Z"
+    },
+    {
+      "type": "info",
+      "text": "%cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold",
+      "time": "2026-10-19T08:50:50.654Z"
+    },
+    {
+      "type": "warning",
+      "text": "⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.",
+      "time": "2026-10-19T08:50:50.734Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "time": "2026-10-19T08:50:53.030Z"
+    }
+  ]
+}

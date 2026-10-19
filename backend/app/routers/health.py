@@ -52,4 +52,12 @@ def get_status(
             "status": "READY" if is_ready else "NOT_AVAILABLE",
             "error": err,
         }
+    elif mode and mode.upper() in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
+        readiness["evidence_status"] = "LIVE_SOURCE_NOT_CONNECTED"
+        readiness["overall_status"] = "DISCONNECTED"
+        readiness["dependencies"]["live_source"] = {
+            "ready": False,
+            "status": "DISCONNECTED",
+            "notice": "Live production banking/payment event stream is disconnected (offline mode only).",
+        }
     return ReadinessStatusResponse(**readiness)

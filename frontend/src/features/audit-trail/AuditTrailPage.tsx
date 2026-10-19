@@ -73,7 +73,7 @@ export const AuditTrailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.getAudit({ offset, limit: PAGE_SIZE });
+      const res = await api.getAudit({ offset, limit: PAGE_SIZE, mode });
       setRecords(res.records || []);
       setTotalRecords(res.total_records || 0);
     } catch (err: unknown) {
@@ -81,7 +81,7 @@ export const AuditTrailPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [offset]);
+  }, [offset, mode]);
 
   useEffect(() => {
     fetchRecords();
@@ -91,7 +91,7 @@ export const AuditTrailPage: React.FC = () => {
   const currentPage = Math.floor(offset / PAGE_SIZE) + 1;
 
   const handleDownload = (format: 'jsonl' | 'csv') => {
-    const url = `/api/audit/export?format=${format}`;
+    const url = `/api/audit/export?format=${format}&mode=${encodeURIComponent(mode)}`;
     window.open(url, '_blank');
   };
 
@@ -280,7 +280,9 @@ export const AuditTrailPage: React.FC = () => {
           </div>
         ) : records.length === 0 ? (
           <div style={{ padding: '36px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            No audit records present in local store.
+            {isLiveDisconnected
+              ? 'LIVE SOURCE DISCONNECTED: Production event ingestion is offline. No live decision audit records to display. Select IEEE-CIS BENCHMARK or SYNTHETIC FIXTURE to inspect ledger entries.'
+              : 'No audit records present in local store.'}
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>

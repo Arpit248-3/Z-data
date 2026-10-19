@@ -1,0 +1,16 @@
+{
+  "scenario1_synthetic": true,
+  "scenario2_ieeecis_overview": true,
+  "scenario2_ieeecis_scoring": true,
+  "scenario3_live_overview": true,
+  "scenario3_live_sandbox": true,
+  "scenario4_switching_and_persistence": true,
+  "scenario5_route_case_explorer": true,
+  "scenario5_route_policy_comparison": true,
+  "scenario5_route_audit_trail": true,
+  "scenario5_route_model_card": true,
+  "scenario5_route_drift_shift": true,
+  "scenario5_route_shift_storm": true,
+  "scenario6_guardrail_leakage": true,
+  "scenario6_guardrail_live_scoring_rejected": true
+}

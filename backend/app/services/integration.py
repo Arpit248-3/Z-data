@@ -266,9 +266,24 @@ class IntegrationService:
                 split_provenance={"split_hash": "07b55a4ed74f238c9ef5b779a749770cf274d4709a4389d9eab860dd9068fbdd"},
                 notice="Synthetic smoke fixture model for fast UI and API functional verification.",
             )
+        elif mode_upper in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
+            return ModelCardResponse(
+                mode="LIVE_SOURCE_NOT_CONNECTED",
+                model_id="LIVE_DISCONNECTED",
+                architecture_version="N/A",
+                architecture_type="DISCONNECTED_STREAM",
+                sub_models=[],
+                calibrator_type="NONE",
+                feature_count=0,
+                features_sample=[],
+                manifest_hash="0" * 64,
+                artifact_hashes={},
+                split_provenance={},
+                notice="LIVE SOURCE NOT CONNECTED: Live banking/payment ingestion stream is disconnected. Real-time inference pipeline inactive.",
+            )
         else:
             raise ValueError(
-                f"Unknown mode '{mode}'. Supported modes: 'IEEE_CIS_OFFLINE_BENCHMARK', 'SYNTHETIC_SMOKE_ONLY'."
+                f"Unknown mode '{mode}'. Supported modes: 'IEEE_CIS_OFFLINE_BENCHMARK', 'SYNTHETIC_SMOKE_ONLY', 'LIVE_SOURCE_NOT_CONNECTED'."
             )
 
     def get_drift_report(self, mode: str = "IEEE_CIS_OFFLINE_BENCHMARK") -> DriftReportAPIResponse:

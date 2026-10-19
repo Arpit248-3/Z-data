@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../lib/api/client';
 import { ReplayRowItem, ScenarioItem } from '../../lib/api/types';
+import { useMode } from '../../context/ModeContext';
 import { LoadingState } from '../../components/LoadingState';
 import { ErrorState } from '../../components/ErrorState';
 
@@ -93,6 +94,7 @@ const getActionMeta = (action: string) => {
 };
 
 export const ShiftStormPage: React.FC = () => {
+  const { mode, isRealDataMode, isLiveDisconnected } = useMode();
   const [scenarios, setScenarios] = useState<ScenarioItem[]>([]);
   const [selectedScenario, setSelectedScenario] = useState<string>('S0');
   const [rows, setRows] = useState<ReplayRowItem[]>([]);
@@ -201,10 +203,10 @@ export const ShiftStormPage: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
           <div>
             <div className="page-header-eyebrow" style={{ marginBottom: '6px' }}>
-              <span className="badge badge-synthetic">
-                <span>OFFLINE REPLAY PROTOCOL</span>
+              <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`}>
+                <span>{mode}</span>
               </span>
-              <span>DETERMINISTIC EVALUATION ENGINE</span>
+              <span>{isRealDataMode ? 'IEEE-CIS OFFLINE BENCHMARK HARNESS' : isLiveDisconnected ? 'LIVE INGESTION DISCONNECTED' : 'OFFLINE REPLAY PROTOCOL'}</span>
               <span style={{ color: 'var(--border-active)' }}>|</span>
               <span style={{ color: 'var(--text-secondary)' }}>
                 {rows.length > 0 ? `${rows.length} loaded cases` : 'Awaiting stream'}
@@ -248,6 +250,30 @@ export const ShiftStormPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {isLiveDisconnected && (
+        <div
+          className="card"
+          style={{
+            borderLeft: '4px solid var(--color-fraud-alert, #ef4444)',
+            backgroundColor: 'rgba(239, 68, 68, 0.08)',
+            padding: '14px 18px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="badge badge-alert">DISCONNECTED</span>
+            <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--color-fraud-alert-bright)' }}>
+              LIVE EDGE BANKING BROKERS OFFLINE
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+            Live production transaction event streaming is disconnected. Real-time shift replay is running against frozen offline validation partitions.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <LoadingState message="Streaming chronological evaluation replay rows..." />

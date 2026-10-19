@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './client';
-import { ApiClientError, HealthResponse, OverviewResponse, SystemStatusResponse } from './types';
+import { ApiClientError, HealthResponse, OperatingMode, OverviewResponse, SystemStatusResponse } from './types';
 
 export interface UseApiStatusResult {
   health: HealthResponse | null;
@@ -11,7 +11,7 @@ export interface UseApiStatusResult {
   refetch: () => Promise<void>;
 }
 
-export function useApiStatus(): UseApiStatusResult {
+export function useApiStatus(mode?: OperatingMode | string): UseApiStatusResult {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [status, setStatus] = useState<SystemStatusResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,7 +21,7 @@ export function useApiStatus(): UseApiStatusResult {
     setLoading(true);
     setError(null);
     try {
-      const [h, s] = await Promise.all([api.getHealth(), api.getStatus()]);
+      const [h, s] = await Promise.all([api.getHealth(), api.getStatus(mode)]);
       setHealth(h);
       setStatus(s);
     } catch (err: unknown) {
@@ -36,7 +36,7 @@ export function useApiStatus(): UseApiStatusResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     fetchStatus();
@@ -59,7 +59,7 @@ export interface UseOverviewResult {
   refetch: () => Promise<void>;
 }
 
-export function useOverview(): UseOverviewResult {
+export function useOverview(mode?: OperatingMode | string): UseOverviewResult {
   const [overview, setOverview] = useState<OverviewResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<ApiClientError | null>(null);
@@ -68,7 +68,7 @@ export function useOverview(): UseOverviewResult {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.getOverview();
+      const data = await api.getOverview(mode);
       setOverview(data);
     } catch (err: unknown) {
       if (err instanceof ApiClientError) {
@@ -82,7 +82,7 @@ export function useOverview(): UseOverviewResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     fetchOverview();

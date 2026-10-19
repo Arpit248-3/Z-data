@@ -23,9 +23,9 @@ const SignalCoreScene = React.lazy(() =>
 
 export const OverviewPage: React.FC = () => {
   const navigate = useNavigate();
-  const { status, isBackendConnected, loading: statusLoading, error: statusError, refetch: refetchStatus } = useApiStatus();
-  const { overview, refetch: refetchOverview } = useOverview();
   const { mode, isRealDataMode, isLiveDisconnected } = useMode();
+  const { status, isBackendConnected, loading: statusLoading, error: statusError, refetch: refetchStatus } = useApiStatus(mode);
+  const { overview, refetch: refetchOverview } = useOverview(mode);
 
   const handleRetryAll = () => {
     refetchStatus();
@@ -215,88 +215,121 @@ export const OverviewPage: React.FC = () => {
               badgeText="3D DETAIL"
             />
 
-            {/* Card 2: Review Capacity (130 Reviews Cap / 6.525% Primary Budget) */}
+            {/* Card 2: Review Capacity */}
             <MetricCard
               label="REVIEW CAPACITY"
-              value="130 / 130"
+              value={isLiveDisconnected ? '0 / 0' : isRealDataMode ? '5,993 / 5,993' : '130 / 130'}
               unit="slots"
-              subtext="1.5x budget (6.525%) • Cap saturated"
+              subtext={
+                isLiveDisconnected
+                  ? 'Live stream disconnected • No active quota'
+                  : isRealDataMode
+                  ? '1.5x budget (5.075%) • Cap saturated'
+                  : '1.5x budget (6.525%) • Cap saturated'
+              }
               icon={<UserCheck size={16} />}
               variant="amber"
-              progressPercent={100}
+              progressPercent={isLiveDisconnected ? 0 : 100}
               clickable={true}
               onClick={() => scrollToSection('review-capacity-pane')}
               detail={reviewCapacityDetail}
-              badgeText="100% CAP"
+              badgeText={isLiveDisconnected ? 'OFFLINE' : '100% CAP'}
             />
 
-            {/* Card 3: Deferral Ratio (48.7% Deferred Rate / 974 Cases) */}
+            {/* Card 3: Deferral Ratio */}
             <MetricCard
               label="DEFERRAL RATIO"
-              value={overview?.deferred_rate ? `${(overview.deferred_rate * 100).toFixed(1)}%` : '48.7%'}
-              unit="974 cases"
+              value={
+                isLiveDisconnected
+                  ? '0.0%'
+                  : isRealDataMode
+                  ? (overview?.deferred_rate ? `${(overview.deferred_rate * 100).toFixed(1)}%` : '2.0%')
+                  : (overview?.deferred_rate ? `${(overview.deferred_rate * 100).toFixed(1)}%` : '48.7%')
+              }
+              unit={isLiveDisconnected ? '0 cases' : isRealDataMode ? '2,328 cases' : '974 cases'}
               subtext="Capacity shed to HELD/DEFERRED (R6)"
               icon={<Filter size={16} />}
               variant="violet"
-              progressPercent={48.7}
+              progressPercent={isLiveDisconnected ? 0 : isRealDataMode ? 2.0 : 48.7}
               clickable={true}
               onClick={() => scrollToSection('topology-section')}
               detail={deferralRatioDetail}
-              badgeText="974 SHED"
+              badgeText={isLiveDisconnected ? '0 SHED' : isRealDataMode ? '2,328 SHED' : '974 SHED'}
             />
 
-            {/* Card 4: Precision @ Touched (7.69% Precision / 9.01% Recall) */}
+            {/* Card 4: Precision @ Touched */}
             <MetricCard
               label="PRECISION @ TOUCHED"
-              value="7.69%"
-              unit="10/130 caught"
-              subtext="9.01% recall on test look (10/111)"
+              value={isLiveDisconnected ? 'N/A' : isRealDataMode ? '34.49%' : '7.69%'}
+              unit={isLiveDisconnected ? '0/0 caught' : isRealDataMode ? '2,067/5,993 caught' : '10/130 caught'}
+              subtext={
+                isLiveDisconnected
+                  ? 'Live stream disconnected • Evaluation suspended'
+                  : isRealDataMode
+                  ? '50.86% recall on test partition (2,067/4,064)'
+                  : '9.01% recall on test look (10/111)'
+              }
               icon={<Crosshair size={16} />}
               variant="cyan"
-              progressPercent={7.69}
+              progressPercent={isLiveDisconnected ? 0 : isRealDataMode ? 34.49 : 7.69}
               clickable={true}
               onClick={() => navigate('/policy-comparison')}
               detail={precisionTouchedDetail}
-              badgeText="TEST LOOK"
+              badgeText={isRealDataMode ? 'IEEE-CIS TEST' : 'TEST LOOK'}
             />
           </section>
         );
       })()}
 
       {/* 3. Outcome Distribution Stacked Bar (Milestone 3A) */}
-      <section aria-label="Outcome Distribution Telemetry" className="sg-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <BarChart3 size={18} style={{ color: 'var(--accent-primary)' }} />
-            <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Outcome Distribution & Triage Proportions
-            </span>
-            <span className="badge badge-synthetic" style={{ fontSize: '11px', padding: '2px 8px' }}>
-              <span>N = 2,000 cases</span>
-            </span>
-          </div>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}>
-            G3_LOOK_1 Canonical Fixture
-          </span>
-        </div>
+      {(() => {
+        const totalTx = isLiveDisconnected ? 0 : isRealDataMode ? 118108 : 2000;
+        const fraudAlertCount = isLiveDisconnected ? 0 : isRealDataMode ? 1280 : 11;
+        const fraudAlertPct = totalTx > 0 ? ((fraudAlertCount / totalTx) * 100).toFixed(2) : '0.00';
+
+        const reviewCount = isLiveDisconnected ? 0 : isRealDataMode ? 4713 : 119;
+        const reviewPct = totalTx > 0 ? ((reviewCount / totalTx) * 100).toFixed(2) : '0.00';
+
+        const routineCount = isLiveDisconnected ? 0 : isRealDataMode ? 109787 : 896;
+        const routinePct = totalTx > 0 ? ((routineCount / totalTx) * 100).toFixed(2) : '0.00';
+
+        const deferredCount = isLiveDisconnected ? 0 : isRealDataMode ? 2328 : 974;
+        const deferredPct = totalTx > 0 ? ((deferredCount / totalTx) * 100).toFixed(2) : '0.00';
+
+        return (
+          <section aria-label="Outcome Distribution Telemetry" className="sg-card" style={{ padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <BarChart3 size={18} style={{ color: 'var(--accent-primary)' }} />
+                <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                  Outcome Distribution & Triage Proportions
+                </span>
+                <span className={`badge ${isRealDataMode ? 'badge-ready' : isLiveDisconnected ? 'badge-alert' : 'badge-synthetic'}`} style={{ fontSize: '11px', padding: '2px 8px' }}>
+                  <span>{isLiveDisconnected ? 'N = 0 cases (Disconnected)' : `N = ${totalTx.toLocaleString()} cases`}</span>
+                </span>
+              </div>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                {isRealDataMode ? 'IEEE-CIS Chronological Test Partition' : isLiveDisconnected ? 'Streaming Bus Offline' : 'G3_LOOK_1 Canonical Fixture'}
+              </span>
+            </div>
 
         {/* Horizontal Stacked Distribution Bar */}
         <div style={{ width: '100%', height: '16px', borderRadius: '4px', overflow: 'hidden', display: 'flex', background: 'var(--bg-surface-subdued)', border: '1px solid var(--border-default)' }}>
           <div
-            style={{ width: '0.55%', minWidth: '6px', backgroundColor: 'var(--color-fraud-alert)' }}
-            title="FRAUD_ALERT: 11 cases (0.55%)"
+            style={{ width: `${fraudAlertPct}%`, minWidth: fraudAlertCount > 0 ? '4px' : '0px', backgroundColor: 'var(--color-fraud-alert)' }}
+            title={`FRAUD_ALERT: ${fraudAlertCount.toLocaleString()} cases (${fraudAlertPct}%)`}
           />
           <div
-            style={{ width: '5.95%', backgroundColor: 'var(--color-manual-review)' }}
-            title="MANUAL_REVIEW: 119 cases (5.95%)"
+            style={{ width: `${reviewPct}%`, backgroundColor: 'var(--color-manual-review)' }}
+            title={`MANUAL_REVIEW: ${reviewCount.toLocaleString()} cases (${reviewPct}%)`}
           />
           <div
-            style={{ width: '44.80%', backgroundColor: 'var(--color-routine)' }}
-            title="ROUTINE: 896 cases (44.80%)"
+            style={{ width: `${routinePct}%`, backgroundColor: 'var(--color-routine)' }}
+            title={`ROUTINE: ${routineCount.toLocaleString()} cases (${routinePct}%)`}
           />
           <div
-            style={{ width: '48.70%', backgroundColor: 'var(--color-epistemic-defer-bright)' }}
-            title="HELD / DEFERRED: 974 cases (48.70%)"
+            style={{ width: `${deferredPct}%`, backgroundColor: 'var(--color-epistemic-defer-bright)' }}
+            title={`HELD / DEFERRED: ${deferredCount.toLocaleString()} cases (${deferredPct}%)`}
           />
         </div>
 
@@ -313,10 +346,10 @@ export const OverviewPage: React.FC = () => {
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '22px', fontWeight: 800, color: 'var(--color-fraud-alert-bright)' }}>
-                11
+                {fraudAlertCount.toLocaleString()}
               </div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                0.55% of total
+                {fraudAlertPct}% of total
               </div>
             </div>
           </div>
@@ -332,10 +365,10 @@ export const OverviewPage: React.FC = () => {
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '22px', fontWeight: 800, color: 'var(--color-manual-review-bright)' }}>
-                119
+                {reviewCount.toLocaleString()}
               </div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                5.95% of total
+                {reviewPct}% of total
               </div>
             </div>
           </div>
@@ -351,10 +384,10 @@ export const OverviewPage: React.FC = () => {
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '22px', fontWeight: 800, color: 'var(--color-routine-bright)' }}>
-                896
+                {routineCount.toLocaleString()}
               </div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                44.80% of total
+                {routinePct}% of total
               </div>
             </div>
           </div>
@@ -370,15 +403,17 @@ export const OverviewPage: React.FC = () => {
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontFamily: 'var(--font-mono)', fontSize: '22px', fontWeight: 800, color: 'var(--color-epistemic-defer-bright)' }}>
-                974
+                {deferredCount.toLocaleString()}
               </div>
               <div style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                48.70% of total
+                {deferredPct}% of total
               </div>
             </div>
           </div>
         </div>
       </section>
+        );
+      })()}
 
       {/* 4. Primary Analytical Visual: Compact Signal Core Routing Topology (350px Height) */}
       <section id="topology-section" aria-label="Signal Core Routing Topology">

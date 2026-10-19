@@ -36,6 +36,7 @@ def list_cases(
         risk_min=risk_min,
         risk_max=risk_max,
         search=search,
+        mode=mode,
     )
 
 
@@ -52,7 +53,7 @@ def get_case(
     case_service: CaseService = Depends(get_case_service),
 ) -> CaseDetailResponse:
     """Retrieve full signals, decision rationale, and feature metadata for a specific case."""
-    case = case_service.get_case_detail(case_id=case_id)
+    case = case_service.get_case_detail(case_id=case_id, mode=mode)
     if case is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

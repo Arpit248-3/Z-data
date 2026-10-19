@@ -40,8 +40,15 @@ class ScoringService:
         self.integration = integration_service
 
     def score_sandbox_transaction(self, request: SandboxScoreRequest) -> SandboxScoreResponse:
-        t0 = time.perf_counter()
         mode_upper = (request.mode or "SYNTHETIC_SMOKE_ONLY").strip().upper()
+        # Validate mode
+        if mode_upper in ("LIVE_SOURCE_NOT_CONNECTED", "LIVE"):
+            raise ValueError("Live source is disconnected. Real-time live scoring is disabled while operating in offline evidence mode.")
+
+        if mode_upper not in ("IEEE_CIS_OFFLINE_BENCHMARK", "IEEE_CIS", "REAL", "SYNTHETIC_SMOKE_ONLY", "SYNTHETIC"):
+            raise ValueError(f"Unsupported scoring mode: '{request.mode}'.")
+
+        t0 = time.perf_counter()
 
         # Branch A: Real-data IEEE-CIS offline benchmark scoring
         if mode_upper in ("IEEE_CIS_OFFLINE_BENCHMARK", "IEEE_CIS", "REAL"):

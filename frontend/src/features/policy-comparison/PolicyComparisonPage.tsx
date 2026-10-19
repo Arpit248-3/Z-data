@@ -45,14 +45,14 @@ export const PolicyComparisonPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.getPoliciesCompare(multiple);
+      const res = await api.getPoliciesCompare(multiple, mode);
       setData(res);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to retrieve policy comparison data');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     fetchComparison(budgetMultiple);

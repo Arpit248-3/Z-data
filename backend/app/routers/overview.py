@@ -1,6 +1,6 @@
 """SignalGate Overview, Consolidated Results, and Scenarios Routers"""
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from backend.app.schemas import (
     ErrorResponse,
@@ -17,10 +17,11 @@ router = APIRouter(tags=["Overview & Evaluation"])
 
 @router.get("/overview", response_model=OverviewResponse)
 def get_overview(
+    mode: Optional[str] = None,
     overview_service: OverviewService = Depends(get_overview_service),
 ) -> OverviewResponse:
     """Retrieve executive evaluation summary strictly from validated project artifacts."""
-    return overview_service.get_overview()
+    return overview_service.get_overview(mode=mode)
 
 
 @router.get(

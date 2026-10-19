@@ -276,6 +276,157 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Operational Evidence Mode Switcher Component
+   --------------------------------------------------------------------------- */
+.mode-switcher-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mode-switcher-trigger {
+  cursor: pointer;
+  height: 28px;
+  padding: 0 10px;
+  gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.mode-switcher-trigger:not(.badge) {
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-surface-raised);
+  color: var(--text-primary);
+}
+
+.mode-switcher-trigger:hover {
+  filter: brightness(1.08);
+}
+
+.mode-switcher-trigger.is-open {
+  box-shadow: 0 0 0 2px var(--accent-primary-tint);
+}
+
+.mode-switcher-trigger-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mode-switcher-chevron {
+  opacity: 0.75;
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.mode-switcher-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.mode-switcher-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1000;
+  min-width: 330px;
+  max-width: 360px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-dropdown);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mode-switcher-dropdown-header {
+  padding: 6px 8px 6px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mode-switcher-api-ready {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-routine-bright);
+  letter-spacing: 0.05em;
+}
+
+.mode-switcher-option {
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+}
+
+.mode-switcher-option:hover {
+  background-color: var(--bg-surface-raised);
+  border-color: var(--border-subtle);
+}
+
+.mode-switcher-option.is-selected {
+  background-color: var(--accent-primary-tint);
+  border-color: var(--accent-primary);
+}
+
+.mode-switcher-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mode-switcher-active-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  letter-spacing: 0.06em;
+}
+
+.mode-switcher-option-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  padding-left: 2px;
+}
+
+.mode-switcher-dropdown-footer {
+  margin-top: 2px;
+  padding: 6px 8px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 0 0 var(--radius-xs) var(--radius-xs);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+/* ---------------------------------------------------------------------------
    Buttons (Disciplined 4px Geometry, Zero Shadows, Zero Gradients)
    --------------------------------------------------------------------------- */
 .sg-btn {

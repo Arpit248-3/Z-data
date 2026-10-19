@@ -901,6 +901,120 @@
   color: #334155;
 }
 
+/* Operational Evidence Mode Selector - Light Theme Harmonization */
+[data-theme="light"] .mode-switcher-trigger,
+.light-theme .mode-switcher-trigger {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .mode-switcher-trigger:hover,
+.light-theme .mode-switcher-trigger:hover {
+  filter: brightness(0.96);
+}
+
+[data-theme="light"] .mode-switcher-trigger.is-open,
+.light-theme .mode-switcher-trigger.is-open {
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.25);
+}
+
+[data-theme="light"] .mode-switcher-trigger.badge-ready,
+.light-theme .mode-switcher-trigger.badge-ready {
+  background-color: rgba(5, 150, 105, 0.08);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+  color: #047857;
+}
+
+[data-theme="light"] .mode-switcher-trigger.badge-synthetic,
+.light-theme .mode-switcher-trigger.badge-synthetic {
+  background-color: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #6D28D9;
+}
+
+[data-theme="light"] .mode-switcher-trigger.badge-alert,
+.light-theme .mode-switcher-trigger.badge-alert {
+  background-color: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #B91C1C;
+}
+
+[data-theme="light"] .mode-switcher-dropdown,
+.light-theme .mode-switcher-dropdown {
+  background-color: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .mode-switcher-dropdown-header,
+.light-theme .mode-switcher-dropdown-header {
+  border-bottom: 1px solid #E2E8F0;
+  color: #64748B;
+}
+
+[data-theme="light"] .mode-switcher-api-ready,
+.light-theme .mode-switcher-api-ready {
+  color: #047857;
+  background-color: rgba(5, 150, 105, 0.10);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+}
+
+[data-theme="light"] .mode-switcher-option,
+.light-theme .mode-switcher-option {
+  color: #0F172A;
+}
+
+[data-theme="light"] .mode-switcher-option:hover,
+.light-theme .mode-switcher-option:hover {
+  background-color: #F8FAFC;
+  border-color: #E2E8F0;
+}
+
+[data-theme="light"] .mode-switcher-option.is-selected,
+.light-theme .mode-switcher-option.is-selected {
+  background-color: rgba(13, 148, 136, 0.08);
+  border-color: #0D9488;
+}
+
+[data-theme="light"] .mode-switcher-active-tag,
+.light-theme .mode-switcher-active-tag {
+  color: #0D9488;
+}
+
+[data-theme="light"] .mode-switcher-option-desc,
+.light-theme .mode-switcher-option-desc {
+  color: #334155; /* Slate 700 on #FFFFFF = 9.1:1 contrast ratio (WCAG AAA) */
+}
+
+[data-theme="light"] .mode-switcher-dropdown-footer,
+.light-theme .mode-switcher-dropdown-footer {
+  border-top: 1px solid #E2E8F0;
+  color: #64748B;
+  background-color: #F8FAFC;
+}
+
+[data-theme="light"] .mode-switcher-option .badge-synthetic,
+.light-theme .mode-switcher-option .badge-synthetic {
+  background-color: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.25);
+  color: #6D28D9;
+}
+
+[data-theme="light"] .mode-switcher-option .badge-ready,
+.light-theme .mode-switcher-option .badge-ready {
+  background-color: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.25);
+  color: #047857;
+}
+
+[data-theme="light"] .mode-switcher-option .badge-alert,
+.light-theme .mode-switcher-option .badge-alert {
+  background-color: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.25);
+  color: #B91C1C;
+}
+
 [data-theme="light"] .provenance-footer,
 .light-theme .provenance-footer {
   background-color: #FFFFFF;

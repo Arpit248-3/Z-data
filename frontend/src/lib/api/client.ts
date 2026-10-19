@@ -22,7 +22,7 @@ import {
 } from './types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const DEFAULT_TIMEOUT_MS = 8000;
+const DEFAULT_TIMEOUT_MS = 30000;
 
 export async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -122,10 +122,16 @@ export const api = {
       }
     ),
   verifyAuditChain: () => request<AuditVerifyResponse>('/api/audit/verify'),
-  getOverview: () => request<OverviewResponse>('/api/overview'),
-  getPoliciesCompare: (budgetMultiple?: string) => {
-    const query = budgetMultiple ? `?budget_multiple=${encodeURIComponent(budgetMultiple)}` : '';
-    return request<PolicyCompareResponse>(`/api/policies/compare${query}`);
+  getOverview: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<OverviewResponse>(`/api/overview${query}`);
+  },
+  getPoliciesCompare: (budgetMultiple?: string, mode?: OperatingMode | string) => {
+    const searchParams = new URLSearchParams();
+    if (budgetMultiple) searchParams.set('budget_multiple', budgetMultiple);
+    if (mode) searchParams.set('mode', mode);
+    const qs = searchParams.toString();
+    return request<PolicyCompareResponse>(`/api/policies/compare${qs ? `?${qs}` : ''}`);
   },
   getScenarios: () => request<ScenariosResponse>('/api/scenarios'),
   getReplayRows: (params?: { scenario?: string; offset?: number; limit?: number }) => {
@@ -156,15 +162,32 @@ export const api = {
     const qs = searchParams.toString();
     return request<CasesResponse>(`/api/cases${qs ? `?${qs}` : ''}`);
   },
-  getCaseDetail: (caseId: string) => request<CaseDetailResponse>(`/api/cases/${encodeURIComponent(caseId)}`),
-  getAudit: (params?: { offset?: number; limit?: number }) => {
+  getCaseDetail: (caseId: string, mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<CaseDetailResponse>(`/api/cases/${encodeURIComponent(caseId)}${query}`);
+  },
+  getAudit: (params?: {
+    offset?: number;
+    limit?: number;
+    action?: string;
+    reason_code?: string;
+    case_id?: string;
+    mode?: OperatingMode | string;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.offset !== undefined) searchParams.set('offset', String(params.offset));
     if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params?.action) searchParams.set('action', params.action);
+    if (params?.reason_code) searchParams.set('reason_code', params.reason_code);
+    if (params?.case_id) searchParams.set('case_id', params.case_id);
+    if (params?.mode) searchParams.set('mode', params.mode);
     const qs = searchParams.toString();
     return request<AuditListResponse>(`/api/audit${qs ? `?${qs}` : ''}`);
   },
-  getResults: () => request<ResultsResponse>('/api/results'),
+  getResults: (mode?: OperatingMode | string) => {
+    const query = mode ? `?mode=${encodeURIComponent(mode)}` : '';
+    return request<ResultsResponse>(`/api/results${query}`);
+  },
   scoreSandbox: (features: Record<string, unknown>, mode?: OperatingMode | string) =>
     request<SandboxScoreResponse>('/api/score-sandbox', {
       method: 'POST',

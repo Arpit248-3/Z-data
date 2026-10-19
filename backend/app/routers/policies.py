@@ -22,6 +22,10 @@ def compare_policies(
         None,
         description="Optional budget sweep multiple: '1.0x', '1.5x', '2.0x', or '3.0x'.",
     ),
+    mode: Optional[str] = Query(
+        None,
+        description="Operational evidence mode (SYNTHETIC_SMOKE_ONLY, IEEE_CIS_OFFLINE_BENCHMARK, LIVE_SOURCE_NOT_CONNECTED)",
+    ),
     policy_service: PolicyService = Depends(get_policy_service),
 ) -> PolicyCompareResponse:
     """Return offline matched-budget policy comparison data (B1, B2, B3a, B4, SignalGate)."""
@@ -36,7 +40,7 @@ def compare_policies(
             },
         )
 
-    res = policy_service.compare_policies(budget_multiple=budget_multiple)
+    res = policy_service.compare_policies(budget_multiple=budget_multiple, mode=mode)
     if res is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

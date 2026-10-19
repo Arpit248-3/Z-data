@@ -26,6 +26,7 @@ def list_audit_records(
     action: Optional[str] = Query(None, description="Filter by triage action."),
     reason_code: Optional[str] = Query(None, description="Filter by reason code."),
     case_id: Optional[str] = Query(None, description="Filter by case identifier."),
+    mode: Optional[str] = Query(None, description="Operational evidence mode filter."),
     audit_service: AuditService = Depends(get_audit_service),
 ) -> AuditListResponse:
     """Read actual persisted JSONL audit records with filtering and pagination."""
@@ -35,6 +36,7 @@ def list_audit_records(
         action=action,
         reason_code=reason_code,
         case_id=case_id,
+        mode=mode,
     )
 
 
@@ -44,6 +46,7 @@ def export_audit_records(
     action: Optional[str] = Query(None, description="Filter by triage action."),
     reason_code: Optional[str] = Query(None, description="Filter by reason code."),
     case_id: Optional[str] = Query(None, description="Filter by case identifier."),
+    mode: Optional[str] = Query(None, description="Operational evidence mode filter."),
     audit_service: AuditService = Depends(get_audit_service),
 ) -> Response:
     """Download filtered audit trail records as JSONL or CSV."""
@@ -52,6 +55,7 @@ def export_audit_records(
         action=action,
         reason_code=reason_code,
         case_id=case_id,
+        mode=mode,
     )
 
     media_type = "application/x-ndjson" if format == "jsonl" else "text/csv"

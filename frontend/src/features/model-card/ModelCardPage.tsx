@@ -205,7 +205,7 @@ export const ModelCardPage: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([api.getOverview(), api.getModelCard(mode)])
+    Promise.all([api.getOverview(mode), api.getModelCard(mode)])
       .then(([o, mc]) => {
         if (isMounted) {
           setOverview(o);
