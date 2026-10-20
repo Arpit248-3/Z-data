@@ -67,6 +67,6 @@ def score_sandbox(
             detail={
                 "code": "SCORING_ERROR",
                 "message": "An unexpected error occurred during model scoring.",
-                "details": {},
+                "details": {"error_type": type(e).__name__, "error": str(e)},
             },
         )

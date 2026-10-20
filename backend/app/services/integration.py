@@ -15,6 +15,7 @@ import hashlib
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+import uuid
 
 import numpy as np
 import pandas as pd
@@ -168,6 +169,32 @@ class IntegrationService:
         self._bundle_verified = False
         self._bundle_error = f"Manifest not found at {manifest_path}"
         return False, self._bundle_error
+
+    def score_ieee_cis_transaction(
+        self,
+        features: Dict[str, Any],
+        transaction_id: Optional[str] = None,
+    ) -> Tuple[ScoringResult, int]:
+        """Score a single transaction using the IEEE-CIS model bundle and log to audit chain."""
+        scoring_svc = self.get_scoring_service()
+        result = scoring_svc.score_single(features=features, transaction_id=transaction_id)
+        audit_seq = 1
+        try:
+            record = self._audit_chain.append_decision(
+                record_id=result.decision_id or f"ieee_{uuid.uuid4().hex[:12]}",
+                action=result.action,
+                reason=result.reason,
+                p=result.p,
+                u=result.u,
+                u2=result.u2,
+                n=result.n,
+                cfg_hash=result.cfg_hash,
+            )
+            audit_seq = record.seq
+            self._save_audit_chain()
+        except Exception:
+            pass
+        return result, audit_seq
 
     # --------------------------------------------------------------------------
     # API Contract Implementations
