@@ -39,8 +39,8 @@ data/interim/
 data/processed/
 *.zip
 
-# Trained Model Artifacts (IEEE-CIS v1 Bundle & Large Binary Checkpoints)
-models/artifacts/ieee_cis_v1/
+# Trained Model Artifacts (IEEE-CIS v1 Bundle Large Binary Weights)
+models/artifacts/ieee_cis_v1/*.joblib
 logs/*.runtime.jsonl
 
 # Third-Party Reference Archive (Clean-room integration lives in integrations/ibm_architecture/)
